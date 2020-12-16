@@ -21,3 +21,10 @@ export interface IUserProfileCreate {
     is_active?: boolean;
     is_superuser?: boolean;
 }
+
+export interface IItem {
+    id: number;
+    title: string;
+    description: string;
+    owner_id: number;
+}

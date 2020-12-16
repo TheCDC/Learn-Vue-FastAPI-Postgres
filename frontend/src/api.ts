@@ -42,4 +42,7 @@ export const api = {
       token,
     });
   },
+  async getMyItems(token: string) {
+    return axios.get(`${apiUrl}/api/v1/items`, authHeaders(token))
+  }
 };
