@@ -4,12 +4,12 @@ import { actions } from './actions';
 import { ItemState } from './state';
 
 const defaultState: ItemState = {
-    items: []
-}
+    items: [],
+};
 
 export const itemModule = {
     state: defaultState,
     mutations,
     actions,
-    getters
-}
+    getters,
+};

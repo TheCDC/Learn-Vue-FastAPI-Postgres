@@ -33,6 +33,10 @@ export default new Router({
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
           children: [
             {
+              path: 'items',
+              component: () => import(/* webpackChunkName: "main-items" */ './views/main/items/Items.vue'),
+            },
+            {
               path: 'dashboard',
               component: () => import(/* webpackChunkName: "main-dashboard" */ './views/main/Dashboard.vue'),
             },
