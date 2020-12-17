@@ -1,41 +1,38 @@
 <template>
   <div>
     <v-toolbar light>
-      <v-toolbar-title> Manage Items </v-toolbar-title>
+      <v-toolbar-title> Manage Your Items </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="primary" to="/main/items/create">Create Item</v-btn>
     </v-toolbar>
-    <v-container fluid>
-      <div class="headline primary--text">Your Items, {{ user.full_name }}</div>
-      <div>
-        <v-data-table :headers="headers" :items="items">
-          <template slot="items" slot-scope="props">
-            <td>{{ props.item.title }}</td>
-            <td>{{ props.item.description }}</td>
-            <td>
-              <v-tooltip top>
-                <span>Edit </span>
-                <v-btn
-                  slot="activator"
-                  flat
-                  :to="{
-                    name: 'main-items-edit',
-                    params: { id: props.item.id },
-                  }"
-                  ><v-icon>edit</v-icon>
-                </v-btn>
-              </v-tooltip>
-              <v-tooltip top>
-                <span>Delete </span>
-                <v-btn slot="activator" flat @click="deleteItem(props.item)"
-                  ><v-icon>delete</v-icon>
-                </v-btn>
-              </v-tooltip>
-            </td>
-          </template>
-        </v-data-table>
-      </div>
-    </v-container>
+    <div>
+      <v-data-table :headers="headers" :items="items">
+        <template slot="items" slot-scope="props">
+          <td>{{ props.item.title }}</td>
+          <td>{{ props.item.description }}</td>
+          <td>
+            <v-tooltip top>
+              <span>Edit </span>
+              <v-btn
+                slot="activator"
+                flat
+                :to="{
+                  name: 'main-items-edit',
+                  params: { id: props.item.id },
+                }"
+                ><v-icon>edit</v-icon>
+              </v-btn>
+            </v-tooltip>
+            <v-tooltip top>
+              <span>Delete </span>
+              <v-btn slot="activator" flat @click="deleteItem(props.item)"
+                ><v-icon>delete</v-icon>
+              </v-btn>
+            </v-tooltip>
+          </td>
+        </template>
+      </v-data-table>
+    </div>
   </div>
 </template>
 <script lang="ts">
