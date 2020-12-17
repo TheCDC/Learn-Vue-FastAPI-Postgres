@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.formatOnSave": true
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-azuretools.vscode-docker",
+			"ms-python.vscode-pylance",
+			"ms-python.python",
+			"tht13.python",
+			"visualstudioexptteam.vscodeintellicode",
+			"eamodio.gitlens"
+		]
+	},
+}
