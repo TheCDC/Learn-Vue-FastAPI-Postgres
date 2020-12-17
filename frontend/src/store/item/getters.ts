@@ -10,8 +10,15 @@ export const getters = {
         });
         return filteredItems;
     },
+    itemsOneItem: (state: ItemState) => (itemId: number) => {
+        const filtered = state.items.filter((i) => i.id === itemId);
+        if (filtered.length > 0) {
+            return { ...filtered[0] };
+        }
+    },
 };
 
 const { read } = getStoreAccessors<ItemState, State>('');
 export const readItemsOneUser = read(getters.itemsOneUser);
 export const readItems = read(getters.items);
+export const readItemsOne = read(getters.itemsOneItem);

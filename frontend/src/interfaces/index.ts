@@ -28,3 +28,14 @@ export interface IItem {
     description: string;
     owner_id: number;
 }
+
+export interface IItemCreate {
+    title: string;
+    description: string;
+}
+
+export interface IItemUpdate {
+    title?: string;
+    description?: string;
+}
+

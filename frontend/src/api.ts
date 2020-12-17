@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from './interfaces';
+import { IUserProfile, IUserProfileUpdate, IUserProfileCreate, IItemCreate, IItemUpdate } from './interfaces';
 
 function authHeaders(token: string) {
   return {
@@ -43,6 +43,15 @@ export const api = {
     });
   },
   async getMyItems(token: string) {
-    return axios.get(`${apiUrl}/api/v1/items`, authHeaders(token))
-  }
+    return axios.get(`${apiUrl}/api/v1/items`, authHeaders(token));
+  },
+  async createItem(token: string, data: IItemCreate) {
+    return axios.post(`${apiUrl}/api/v1/items`, data, authHeaders(token));
+  },
+  async updateItem(token: string, itemId: number, data: IItemUpdate) {
+    return axios.put(`${apiUrl}/api/v1/items/${itemId}`, data, authHeaders(token));
+  },
+  async deleteItem(token: string, itemId) {
+    return axios.delete(`${apiUrl}/api/v1/items/${itemId}`, authHeaders(token));
+  },
 };
