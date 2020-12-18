@@ -9,9 +9,10 @@ import router from './router';
 import store from '@/store';
 import './registerServiceWorker';
 import 'vuetify/dist/vuetify.min.css';
-
+import { bootstrapFilters } from './views/filters';
 Vue.config.productionTip = false;
 
+bootstrapFilters();
 new Vue({
   router,
   store,

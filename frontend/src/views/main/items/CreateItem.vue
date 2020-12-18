@@ -6,9 +6,15 @@
       </v-card-title>
       <v-card-text>
         <template>
-          <v-form v-model="valid">
-            <v-text-field label="Title" v-model="title" required></v-text-field>
+          <v-form v-model="valid" @keyup.enter="submit" @submit.prevent="">
+            <v-text-field
+              @keyup.enter="submit"
+              label="Title"
+              v-model="title"
+              required
+            ></v-text-field>
             <v-textarea
+              @keyup.enter="submit"
               label="Description"
               v-model="description"
               required

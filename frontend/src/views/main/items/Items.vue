@@ -9,7 +9,7 @@
       <v-data-table :headers="headers" :items="items">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.title }}</td>
-          <td>{{ props.item.description }}</td>
+          <td>{{ props.item.description | truncate(100, "...") }}</td>
           <td>
             <v-tooltip top>
               <span>Edit </span>

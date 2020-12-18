@@ -51,6 +51,11 @@ export default new Router({
               component: () => import(/* webpackChunkName: "main-dashboard" */ './views/main/Dashboard.vue'),
             },
             {
+              path: 'chatSocket',
+              component: () => import(
+                /* webpackChunkName: "main-chatSocket" */ './views/main/chatSocket/chatSocket.vue'),
+            },
+            {
               path: 'profile',
               component: RouterComponent,
               redirect: 'profile/view',
