@@ -430,6 +430,23 @@ If you want, you can also remove the `FRONTEND` environment variables from:
 
 But it would be only to clean them up, leaving them won't really have any effect either way.
 
+## Frontend Debugging
+Configure Firefox for debugging [https://stackoverflow.com/questions/57261472/firefox-does-not-open-when-debugging-in-visual-studio-code](https://stackoverflow.com/questions/57261472/firefox-does-not-open-when-debugging-in-visual-studio-code)
+
+In `about:config`:
+
+    Preference Name                          Value  Comment
+    devtools.debugger.remote-enabled         true   Required
+    devtools.chrome.enabled                  true   Required
+    devtools.debugger.prompt-connection      false  Recommended
+    devtools.debugger.force-local            false  Set this only if you want to attach VS Code to Firefox running on a different machine (using the host property in the attach configuration)
+
+Open Firefox with `firefox -start-debugger-server`
+
+Run `npm run serve` as normal to serve the frontend. 
+
+In VS Code launch the "Vue3: Firefox" debuggging configuration. Firefox will pop up with an "Incoming Connection" prompt from VS Code so it can have permissions to debug the app.
+
 ## Deployment
 
 You can deploy the stack to a Docker Swarm mode cluster with a main Traefik proxy, set up using the ideas from <a href="https://dockerswarm.rocks" target="_blank">DockerSwarm.rocks</a>, to get automatic HTTPS certificates, etc.

@@ -1,11 +1,16 @@
 <template>
   <div id="app">
     <h2>Vue.js WebSocket Tutorial</h2>
+    <v-btn v-on:click="reset">Reset</v-btn>
+
     <h3>Send a message</h3>
     <v-form @keyup.enter="sendMessage" @submit.prevent="">
       <v-text-field @keyup.enter="sendMessage" v-model="message"></v-text-field>
       <v-btn v-on:click="sendMessage('hello')">Send Message</v-btn>
     </v-form>
+    <div v-for="(errorMessage, index) in chatErrors" v-bind:key="index">
+      {{ errorMessage.message }}
+    </div>
     <div v-for="(item, index) in received" v-bind:key="index">
       <v-card>
         <v-card-text>
@@ -23,30 +28,57 @@ interface IMessage {
   data: string;
   timestamp: number;
 }
+interface IChatError {
+  message: string;
+}
 @Component
 export default class ChatSocket extends Vue {
   message: string = "";
   received: IMessage[] = [];
+  chatErrors: IChatError[] = [];
   connection: WebSocket = new WebSocket("wss://echo.websocket.org");
-  created() {
+  public reset() {
+    this.received = [];
+    this.chatErrors = [];
     console.log("Starting connection to WebSocket Server");
-
+    new WebSocket("wss://echo.websocket.org");
     this.connection.onmessage = ((v: ChatSocket) => {
       return function (event) {
-        const val = event as IMessage;
-        console.log(val);
-        v.received.unshift(val);
+        try {
+          const val = event as IMessage;
+          console.log(val);
+          v.received.unshift(val);
+        } catch (error) {
+          v.chatErrors.push({ message: error.toString() });
+        }
       };
     })(this);
 
-    this.connection.onopen = function (event) {
-      console.log(event);
-      console.log("Successfully connected to the echo websocket server...");
+    this.connection.onopen = ((cs: ChatSocket) => {
+      return (event) => {
+        try {
+          console.log(event);
+          console.log("Successfully connected to the echo websocket server...");
+        } catch (error) {
+          cs.chatErrors.push({ message: error.toString() });
+        }
+      };
+    })(this);
+    this.connection.onerror = (err) => {
+      this.chatErrors.push({ message: err.toString() });
     };
   }
+  public mounted() {
+    this.reset();
+  }
+  created() {}
   sendMessage() {
-    this.connection.send(this.message);
-    this.message = "";
+    try {
+      this.connection.send(this.message);
+      this.message = "";
+    } catch (error) {
+      this.chatErrors.push({ message: error });
+    }
   }
 }
 </script>

@@ -14,7 +14,9 @@
 			"ms-python.python",
 			"tht13.python",
 			"visualstudioexptteam.vscodeintellicode",
-			"eamodio.gitlens"
+			"eamodio.gitlens",
+			"firefox-devtools.vscode-firefox-debug",
+			"msjsdiag.debugger-for-chrome"
 		]
 	},
 }
