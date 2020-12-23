@@ -34,6 +34,6 @@ class Item(ItemInDBBase):
     pass
 
 
-# Properties properties stored in DB
+# Additional properties stored in DB
 class ItemInDB(ItemInDBBase):
     pass
