@@ -35,7 +35,7 @@ class BekpackUser(Base):
 
 class BekpackTrip(Base):
     id = Column(Integer, primary_key=True, index=True)
-    bags = relationship("BekpackBag", back_populates="owner_list")
+    bags = relationship("BekpackBag", back_populates="owner_trip")
     color = Column(ColorType)
     is_active = Column(Boolean(), default=True)
     members = relationship(
@@ -45,14 +45,20 @@ class BekpackTrip(Base):
     )
     name = Column(String, index=True)
     owner = relationship(BekpackUser, back_populates=BekpackUser.owned_trips)
-    owner_id = Column(Integer, ForeignKey(BekpackUser.id))
+    owner_id = Column(Integer, ForeignKey(BekpackUser.id), index=True)
+    items_lists = relationship("BekpackTripItemList", back_populates="parent_trip")
 
 
 class BekpackTripItemList(Base):
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, unique=True)
     name = Column(String)
-    parent_trip_id = Column(Integer, ForeignKey(BekpackTrip.id), primary_key=True)
-    parent_user_id = Column(Integer, ForeignKey(BekpackUser.id), primary_key=True)
+    parent_trip_id = Column(
+        Integer, ForeignKey(BekpackTrip.id, ondelete="cascade"), index=True
+    )
+    parent_trip = relationship(BekpackTrip, back_populates=BekpackTrip.items_lists)
+    parent_user_id = Column(
+        Integer, ForeignKey(BekpackUser.id, ondelete="cascade"), primary_key=True
+    )
 
 
 class BekpackBag(Base):
@@ -74,6 +80,9 @@ class BekpackListItem(Base):
     list_index = Column(Integer)
     name = Column(String)
     parent_list_id = Column(
-        Integer, ForeignKey(BekpackTripItemList.id), primary_key=True, index=True
+        Integer,
+        ForeignKey(BekpackTripItemList.id, ondelete="cascade"),
+        index=True,
+        nullable=False,
     )
     quantity = Column(Integer)
