@@ -15,4 +15,23 @@ from .bekpack.bekpacklistitem import (
     BekpackListItemUpdate,
 )
 
-# TODO: import the rest of the BekPack models
+from .bekpack.bekpacktrip import (
+    BekpackTrip,
+    BekpackTripCreate,
+    BekpackTripInDB,
+    BekpackTripUpdate,
+)
+
+from .bekpack.bekpacktripitemlist import (
+    BekpackTripItemList,
+    BekpackTripItemListCreate,
+    BekpackTripItemListInDBBase,
+    BekpackTripItemListUpdate,
+)
+
+from .bekpack.bekpackuser import (
+    BekPackUser,
+    BekPackUserCreate,
+    BekPackUserInDB,
+    BekPackUserUpdate,
+)

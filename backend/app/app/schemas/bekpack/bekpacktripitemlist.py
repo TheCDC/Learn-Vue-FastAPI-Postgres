@@ -32,7 +32,7 @@ class BekpackTripItemListInDBBase(BekpackTripItemListBase):
 
 
 # Properties to return to client
-class BekpackTrip(BekpackTripItemListInDBBase):
+class BekpackTripItemList(BekpackTripItemListInDBBase):
     pass
 
 
