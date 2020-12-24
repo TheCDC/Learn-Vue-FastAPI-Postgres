@@ -13,9 +13,7 @@ class BekPackUserBase(BaseModel):
 
 # Properties to receive via API on creation
 class BekPackUserCreate(BekPackUserBase):
-    owned_bags: Set[int] = []
-    owned_trips: Set[int] = []
-    joined_trips: Set[int] = []
+    pass
 
 
 # Properties to receive via API on update
