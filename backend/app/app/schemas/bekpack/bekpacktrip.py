@@ -7,10 +7,10 @@ from .validators import validate_color
 
 # Shared properties
 class BekpackTripBase(BaseModel):
-    bags: Optional[Set[int]] = None
+    bags: Optional[Set[int]] = []
     color: Optional[str] = str("#729FCF")
     is_active: Optional[bool] = True
-    members: Optional[Set[int]] = None
+    members: Optional[Set[int]] = []
     name: Optional[str] = None
 
     @validator("color")
@@ -23,7 +23,6 @@ class BekpackTripBase(BaseModel):
 # Properties to receive on item creation
 class BekpackTripCreate(BekpackTripBase):
     name: str
-    owner_id: int
 
 
 # Properties to receive on item update
