@@ -1,5 +1,4 @@
 from typing import List
-from app.models.user import User
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session

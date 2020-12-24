@@ -1,10 +1,11 @@
+from app.schemas.bekpack.bekpacktrip import BekpackTripUpdate
 from app.tests.utils.user import create_random_user
 from app.tests.utils.item import random_lower_string
 from sqlalchemy.orm import Session
 from app.schemas import BekpackTripCreate
 from app.crud import bekpacktrip
 from app.models.bekpack import BekpackUser
-from .utils import get_bekpack_user
+from .utils import get_random_color, get_bekpack_user
 
 
 def test_create_bekpaktrip(db: Session):
@@ -64,3 +65,37 @@ def test_add_members(db: Session):
     required_members_ids = [m.id for m in other_members] + [owner.id]
     for m_r in trip_retrieved.members:
         assert m_r.id in required_members_ids
+
+
+def test_update_bekpacktrip(db: Session):
+    owner = get_bekpack_user(db)
+    newowner = get_bekpack_user(db)
+    name = random_lower_string()
+    color = get_random_color()
+    btc = BekpackTripCreate(name=name)
+    trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
+    newname = random_lower_string()
+    newcolor = get_random_color()
+    newis_active = False
+    btc_2 = BekpackTripUpdate(
+        name=newname, color=newcolor, is_active=newis_active, owner_id=newowner.id
+    )
+    trip_updated = bekpacktrip.update(db=db, db_obj=trip_created, obj_in=btc_2)
+    # assert same record
+    assert trip_created.id == trip_updated.id
+    assert trip_created.owner_id == trip_updated.owner_id
+    # assert properties changed
+    assert trip_updated.owner_id == newowner.id
+    assert trip_updated.name == newname
+    assert trip_updated.is_active == newis_active
+    assert trip_updated.color.hex.lower() == newcolor.lower()
+
+
+def test_change_owner(db: Session):
+    owner = get_bekpack_user(db)
+    newowner = get_bekpack_user(db)
+    name = random_lower_string()
+    btc = BekpackTripCreate(name=name)
+    created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
+    update = BekpackTripUpdate(owner_id=newowner.id)
+    updated = bekpacktrip.update(db, db_obj=created, obj_in=update)
