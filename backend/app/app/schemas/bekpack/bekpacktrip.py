@@ -1,16 +1,23 @@
 from typing import Optional, Set
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator, ValidationError
 
-from colour import Color
+from .validators import validate_color
+
 
 # Shared properties
 class BekpackTripBase(BaseModel):
     bags: Optional[Set[int]] = None
-    color: Optional[Color] = Color("blue")
+    color: Optional[str] = str("#729FCF")
     is_active: Optional[bool] = True
     members: Optional[Set[int]] = None
     name: Optional[str] = None
+
+    @validator("color")
+    def validate_color(cls, v: str):
+        if not validate_color(v):
+            raise ValidationError("Color string must be '#XXXXXX' where X [a-fA-F0-9]")
+        return v
 
 
 # Properties to receive on item creation
@@ -22,7 +29,7 @@ class BekpackTripCreate(BekpackTripBase):
 # Properties to receive on item update
 class BekpackTripUpdate(BekpackTripBase):
     bags: Optional[Set[int]]
-    color: Optional[Color]
+    color: Optional[str]
     is_active: Optional[bool]
     members: Optional[Set[int]]
     name: Optional[str]

@@ -12,12 +12,9 @@ if TYPE_CHECKING:
 
 
 class BekPackTrip_Members(Base):
-    trip_id = Column(
-        Integer, ForeignKey("bekpacktrip.id"), primary_key=True, index=True
-    )
-    user_id = Column(
-        Integer, ForeignKey("bekpackuser.id"), primary_key=True, index=True
-    )
+    id = Column(Integer, primary_key=True)
+    trip_id = Column(Integer, ForeignKey("bekpacktrip.id"), index=True)
+    user_id = Column(Integer, ForeignKey("bekpackuser.id"), index=True)
 
 
 class BekpackUser(Base):
@@ -25,7 +22,7 @@ class BekpackUser(Base):
     is_active = Column(Boolean(), default=True)
     joined_trips = relationship(
         "BekpackTrip",
-        secondary=BekPackTrip_Members,
+        secondary=BekPackTrip_Members.__table__,
         back_populates="members",
     )
     owned_bags = relationship("BekpackBag", back_populates="owner")
@@ -40,11 +37,11 @@ class BekpackTrip(Base):
     is_active = Column(Boolean(), default=True)
     members = relationship(
         BekpackUser,
-        secondary=BekPackTrip_Members,
-        back_populates=BekpackUser.joined_trips,
+        secondary=BekPackTrip_Members.__table__,
+        back_populates="joined_trips",
     )
     name = Column(String, index=True)
-    owner = relationship(BekpackUser, back_populates=BekpackUser.owned_trips)
+    owner = relationship(BekpackUser, back_populates="owned_trips")
     owner_id = Column(Integer, ForeignKey(BekpackUser.id), index=True)
     items_lists = relationship("BekpackTripItemList", back_populates="parent_trip")
 
@@ -55,7 +52,7 @@ class BekpackTripItemList(Base):
     parent_trip_id = Column(
         Integer, ForeignKey(BekpackTrip.id, ondelete="cascade"), index=True
     )
-    parent_trip = relationship(BekpackTrip, back_populates=BekpackTrip.items_lists)
+    parent_trip = relationship(BekpackTrip, back_populates="items_lists")
     parent_user_id = Column(
         Integer, ForeignKey(BekpackUser.id, ondelete="cascade"), primary_key=True
     )
@@ -64,16 +61,15 @@ class BekpackTripItemList(Base):
 class BekpackBag(Base):
     color = Column(ColorType)
     id = Column(Integer, primary_key=True, index=True)
-    items = relationship("BekpackListItem", back_populates="owner")
+    items = relationship("BekpackListItem", backref="bag")
     name = Column(String)
-    owner = relationship(BekpackUser, back_populates=BekpackUser.owned_bags)
+    owner = relationship(BekpackUser, back_populates="owned_bags")
     owner_id = Column(Integer, ForeignKey(BekpackUser.id), index=True)
-    owner_trip = relationship(BekpackTrip, back_populates=BekpackTrip.bags)
+    owner_trip = relationship(BekpackTrip, back_populates="bags")
     owner_trip_id = Column(Integer, ForeignKey(BekpackTrip.id), index=True)
 
 
 class BekpackListItem(Base):
-    bag = relationship(BekpackBag, back_populates=BekpackBag.items)
     bag_id = Column(Integer, ForeignKey(BekpackBag.id))
     description = Column(String)
     id = Column(Integer, primary_key=True, index=True)

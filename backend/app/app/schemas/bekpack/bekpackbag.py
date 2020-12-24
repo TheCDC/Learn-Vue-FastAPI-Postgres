@@ -1,11 +1,18 @@
+from .validators import validate_color
 from typing import Set, Optional
-from colour import Color
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator, ValidationError
 
 # Shared properties
 class BekpackBagBase(BaseModel):
-    color: Optional[Color] = Color("orange")
+    color: Optional[str] = "#F57900"
+
+    @validator("color")
+    def validate_color(cls, v: str):
+        if not validate_color(v):
+            raise ValidationError("Color string must be '#XXXXXX' where X [a-fA-F0-9]")
+        return v
+
     items: Optional[Set[int]] = None
     name: Optional[str] = None
     owner_id: Optional[int] = None
