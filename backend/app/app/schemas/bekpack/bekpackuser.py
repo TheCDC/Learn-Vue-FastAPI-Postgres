@@ -1,14 +1,12 @@
-from typing import Optional, Set
+from typing import List, Optional, Set
 
 from pydantic import BaseModel
 from sqlalchemy.sql.sqltypes import Boolean
 
 # Shared properties
 class BekPackUserBase(BaseModel):
-    owned_trips: Optional[Set[int]] = None
-    joined_trips: Optional[Set[int]] = None
-    owned_bags: Optional[Set[int]] = None
-    is_active: Optional[bool] = True
+    class Config:
+        orm_mode = True
 
 
 # Properties to receive via API on creation
@@ -22,6 +20,7 @@ class BekPackUserUpdate(BekPackUserBase):
     joined_trips: Optional[Set[int]]
     owned_bags: Optional[Set[int]]
     is_active: Optional[bool]
+    owner_id: Optional[int]
 
 
 # Properties shared by models stored in DB
@@ -36,6 +35,12 @@ class BekPackUserInDBBase(BekPackUserBase):
 
 # Additional properties to return via API
 class BekPackUser(BekPackUserBase):
+    id: int
+    owned_trips: Set[int] = None
+    joined_trips: Set[int] = None
+    owned_bags: Set[int] = None
+    is_active: bool = True
+    owner_id: int
     pass
 
 

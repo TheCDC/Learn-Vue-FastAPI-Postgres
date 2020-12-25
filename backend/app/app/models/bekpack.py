@@ -27,7 +27,7 @@ class BekpackUser(Base):
     )
     owned_bags = relationship("BekpackBag", back_populates="owner")
     owned_trips = relationship("BekpackTrip", back_populates="owner")
-    owner_id = Column(Integer, ForeignKey("user.id"))
+    owner_id = Column(Integer, ForeignKey("user.id"), unique=True)
 
 
 class BekpackTrip(Base):
