@@ -45,23 +45,6 @@ class BekPackUser(BekPackUserBase):
     owned_trips: List[BekpackTrip] = []
     owner_id: int
 
-    # @validator("joined_trips")
-    # def validate_joined(cls, val):
-    #     # print("joined", [v for v in val if not isinstance(v, int)])
-    #     if len(val) > 0:
-    #         if isinstance(val[0], Base):
-    #             return [m.id for m in val]
-    #     return val
-
-    # @validator("owned_trips")
-    # def validate_owned(cls, val):
-    #     print("owned", [v for v in val if not isinstance(v, int)])
-    #     if len(val) > 0:
-    #         if isinstance(val[0], Base):
-    #             return [m.id for m in val]
-
-    #     return val
-
 
 # Additional properties stored in DB
 class BekPackUserInDB(BekPackUserInDBBase):

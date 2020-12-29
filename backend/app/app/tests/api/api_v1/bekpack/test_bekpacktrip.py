@@ -10,14 +10,15 @@ from app.tests.utils.item import create_random_item
 
 
 def test_create_delete_bekpacktrip(
-    client: TestClient, normal_user_token_headers: Dict[str, str], db: Session
+    client: TestClient, normal_user_token_headers_random: Dict[str, str], db: Session
 ) -> None:
+
     # create the user
     user = create_random_user(db)
     data = {"owner_id": user.id}
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpackusers/",
-        headers=normal_user_token_headers,
+        headers=normal_user_token_headers_random,
         json=data,
     )
     content = response.json()
@@ -30,7 +31,7 @@ def test_create_delete_bekpacktrip(
     trip_data = {"name": random_lower_string(), "color": "black"}
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
-        headers=normal_user_token_headers,
+        headers=normal_user_token_headers_random,
         json=trip_data,
     )
     content = response.json()
@@ -41,12 +42,12 @@ def test_create_delete_bekpacktrip(
     # delete trip
     response = client.delete(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id}",
-        headers=normal_user_token_headers,
+        headers=normal_user_token_headers_random,
     )
     # then delete user
     response = client.delete(
         f"{settings.API_V1_STR}/bekpack/bekpackusers/{user_id_old}",
-        headers=normal_user_token_headers,
+        headers=normal_user_token_headers_random,
     )
     content_new = response.json()
     assert "id" in content_new
