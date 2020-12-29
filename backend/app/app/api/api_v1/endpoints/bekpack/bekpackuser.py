@@ -14,22 +14,58 @@ from app.api import deps
 router = APIRouter()
 
 
+@router.get("/me", response_model=schemas.BekPackUser)
+def get_bekpackuser_me(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """Get a BekpackUser"""
+    try:
+        bp_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
+    except sqlalchemy.orm.exc.NoResultFound:
+        raise HTTPException(status_code=404, detail="BekpackUser not found")
+    if not bp_user:
+        raise HTTPException(status_code=404, detail="BekpackUser not found")
+    if not crud_user.is_superuser(current_user) and (
+        current_user.id != bp_user.owner_id
+    ):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    return bp_user
+
+
+@router.get("/{id}", response_model=schemas.BekPackUser)
+def get_bekpackuser(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: int,
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """Get a BekpackUser"""
+    bp_user = crud_bekpackuser.get(db=db, id=id)
+    if not bp_user:
+        raise HTTPException(status_code=404, detail="BekpackUser not found")
+    if not crud_user.is_superuser(current_user) and (
+        current_user.id != bp_user.owner_id
+    ):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    return bp_user
+
+
 @router.post("/", response_model=schemas.BekPackUser)
 def create_bekpackuser(
     *,
     db: Session = Depends(deps.get_db),
     user_in: schemas.BekPackUserCreate,
     current_user: User = Depends(deps.get_current_active_user),
-) -> BekpackUser:
+) -> Any:
     """Create new BekpackUser"""
     try:
-
         bp_user = crud_bekpackuser.create_with_owner(
             db=db, obj_in=user_in, owner_id=current_user.id
         )
     except sqlalchemy.exc.IntegrityError:
         raise HTTPException(status_code=404, detail="BekpackUser already exists")
-
     return bp_user
 
 
@@ -39,7 +75,7 @@ def delete_bekpackuser(
     db: Session = Depends(deps.get_db),
     id: int,
     current_user: User = Depends(deps.get_current_active_user),
-) -> BekpackUser:
+) -> Any:
     """Delete a BekpackUser"""
     bp_user = crud_bekpackuser.get(db=db, id=id)
     if not bp_user:
@@ -52,12 +88,12 @@ def delete_bekpackuser(
     return bp_user
 
 
-@router.delete("/", response_model=schemas.BekPackUser)
-def delete_bekpackuser(
+@router.delete("/me", response_model=schemas.BekPackUser)
+def delete_bekpackuser_me(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-) -> BekpackUser:
+) -> Any:
     """Delete a BekpackUser"""
     try:
         bp_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)

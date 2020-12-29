@@ -1,34 +1,37 @@
 from typing import Optional, Set
 
-from pydantic import BaseModel, validator, ValidationError
+from pydantic import BaseModel, validator
 
-from .validators import validate_color
-
+from pydantic.color import Color
+from ...crud.encoders import convert_color
 
 # Shared properties
 class BekpackTripBase(BaseModel):
-    bags: Optional[Set[int]] = []
-    color: Optional[str] = str("#729FCF")
-    is_active: Optional[bool] = True
-    members: Optional[Set[int]] = []
-    name: Optional[str] = None
+    name: Optional[str]
+    color: Optional[Color]
+
+    class Config:
+        orm_mode = True
+        json_encoders = {Color: convert_color}
 
     @validator("color")
-    def validate_color(cls, v: str):
-        if not validate_color(v):
-            raise ValidationError("Color string must be '#XXXXXX' where X [a-fA-F0-9]")
-        return v
+    def validate(cls, c: Color):
+        if isinstance(c, Color):
+            return c.as_hex()
+        elif isinstance(c, str):
+            return Color(c)
+        return c
 
 
 # Properties to receive on item creation
 class BekpackTripCreate(BekpackTripBase):
     name: str
+    color: Color = "black"
 
 
 # Properties to receive on item update
 class BekpackTripUpdate(BekpackTripBase):
-    bags: Optional[Set[int]]
-    color: Optional[str]
+    color: Optional[Color]
     is_active: Optional[bool]
     members: Optional[Set[int]]
     name: Optional[str]
@@ -47,7 +50,8 @@ class BekpackTripInDBBase(BekpackTripBase):
 
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
-    pass
+    bags: Set[int] = []
+    members: Set[int] = []
 
 
 # Additional properties stored in DB

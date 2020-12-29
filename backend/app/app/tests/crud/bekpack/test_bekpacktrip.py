@@ -24,13 +24,18 @@ def test_create_multiple_bekpacktrip(db: Session):
     bp_user = get_bekpack_user(db)
     # create five trips
     names = [random_lower_string() for i in range(5)]
-    trips_created = [
-        bekpacktrip.create_with_owner(
-            db, obj_in=BekpackTripCreate(name=name), owner_id=bp_user.id
-        )
-        for name in names
-    ]
-    trips_retrieved = bekpacktrip.get_by_owner(db, owner_id=bp_user.id)
+    trips_created = sorted(
+        [
+            bekpacktrip.create_with_owner(
+                db, obj_in=BekpackTripCreate(name=name), owner_id=bp_user.id
+            )
+            for name in names
+        ],
+        key=lambda trip: trip.id,
+    )
+    trips_retrieved = sorted(
+        bekpacktrip.get_by_owner(db, owner_id=bp_user.id), key=lambda trip: trip.id
+    )
     # same number of trips retrieved and created
     assert len(trips_retrieved) == len(trips_created)
     for c, r in zip(trips_created, trips_retrieved):
@@ -88,7 +93,7 @@ def test_update_bekpacktrip(db: Session):
     assert trip_updated.owner_id == newowner.id
     assert trip_updated.name == newname
     assert trip_updated.is_active == newis_active
-    assert trip_updated.color.hex.lower() == newcolor.lower()
+    assert trip_updated.color.lower() == newcolor.lower()
 
 
 def test_change_owner(db: Session):
