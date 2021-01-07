@@ -33,7 +33,6 @@ class BekpackTripCreate(BekpackTripBase):
 class BekpackTripUpdate(BekpackTripBase):
     color: Optional[Color]
     is_active: Optional[bool]
-    members: Optional[Set[int]]
     name: Optional[str]
     owner_id: Optional[int]
 
