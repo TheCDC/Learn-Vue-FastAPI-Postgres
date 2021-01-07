@@ -1,9 +1,7 @@
-from typing import List, Optional, Set
-from app.db.base_class import Base
-from app.schemas.bekpack.bekpacktrip import BekpackTrip
+from typing import Optional, Set
 
-from pydantic import BaseModel, validator
-from sqlalchemy.sql.sqltypes import Boolean
+from pydantic import BaseModel
+
 
 # Shared properties
 class BekPackUserBase(BaseModel):
@@ -20,8 +18,6 @@ class BekPackUserCreate(BekPackUserBase):
 class BekPackUserUpdate(BekPackUserBase):
     is_active: Optional[bool]
     joined_trips: Optional[Set[int]]
-    owned_bags: Optional[Set[int]]
-    owned_trips: Optional[Set[int]]
     owner_id: Optional[int]
 
 
@@ -40,9 +36,6 @@ class BekPackUser(BekPackUserBase):
 
     id: int
     is_active: bool = True
-    joined_trips: List[BekpackTrip] = []
-    owned_bags: List[int] = []
-    owned_trips: List[BekpackTrip] = []
     owner_id: int
 
 

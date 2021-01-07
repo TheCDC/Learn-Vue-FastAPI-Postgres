@@ -5,6 +5,7 @@ from app import models
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.crud import bekpackuser as crud_bekpackuser
+from app.crud import bekpacktrip as crud_bekpacktrip
 from app.crud import user as crud_user
 from app.models.bekpack import BekpackUser
 from app.models import User
@@ -34,8 +35,48 @@ def get_bekpackuser_me(
     return bp_user
 
 
+@router.get("/owned_trips", response_model=List[schemas.BekpackTrip])
+def get_my_owned_BekPackTrips(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    skip: int = 0,
+    limit: int = 100,
+) -> Any:
+    """Get a BekpackUser"""
+    try:
+        bp_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
+    except sqlalchemy.orm.exc.NoResultFound:
+        raise HTTPException(status_code=404, detail="BekpackUser not found")
+    if not bp_user:
+        raise HTTPException(status_code=404, detail="BekpackUser not found")
+    return crud_bekpacktrip.get_by_owner(
+        db=db, owner_id=bp_user.id, skip=skip, limit=limit
+    )
+
+
+@router.get("/joined_trips", response_model=List[schemas.BekpackTrip])
+def get_my_joined_BekPackTrips(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    skip: int = 0,
+    limit: int = 100,
+) -> Any:
+    """Get a BekpackUser"""
+    try:
+        bp_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
+    except sqlalchemy.orm.exc.NoResultFound:
+        raise HTTPException(status_code=404, detail="BekpackUser not found")
+    if not bp_user:
+        raise HTTPException(status_code=404, detail="BekpackUser not found")
+    return crud_bekpacktrip.get_joined_by_member(
+        db=db, member_id=bp_user.id, skip=skip, limit=limit
+    )
+
+
 @router.get("/{id}", response_model=schemas.BekPackUser)
-def get_bekpackuser(
+def get_bekpackuser_by_id(
     *,
     db: Session = Depends(deps.get_db),
     id: int,

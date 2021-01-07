@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.bekpack import BekpackTrip, BekpackUser
+from app.models.bekpack import BekpackTrip, BekpackUser, BekPackTrip_Members
 from app.schemas import BekpackTripCreate, BekpackTripUpdate
 
 
@@ -34,6 +35,16 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
             .limit(limit)
             .all()
         )
+
+    def get_joined_by_member(
+        self, db: Session, *, member_id: int, skip: int = 0, limit: int = 100
+    ) -> List[BekpackTrip]:
+        associations: List[BekPackTrip_Members] = (
+            db.query(BekPackTrip_Members)
+            .filter(BekPackTrip_Members.user_id == member_id)
+            .all()
+        )
+        return [a.trip for a in associations]
 
 
 bekpacktrip = CRUDBekpackTrip(BekpackTrip)

@@ -1,9 +1,13 @@
-from typing import Optional, Set
+from typing import List, Optional, Set
 
 from pydantic import BaseModel, validator
-
 from pydantic.color import Color
+
+from app.schemas.bekpack.bekpackbag import BekpackBag
+from app.schemas.bekpack.bekpackuser import BekPackUser
+
 from ...crud.encoders import convert_color
+
 
 # Shared properties
 class BekpackTripBase(BaseModel):
@@ -26,7 +30,7 @@ class BekpackTripBase(BaseModel):
 # Properties to receive on item creation
 class BekpackTripCreate(BekpackTripBase):
     name: str
-    color: Color = "black"
+    color: Color = "blue"
 
 
 # Properties to receive on item update
@@ -49,8 +53,8 @@ class BekpackTripInDBBase(BekpackTripBase):
 
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
-    bags: Set[int] = []
-    members: Set[int] = []
+    bags: List[BekpackBag]
+    members: List[BekPackUser]
 
 
 # Additional properties stored in DB

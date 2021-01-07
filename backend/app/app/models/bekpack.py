@@ -13,8 +13,14 @@ if TYPE_CHECKING:
 
 class BekPackTrip_Members(Base):
     id = Column(Integer, primary_key=True)
-    trip_id = Column(Integer, ForeignKey("bekpacktrip.id"), index=True)
-    user_id = Column(Integer, ForeignKey("bekpackuser.id"), index=True)
+    trip = relationship("BekpackTrip")
+    trip_id = Column(
+        Integer, ForeignKey("bekpacktrip.id", ondelete="CASCADE"), index=True
+    )
+    user = relationship("BekpackUser")
+    user_id = Column(
+        Integer, ForeignKey("bekpackuser.id", ondelete="CASCADE"), index=True
+    )
 
 
 class BekpackUser(Base):
@@ -27,7 +33,7 @@ class BekpackUser(Base):
     )
     owned_bags = relationship("BekpackBag", back_populates="owner")
     owned_trips = relationship("BekpackTrip", back_populates="owner")
-    owner_id = Column(Integer, ForeignKey("user.id"), unique=True)
+    owner_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), unique=True)
 
 
 class BekpackTrip(Base):
@@ -42,7 +48,9 @@ class BekpackTrip(Base):
     )
     name = Column(String, index=True)
     owner = relationship(BekpackUser, back_populates="owned_trips")
-    owner_id = Column(Integer, ForeignKey(BekpackUser.id), index=True)
+    owner_id = Column(
+        Integer, ForeignKey(BekpackUser.id, ondelete="CASCADE"), index=True
+    )
     items_lists = relationship("BekpackTripItemList", back_populates="parent_trip")
 
 
@@ -64,9 +72,13 @@ class BekpackBag(Base):
     items = relationship("BekpackListItem", backref="bag")
     name = Column(String)
     owner = relationship(BekpackUser, back_populates="owned_bags")
-    owner_id = Column(Integer, ForeignKey(BekpackUser.id), index=True)
+    owner_id = Column(
+        Integer, ForeignKey(BekpackUser.id, ondelete="CASCADE"), index=True
+    )
     owner_trip = relationship(BekpackTrip, back_populates="bags")
-    owner_trip_id = Column(Integer, ForeignKey(BekpackTrip.id), index=True)
+    owner_trip_id = Column(
+        Integer, ForeignKey(BekpackTrip.id, ondelete="CASCADE"), index=True
+    )
 
 
 class BekpackListItem(Base):
