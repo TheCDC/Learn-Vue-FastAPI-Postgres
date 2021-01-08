@@ -1,0 +1,80 @@
+import { api } from '@/api';
+import { IBekpackTripCreate, IBekpackTripUpdate, IItemCreate, IItemUpdate } from '@/interfaces';
+import { getStoreAccessors } from 'typesafe-vuex';
+import { ActionContext } from 'vuex';
+import { dispatchCheckApiError } from '../main/actions';
+import { commitAddNotification, commitRemoveNotification } from '../main/mutations';
+import { State } from '../state';
+import { commitDeleteTrip, commitUpdateTrip, commitSetTrips, commitSetUser, commitSetTrip } from './mutations';
+import { BekpackState } from './state';
+type MainContext = ActionContext<BekpackState, State>;
+
+export const actions = {
+    async actionGetUser(context: MainContext) {
+        try {
+            const response = await api.getMyBekpackUser(context.rootState.main.token);
+            if (response) {
+                commitSetUser(context, response.data);
+            }
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
+    async actionGetMyTrips(context: MainContext) {
+        try {
+            const response = await api.getMyBekpackTrips(context.rootState.main.token);
+            if (response) {
+                commitSetTrips(context, response.data);
+            }
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
+    async actionCreateTrip(context: MainContext, payload: IBekpackTripCreate) {
+        try {
+            const loadingNotification = { content: 'saving', showProgress: true };
+            commitAddNotification(context, loadingNotification);
+            const response = (await Promise.all([
+                api.createBekpackTrip(context.rootState.main.token, payload),
+                await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
+            ]))[0];
+            commitSetTrip(context, response.data);
+            commitRemoveNotification(context, loadingNotification);
+            commitAddNotification(context, { content: 'Trip successfully created', color: 'success' });
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
+    async actionUpdateTrip(context: MainContext, payload: { id: number, item: IBekpackTripUpdate; }) {
+        try {
+            const loadingNotification = { content: 'saving', showProgress: true };
+            commitAddNotification(context, loadingNotification);
+            const response = (await Promise.all([
+                api.updateBekpackTrip(context.rootState.main.token, payload.id, payload.item),
+                await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
+            ]))[0];
+            commitUpdateTrip(context, response.data);
+            commitRemoveNotification(context, loadingNotification);
+            commitAddNotification(context, { content: 'Item successfully updated', color: 'success' });
+
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
+    async actionDeleteTrip(context: MainContext, payload: { id: number; }) {
+        try {
+
+            const loadingNotification = { content: 'deleting', showProgress: true };
+            commitAddNotification(context, loadingNotification);
+            const response = (await Promise.all([
+                api.deleteBekpackTrip(context.rootState.main.token, payload.id),
+                await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
+            ]))[0];
+            commitDeleteTrip(context, response.data);
+            commitRemoveNotification(context, loadingNotification);
+            commitAddNotification(context, { content: 'Item successfully deleted', color: 'success' });
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
+};

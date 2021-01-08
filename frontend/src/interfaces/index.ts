@@ -39,3 +39,28 @@ export interface IItemUpdate {
     description?: string;
 }
 
+
+export interface IBekpackUser {
+    id: number;
+    is_active: boolean;
+    owner_id: number;
+}
+
+export interface IBekpackTrip {
+    color: string;
+    id: number;
+    is_active: boolean;
+    name: string;
+    owner_id: string;
+}
+
+export interface IBekpackTripCreate {
+    color: string;
+    name: string;
+}
+
+export interface IBekpackTripUpdate {
+    color?: string;
+    is_active?: boolean;
+    name?: string;
+}

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate, IItemCreate, IItemUpdate } from './interfaces';
+import { IUserProfile, IUserProfileUpdate, IUserProfileCreate, IItemCreate, IItemUpdate, IBekpackTripCreate, IBekpackTripUpdate } from './interfaces';
 
 function authHeaders(token: string) {
   return {
@@ -53,5 +53,20 @@ export const api = {
   },
   async deleteItem(token: string, itemId) {
     return axios.delete(`${apiUrl}/api/v1/items/${itemId}`, authHeaders(token));
+  },
+  async getMyBekpackUser(token: string) {
+    return axios.get(`${apiUrl}/api/v1/bekpack/bekpackusers/me`, authHeaders(token));
+  },
+  async createBekpackTrip(token: string, data: IBekpackTripCreate) {
+    return axios.post(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, data, authHeaders(token));
+  },
+  async updateBekpackTrip(token: string, tripId: number, data: IBekpackTripUpdate) {
+    return axios.put(`${apiUrl}​/api​/v1​/bekpack​/bekpacktrips​/${tripId}`, data, authHeaders(token));
+  },
+  async deleteBekpackTrip(token: string, tripId: number) {
+    return axios.delete(`${apiUrl}/api/v1/bekpack/bekpacktrips/${tripId}`, authHeaders(token));
+  },
+  async getMyBekpackTrips(token: string) {
+    return axios.get(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, authHeaders(token));
   },
 };
