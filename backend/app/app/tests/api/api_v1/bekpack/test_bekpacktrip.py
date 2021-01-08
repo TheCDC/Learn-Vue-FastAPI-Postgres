@@ -1,13 +1,10 @@
 from typing import Dict
 from app.tests.api.api_v1.bekpack.utils import get_bekpack_user
-from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string
-import urllib3
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.tests.utils.item import create_random_item
 
 
 def test_create_delete_bekpacktrip(
