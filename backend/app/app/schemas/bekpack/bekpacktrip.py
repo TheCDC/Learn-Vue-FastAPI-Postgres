@@ -12,6 +12,7 @@ from ...crud.encoders import convert_color
 # Shared properties
 class BekpackTripBase(BaseModel):
     name: Optional[str]
+    description: Optional[str]
     color: Optional[Color]
 
     class Config:
@@ -30,6 +31,7 @@ class BekpackTripBase(BaseModel):
 # Properties to receive on item creation
 class BekpackTripCreate(BekpackTripBase):
     name: str
+    description: str
     color: Color = "blue"
 
 
@@ -38,6 +40,7 @@ class BekpackTripUpdate(BekpackTripBase):
     color: Optional[Color]
     is_active: Optional[bool]
     name: Optional[str]
+    description: Optional[str]
     owner_id: Optional[int]
 
 
@@ -53,8 +56,9 @@ class BekpackTripInDBBase(BekpackTripBase):
 
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
-    bags: List[BekpackBag]
-    members: List[BekPackUser]
+    # bags: List[BekpackBag]
+    # members: List[BekPackUser]
+    pass
 
 
 # Additional properties stored in DB

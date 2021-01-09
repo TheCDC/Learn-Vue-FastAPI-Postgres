@@ -40,6 +40,7 @@ class BekpackTrip(Base):
     id = Column(Integer, primary_key=True, index=True)
     bags = relationship("BekpackBag", back_populates="owner_trip")
     color = Column(String)
+    description = Column(String)
     is_active = Column(Boolean(), default=True)
     members = relationship(
         BekpackUser,

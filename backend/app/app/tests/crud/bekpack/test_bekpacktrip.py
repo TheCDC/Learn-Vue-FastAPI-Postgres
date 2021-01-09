@@ -10,7 +10,9 @@ from .utils import get_random_color, get_bekpack_user
 
 def test_create_bekpaktrip(db: Session):
     bp_user = get_bekpack_user(db)
-    btc = BekpackTripCreate(name=random_lower_string())
+    btc = BekpackTripCreate(
+        name=random_lower_string(), description=random_lower_string()
+    )
     bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=bp_user.id)
     assert bpt.owner_id == bp_user.id
     u: BekpackUser = db.query(BekpackUser).filter(BekpackUser.id == bp_user.id).one()
@@ -27,7 +29,9 @@ def test_create_multiple_bekpacktrip(db: Session):
     trips_created = sorted(
         [
             bekpacktrip.create_with_owner(
-                db, obj_in=BekpackTripCreate(name=name), owner_id=bp_user.id
+                db,
+                obj_in=BekpackTripCreate(name=name, description=random_lower_string()),
+                owner_id=bp_user.id,
             )
             for name in names
         ],
@@ -47,7 +51,9 @@ def test_create_multiple_bekpacktrip(db: Session):
 
 def test_delete_bekpaktrip(db: Session):
     bp_user = get_bekpack_user(db)
-    btc = BekpackTripCreate(name=random_lower_string())
+    btc = BekpackTripCreate(
+        name=random_lower_string(), description=random_lower_string()
+    )
     bpt_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=bp_user.id)
     bpt_deleted = bekpacktrip.remove(db=db, id=bpt_created.id)
     bpt_nonexistent = bekpacktrip.get(db=db, id=bpt_created.id)
@@ -61,7 +67,9 @@ def test_delete_bekpaktrip(db: Session):
 
 def test_add_members(db: Session):
     owner = get_bekpack_user(db)
-    btc = BekpackTripCreate(name=random_lower_string())
+    btc = BekpackTripCreate(
+        name=random_lower_string(), description=random_lower_string()
+    )
     trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
     other_members = [get_bekpack_user(db) for i in range(5)]
     for m in other_members:
@@ -77,7 +85,9 @@ def test_update_bekpacktrip(db: Session):
     newowner = get_bekpack_user(db)
     name = random_lower_string()
     color = get_random_color()
-    btc = BekpackTripCreate(name=name)
+    btc = BekpackTripCreate(
+        name=random_lower_string(), description=random_lower_string()
+    )
     trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
     newname = random_lower_string()
     newcolor = get_random_color()
@@ -100,7 +110,9 @@ def test_change_owner(db: Session):
     owner = get_bekpack_user(db)
     newowner = get_bekpack_user(db)
     name = random_lower_string()
-    btc = BekpackTripCreate(name=name)
+    btc = BekpackTripCreate(
+        name=random_lower_string(), description=random_lower_string()
+    )
     created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
     update = BekpackTripUpdate(owner_id=newowner.id)
     updated = bekpacktrip.update(db, db_obj=created, obj_in=update)
