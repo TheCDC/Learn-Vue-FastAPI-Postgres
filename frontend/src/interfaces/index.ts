@@ -51,7 +51,7 @@ export interface IBekpackTrip {
     id: number;
     is_active: boolean;
     name: string;
-    owner_id: string;
+    owner_id: number;
 }
 
 export interface IBekpackTripCreate {

@@ -10,6 +10,14 @@
       <v-layout column fill-height>
         <v-list>
           <v-subheader>Main menu</v-subheader>
+          <v-list-tile to="/main/bekpack">
+            <v-list-tile-action>
+              <v-icon>web</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Bekpack</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
           <v-list-tile to="/main/items">
             <v-list-tile-action>
               <v-icon>web</v-icon>

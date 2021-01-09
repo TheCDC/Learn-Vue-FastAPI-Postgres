@@ -19,16 +19,13 @@ router = APIRouter()
 def create_bekpackuser(
     *,
     db: Session = Depends(deps.get_db),
-    user_in: schemas.BekPackUserCreate,
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     """Create new BekpackUser"""
     try:
-        bp_user = crud_bekpackuser.create_with_owner(
-            db=db, obj_in=user_in, owner_id=current_user.id
-        )
+        bp_user = crud_bekpackuser.create_with_owner(db=db, owner_id=current_user.id)
     except sqlalchemy.exc.IntegrityError:
-        raise HTTPException(status_code=404, detail="BekpackUser already exists")
+        raise HTTPException(status_code=409, detail="BekpackUser already exists")
     return bp_user
 
 

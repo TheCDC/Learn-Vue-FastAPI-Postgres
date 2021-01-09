@@ -9,11 +9,8 @@ from app.schemas import BekPackUserCreate, BekPackUserUpdate
 
 
 class CRUDBekpackUser(CRUDBase[BekpackUser, BekPackUserCreate, BekPackUserUpdate]):
-    def create_with_owner(
-        self, db: Session, *, obj_in: BekPackUserCreate, owner_id: int
-    ) -> BekpackUser:
-        obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data, owner_id=owner_id)
+    def create_with_owner(self, db: Session, *, owner_id: int) -> BekpackUser:
+        db_obj = self.model(owner_id=owner_id)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

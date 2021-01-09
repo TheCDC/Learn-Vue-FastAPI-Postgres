@@ -10,6 +10,16 @@ import { BekpackState } from './state';
 type MainContext = ActionContext<BekpackState, State>;
 
 export const actions = {
+    async actionCreateUser(context: MainContext) {
+        try {
+            const response = await api.createBekpackUser(context.rootState.main.token);
+            if (response) {
+                commitSetUser(context, response.data);
+            }
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
     async actionGetUser(context: MainContext) {
         try {
             const response = await api.getMyBekpackUser(context.rootState.main.token);
@@ -55,7 +65,7 @@ export const actions = {
             ]))[0];
             commitUpdateTrip(context, response.data);
             commitRemoveNotification(context, loadingNotification);
-            commitAddNotification(context, { content: 'Item successfully updated', color: 'success' });
+            commitAddNotification(context, { content: 'Trip successfully updated', color: 'success' });
 
         } catch (error) {
             await dispatchCheckApiError(context, error);
@@ -78,3 +88,10 @@ export const actions = {
         }
     },
 };
+const { dispatch } = getStoreAccessors<BekpackState, State>('');
+export const dispatchCreateTrip = dispatch(actions.actionCreateTrip);
+export const dispatchDeleteTrip = dispatch(actions.actionDeleteTrip);
+export const dispatchGetMyTrips = dispatch(actions.actionGetMyTrips);
+export const dispatchGetBekpackUser = dispatch(actions.actionGetUser);
+export const dispatchCreateBekpackUser = dispatch(actions.actionCreateUser);
+export const dispatchUpdateTrip = dispatch(actions.actionUpdateTrip);

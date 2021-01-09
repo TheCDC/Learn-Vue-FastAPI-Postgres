@@ -33,6 +33,11 @@ export default new Router({
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
           children: [
             {
+              path: 'bekpack',
+              name: 'main-bekpack',
+              component: () => import(/* webpackChunkName: "main-bekpack" */ './views/main/bekpack/Bekpack.vue')
+            },
+            {
               path: 'items',
               component: () => import(/* webpackChunkName: "main-items" */ './views/main/items/Items.vue')
             },

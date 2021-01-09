@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate, IItemCreate, IItemUpdate, IBekpackTripCreate, IBekpackTripUpdate } from './interfaces';
+import { IUserProfile, IUserProfileUpdate, IUserProfileCreate, IItemCreate, IItemUpdate, IBekpackTripCreate, IBekpackTripUpdate, IItem, IBekpackUser, IBekpackTrip } from './interfaces';
 
 function authHeaders(token: string) {
   return {
@@ -43,7 +43,7 @@ export const api = {
     });
   },
   async getMyItems(token: string) {
-    return axios.get(`${apiUrl}/api/v1/items`, authHeaders(token));
+    return axios.get<IItem[]>(`${apiUrl}/api/v1/items`, authHeaders(token));
   },
   async createItem(token: string, data: IItemCreate) {
     return axios.post(`${apiUrl}/api/v1/items`, data, authHeaders(token));
@@ -54,8 +54,17 @@ export const api = {
   async deleteItem(token: string, itemId) {
     return axios.delete(`${apiUrl}/api/v1/items/${itemId}`, authHeaders(token));
   },
+  async createBekpackUser(token: string) {
+    return axios.post(`${apiUrl}/api/v1/bekpack/bekpackusers`, {}, authHeaders(token));
+  },
   async getMyBekpackUser(token: string) {
-    return axios.get(`${apiUrl}/api/v1/bekpack/bekpackusers/me`, authHeaders(token));
+    return axios.get<IBekpackUser>(`${apiUrl}/api/v1/bekpack/bekpackusers/me`, authHeaders(token))
+      .catch((error) => {
+        if (error.response.status !== 404) {
+          return error;
+        }
+        return null;
+      });
   },
   async createBekpackTrip(token: string, data: IBekpackTripCreate) {
     return axios.post(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, data, authHeaders(token));
@@ -67,6 +76,6 @@ export const api = {
     return axios.delete(`${apiUrl}/api/v1/bekpack/bekpacktrips/${tripId}`, authHeaders(token));
   },
   async getMyBekpackTrips(token: string) {
-    return axios.get(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, authHeaders(token));
+    return axios.get<IBekpackTrip[]>(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, authHeaders(token));
   },
 };

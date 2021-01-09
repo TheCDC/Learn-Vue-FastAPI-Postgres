@@ -7,9 +7,8 @@ from random import choice
 
 
 def get_bekpack_user(db: Session) -> BekpackTrip:
-    bpuser_in = BekPackUserCreate()
     user = create_random_user(db)
-    bpuser = bekpackuser.create_with_owner(db, obj_in=bpuser_in, owner_id=user.id)
+    bpuser = bekpackuser.create_with_owner(db, owner_id=user.id)
     return bpuser
 
 
