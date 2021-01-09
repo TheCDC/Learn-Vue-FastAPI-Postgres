@@ -76,6 +76,11 @@ export const api = {
     return axios.delete(`${apiUrl}/api/v1/bekpack/bekpacktrips/${tripId}`, authHeaders(token));
   },
   async getMyBekpackTrips(token: string) {
-    return axios.get<IBekpackTrip[]>(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, authHeaders(token));
+    return axios.get<IBekpackTrip[]>(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, authHeaders(token)).catch((error) => {
+      if (error.response.status !== 404) {
+        return error;
+      }
+      return null;
+    });
   },
 };
