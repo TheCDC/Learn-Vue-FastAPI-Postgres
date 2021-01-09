@@ -48,6 +48,7 @@ export interface IBekpackUser {
 
 export interface IBekpackTrip {
     color: string;
+    description: string;
     id: number;
     is_active: boolean;
     name: string;
@@ -56,11 +57,13 @@ export interface IBekpackTrip {
 
 export interface IBekpackTripCreate {
     color: string;
+    description: string;
     name: string;
 }
 
 export interface IBekpackTripUpdate {
     color?: string;
+    description?: string;
     is_active?: boolean;
     name?: string;
 }

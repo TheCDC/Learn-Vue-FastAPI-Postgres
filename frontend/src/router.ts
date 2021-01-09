@@ -34,8 +34,15 @@ export default new Router({
           children: [
             {
               path: 'bekpack',
-              name: 'main-bekpack',
-              component: () => import(/* webpackChunkName: "main-bekpack" */ './views/main/bekpack/Bekpack.vue')
+              name: 'bekpack',
+              component: () => import(/* webpackChunkName: "bekpack" */ './views/main/bekpack/Bekpack.vue'),
+              children: [
+              ],
+            },
+            {
+              path: 'bekpack/createTrip',
+              name: 'bekpack-create-trip',
+              component: () => import(/* webpackChunkName: "bekpack-create-trip" */ './views/main/bekpack/CreateTrip.vue'),
             },
             {
               path: 'items',

@@ -4,7 +4,13 @@
       <v-toolbar light>
         <v-toolbar-title> Your BekPack</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="primary" to="/main/bekpack/createTrip">Create Trip</v-btn>
+        <v-btn
+          color="primary"
+          :to="{
+            name: 'bekpack-create-trip',
+          }"
+          >Create Trip</v-btn
+        >
       </v-toolbar>
     </div>
     <div v-if="!hasAccount">
