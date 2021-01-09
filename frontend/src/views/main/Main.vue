@@ -112,38 +112,40 @@
       </v-layout>
     </v-navigation-drawer>
     <!-- TODO: fix v-app-bar rendering too far to the left -->
-    <v-app-bar dark color="primary">
-      <v-icon @click.stop="switchShowDrawer">mdi-hamburger</v-icon>
-      <v-app-bar-title v-text="appName"></v-app-bar-title>
-      <v-spacer></v-spacer>
-      <v-menu>
-        <template v-slot:activator="{ on }">
-          <v-btn v-on="on" icon>
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item to="/main/profile">
-            <v-list-item-content>
-              <v-list-item-title>Profile</v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-icon>person</v-icon>
-            </v-list-item-action>
-          </v-list-item>
-          <v-list-item @click="logout">
-            <v-list-item-content>
-              <v-list-item-title>Logout</v-list-item-title>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-icon>close</v-icon>
-            </v-list-item-action>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-app-bar>
 
     <v-main>
+      <v-app-bar dark color="primary">
+        <v-icon @click.stop="switchShowDrawer">mdi-hamburger</v-icon>
+        <v-spacer></v-spacer>
+
+        <v-app-bar-title v-text="appName"></v-app-bar-title>
+        <v-spacer></v-spacer>
+        <v-menu>
+          <template v-slot:activator="{ on }">
+            <v-btn v-on="on" icon>
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item to="/main/profile">
+              <v-list-item-content>
+                <v-list-item-title>Profile</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-icon>person</v-icon>
+              </v-list-item-action>
+            </v-list-item>
+            <v-list-item @click="logout">
+              <v-list-item-content>
+                <v-list-item-title>Logout</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-icon>close</v-icon>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-app-bar>
       <router-view></router-view>
     </v-main>
     <v-footer class="pa-0" fixed>
