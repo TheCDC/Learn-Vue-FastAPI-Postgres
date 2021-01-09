@@ -6,30 +6,47 @@
       <v-btn color="primary" to="/main/items/create">Create Item</v-btn>
     </v-toolbar>
     <div>
-      <v-data-table :headers="headers" :items="items">
-        <template slot="items" slot-scope="props">
-          <td>{{ props.item.title }}</td>
-          <td>{{ props.item.description | truncate(100, "...") }}</td>
-          <td>
-            <v-tooltip top>
-              <span>Edit </span>
+      <v-data-table
+        :headers="headers"
+        :items="items"
+        :footer-props="{
+          showFirstLastPage: true,
+          firstIcon: 'mdi-arrow-collapse-left',
+          lastIcon: 'mdi-arrow-collapse-right',
+          prevIcon: 'mdi-minus',
+          nextIcon: 'mdi-plus',
+        }"
+      >
+        <template v-slot:[`item.description`]="{ item }">
+          {{ item.description | truncate(100, "...") }}
+        </template>
+        <template v-slot:[`item.title`]="{ item }">
+          {{ item.title | truncate(100, "...") }}
+        </template>
+
+        <template v-slot:[`item.id`]="{ item }">
+          <v-tooltip top>
+            <span>Edit </span>
+            <template v-slot:activator="{ on }">
               <v-btn
-                slot="activator"
-                flat
+                text
+                v-on="on"
                 :to="{
                   name: 'main-items-edit',
-                  params: { id: props.item.id },
+                  params: { id: item.id },
                 }"
                 ><v-icon>edit</v-icon>
               </v-btn>
-            </v-tooltip>
-            <v-tooltip top>
-              <span>Delete </span>
-              <v-btn slot="activator" flat @click="deleteItem(props.item)"
+            </template>
+          </v-tooltip>
+          <v-tooltip top>
+            <span>Delete </span>
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" text @click="deleteItem(item)"
                 ><v-icon>delete</v-icon>
               </v-btn>
-            </v-tooltip>
-          </td>
+            </template>
+          </v-tooltip>
         </template>
       </v-data-table>
     </div>

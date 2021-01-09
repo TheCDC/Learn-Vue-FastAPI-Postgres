@@ -13,6 +13,7 @@
               v-model="title"
               required
             ></v-text-field>
+            <v-color-picker> </v-color-picker>
             <v-textarea
               @keyup.enter="submit"
               label="Description"

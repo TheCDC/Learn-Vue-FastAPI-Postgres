@@ -10,10 +10,12 @@ import store from '@/store';
 import './registerServiceWorker';
 import 'vuetify/dist/vuetify.min.css';
 import { bootstrapFilters } from './views/filters';
+import vuetify from '@/plugins/vuetify';
 Vue.config.productionTip = false;
 
 bootstrapFilters();
 new Vue({
+  vuetify,
   router,
   store,
   render: (h) => h(App),
