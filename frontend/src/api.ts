@@ -70,7 +70,7 @@ export const api = {
     return axios.post(`${apiUrl}/api/v1/bekpack/bekpacktrips/`, data, authHeaders(token));
   },
   async updateBekpackTrip(token: string, tripId: number, data: IBekpackTripUpdate) {
-    return axios.put(`${apiUrl}​/api​/v1​/bekpack​/bekpacktrips​/${tripId}`, data, authHeaders(token));
+    return axios.put(`${apiUrl}/api/v1/bekpack/bekpacktrips/${tripId}`, data, authHeaders(token));
   },
   async deleteBekpackTrip(token: string, tripId: number) {
     return axios.delete(`${apiUrl}/api/v1/bekpack/bekpacktrips/${tripId}`, authHeaders(token));

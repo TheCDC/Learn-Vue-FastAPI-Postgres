@@ -45,6 +45,11 @@ export default new Router({
               component: () => import(/* webpackChunkName: "bekpack-create-trip" */ './views/main/bekpack/CreateTrip.vue'),
             },
             {
+              path: 'bekpack/editTrip/:id',
+              name: 'bekpack-edit-trip',
+              component: () => import(/* webpackChunkName: "bekpack-edit-trip" */ './views/main/bekpack/EditTrip.vue'),
+            },
+            {
               path: 'items',
               component: () => import(/* webpackChunkName: "main-items" */ './views/main/items/Items.vue')
             },

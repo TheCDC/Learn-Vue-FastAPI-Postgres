@@ -10,7 +10,7 @@ export const mutations = {
     },
 
     setTrip(state: BekpackState, payload: IBekpackTrip) {
-        state.trips.push(payload);
+        state.trips.unshift(payload);
     },
     setTrips(state: BekpackState, payload: IBekpackTrip[]) {
         state.trips = payload;
@@ -19,9 +19,8 @@ export const mutations = {
         const others = state.trips.filter((u) => {
             return u.id !== payload.id;
         });
-        others.push(payload);
+        others.unshift(payload);
         state.trips = others;
-
     },
     deleteTrip(state: BekpackState, payload: IBekpackTrip) {
         const others = state.trips.filter((u) => {
