@@ -48,17 +48,12 @@ class BekpackTripInDBBase(BekpackTripBase):
     name: str
     owner_id: int
 
-    class Config:
-        orm_mode = True
-
 
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
     # bags: List[BekpackBag]
     # members: List[BekPackUser]
     time_updated: datetime
-
-    pass
 
 
 # Additional properties stored in DB

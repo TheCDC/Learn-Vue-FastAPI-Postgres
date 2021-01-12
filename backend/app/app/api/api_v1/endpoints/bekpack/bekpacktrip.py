@@ -2,10 +2,11 @@ from typing import Any, List
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_pagination import Page, pagination_params
+from fastapi_pagination.paginator import paginate
 from sqlalchemy.orm import Session
 
 import app.schemas as schemas
-from app import models
 from app.api import deps
 from app.crud import bekpacktrip as crud_bekpacktrip
 from app.crud import bekpackuser as crud_bekpackuser
@@ -15,23 +16,25 @@ from app.models import User
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.BekpackTrip])
+@router.get(
+    "/",
+    response_model=Page[schemas.BekpackTrip],
+    dependencies=[Depends(pagination_params)],
+)
 def get_my_bakpacktrips(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-    skip: int = 0,
-    limit: int = 100,
 ) -> List[schemas.BekpackTrip]:
     try:
         if crud_user.is_superuser(current_user):
-            return crud_bekpacktrip.get_multi(db=db, skip=skip, limit=limit)
+            return paginate(crud_bekpacktrip.get_all(db=db))
         else:
             owner = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
     except sqlalchemy.orm.exc.NoResultFound:
         raise HTTPException(status_code=404, detail="User not registered for BekPack")
-
-    return crud_bekpacktrip.get_by_owner(db=db, owner_id=owner.id)
+    records = crud_bekpacktrip.get_by_owner(db=db, owner_id=owner.id)
+    return paginate(records)
 
 
 @router.get("/{id}", response_model=schemas.BekpackTrip)
