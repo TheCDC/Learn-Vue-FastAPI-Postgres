@@ -16,7 +16,6 @@
             <v-color-picker v-model="color"> </v-color-picker>
 
             <v-textarea
-              @keyup.enter="submit"
               label="Description"
               v-model="description"
               required
@@ -41,7 +40,7 @@ import {
   dispatchGetTripToEdit,
   dispatchUpdateTrip,
 } from "@/store/bekpack/actions";
-import { readTripsOne } from "@/store/bekpack/getters";
+import { readTripsOne, readTripToEdit } from "@/store/bekpack/getters";
 import { Component, Vue } from "vue-property-decorator";
 @Component
 export default class EditItem extends Vue {
@@ -61,7 +60,7 @@ export default class EditItem extends Vue {
   }
 
   get item() {
-    return readTripsOne(this.$store)(+this.$router.currentRoute.params.id);
+    return readTripToEdit(this.$store);
   }
   public reset() {
     this.name = "";

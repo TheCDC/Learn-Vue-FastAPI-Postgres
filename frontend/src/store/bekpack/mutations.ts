@@ -18,7 +18,6 @@ export const mutations = {
         state.trips.items.unshift(payload);
     },
     setTripToEdit(state: BekpackState, payload: IBekpackTrip) {
-
         state.tripToEdit = payload;
     },
     updateTrip(state: BekpackState, payload: IBekpackTrip) {

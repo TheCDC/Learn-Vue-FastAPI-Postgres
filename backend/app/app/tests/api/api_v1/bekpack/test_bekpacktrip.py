@@ -1,5 +1,6 @@
 from typing import Dict
 from app.tests.api.api_v1.bekpack.utils import get_bekpack_user
+from app.tests.crud.bekpack.utils import get_random_color
 from app.tests.utils.utils import random_lower_string
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -20,7 +21,7 @@ def test_create_delete_bekpacktrip(
     assert content["is_active"] == True
     user_id_old = content["id"]
     # create trip
-    trip_data = {"name": random_lower_string(), "color": "black"}
+    trip_data = {"name": random_lower_string(), "color": get_random_color()}
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
         headers=normal_user_token_headers_random,
@@ -55,7 +56,7 @@ def test_update_bekpacktrip(
     content = response.json()
     user_id_old = content["id"]
     # create trip
-    trip_data = {"name": random_lower_string(), "color": "black"}
+    trip_data = {"name": random_lower_string(), "color": get_random_color()}
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
         headers=normal_user_token_headers_random,
@@ -64,7 +65,7 @@ def test_update_bekpacktrip(
     content = response.json()
     trip_id_created = content["id"]
     # update trip
-    content_update = {"color": "green", "name": "newname"}
+    content_update = {"color": get_random_color(), "name": "newname"}
     response = client.put(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id_created}",
         headers=normal_user_token_headers_random,

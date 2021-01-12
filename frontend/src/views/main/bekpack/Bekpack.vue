@@ -47,7 +47,9 @@
         <template v-slot:[`item.description`]="{ item }">
           {{ item.description | truncate(100, "...") }}
         </template>
-
+        <template v-slot:[`item.time_created`]="{ item }">
+          {{ new Date(item.time_created) }}
+        </template>
         <template v-slot:[`item.id`]="{ item }">
           <v-spacer> </v-spacer>
           <v-tooltip top>
@@ -133,14 +135,14 @@ export default class Bekpack extends Vue {
     await dispatchDeleteTrip(this.$store, t);
   }
   public headers = [
-    { text: "name", sortable: true, value: "name", align: "left" },
+    { text: "name", sortable: false, value: "name", align: "left" },
     {
       text: "description",
-      sortable: true,
+      sortable: false,
       value: "description",
       align: "left",
     },
-    { text: "time_created", value: "time_created" },
+    { text: "Time Created", value: "time_created", align: "left" },
     { text: "Actions", sortable: false, value: "id", align: "right" },
   ];
 }
