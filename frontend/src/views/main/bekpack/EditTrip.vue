@@ -7,10 +7,16 @@
       <v-card-text>
         <template>
           <v-form v-model="valid">
-            <v-text-field label="Name" v-model="name" required></v-text-field>
+            <v-text-field
+              @keyup.enter="submit"
+              label="Name"
+              v-model="name"
+              required
+            ></v-text-field>
             <v-color-picker v-model="color"> </v-color-picker>
 
             <v-textarea
+              @keyup.enter="submit"
               label="Description"
               v-model="description"
               required

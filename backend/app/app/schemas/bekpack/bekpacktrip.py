@@ -1,10 +1,8 @@
-from typing import List, Optional, Set
+from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, validator
 from pydantic.color import Color
-
-from app.schemas.bekpack.bekpackbag import BekpackBag
-from app.schemas.bekpack.bekpackuser import BekPackUser
 
 from ...crud.encoders import convert_color
 
@@ -58,6 +56,8 @@ class BekpackTripInDBBase(BekpackTripBase):
 class BekpackTrip(BekpackTripInDBBase):
     # bags: List[BekpackBag]
     # members: List[BekPackUser]
+    time_updated: datetime
+
     pass
 
 

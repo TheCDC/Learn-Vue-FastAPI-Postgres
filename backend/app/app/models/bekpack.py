@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from app.models.mixins import TimestampsMixin
 
 
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
@@ -36,7 +37,7 @@ class BekpackUser(Base):
     owner_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), unique=True)
 
 
-class BekpackTrip(Base):
+class BekpackTrip(Base, TimestampsMixin):
     id = Column(Integer, primary_key=True, index=True)
     bags = relationship("BekpackBag", back_populates="owner_trip")
     color = Column(String)
