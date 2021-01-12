@@ -30,10 +30,14 @@
     <div>
       <v-data-table
         :headers="headers"
-        :items="trips"
+        :items="trips.items"
         :footer-props="{
           showFirstLastPage: true,
+          itemsPerPageOptions: [10, 20, 50],
         }"
+        :server-items-length="trips.total"
+        :options.sync="tablePaginationoptions"
+        :loading="loading"
       >
         <template v-slot:[`item.name`]="{ item }">
           <v-chip class="ma-2" :color="item.color">
@@ -74,7 +78,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import {
   dispatchCreateBekpackUser,
   dispatchDeleteTrip,
@@ -87,15 +91,31 @@ import {
   readUserHasAccount,
 } from "@/store/bekpack/getters";
 import { IBekpackTrip } from "@/interfaces";
+import { IPageRead } from "@/interfaces/common";
 @Component
 export default class Bekpack extends Vue {
+  public page: IPageRead = { page: 0, size: 10 };
+  public tablePaginationoptions = {};
+  public loading: boolean = false;
+  @Watch("tablePaginationoptions")
+  public async onChildChanged(
+    val: { page: number; itemsPerPage: number },
+    oldVal: object
+  ) {
+    this.page.page = val.page - 1; //pagination options page number is 1-indexed but API is 0-indexed
+    this.page.size = val.itemsPerPage;
+    await this.load();
+  }
   public async mounted() {
     this.load();
   }
   public async load() {
+    this.loading = true;
     await dispatchGetBekpackUser(this.$store);
-    await dispatchGetMyTrips(this.$store);
+    await dispatchGetMyTrips(this.$store, { page: this.page });
+    this.loading = false;
   }
+
   public async registerAccount() {
     await dispatchCreateBekpackUser(this.$store);
     await this.load();
@@ -120,7 +140,8 @@ export default class Bekpack extends Vue {
       value: "description",
       align: "left",
     },
-    { text: "Actions", sortable: false, value: "id" },
+    { text: "time_created", value: "time_created" },
+    { text: "Actions", sortable: false, value: "id", align: "right" },
   ];
 }
 </script>

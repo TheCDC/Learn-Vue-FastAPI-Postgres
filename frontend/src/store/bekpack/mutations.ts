@@ -1,4 +1,5 @@
 import { IBekpackTrip, IBekpackUser } from '@/interfaces';
+import { IPage } from '@/interfaces/common';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
 import { BekpackState } from './state';
@@ -9,31 +10,37 @@ export const mutations = {
         state.hasBekpackAccount = true;
     },
 
-    setTrip(state: BekpackState, payload: IBekpackTrip) {
-        state.trips.unshift(payload);
-    },
-    setTrips(state: BekpackState, payload: IBekpackTrip[]) {
+    setTrips(state: BekpackState, payload: IPage<IBekpackTrip>) {
         state.trips = payload;
     },
+    setTripsOne(state: BekpackState, payload: IBekpackTrip) {
+
+        state.trips.items.unshift(payload);
+    },
+    setTripToEdit(state: BekpackState, payload: IBekpackTrip) {
+
+        state.tripToEdit = payload;
+    },
     updateTrip(state: BekpackState, payload: IBekpackTrip) {
-        const others = state.trips.filter((u) => {
+        const others = state.trips.items.filter((u) => {
             return u.id !== payload.id;
         });
         others.unshift(payload);
-        state.trips = others;
+        state.trips.items = others;
     },
     deleteTrip(state: BekpackState, payload: IBekpackTrip) {
-        const others = state.trips.filter((u) => {
+        const others = state.trips.items.filter((u) => {
             return u.id !== payload.id;
         });
-        state.trips = others;
+        state.trips.items = others;
     },
 };
 
 const { commit } = getStoreAccessors<BekpackState, State>('');
 
 export const commitDeleteTrip = commit(mutations.deleteTrip);
-export const commitSetTrip = commit(mutations.setTrip);
+export const commitSetTrip = commit(mutations.setTripsOne);
+export const commitSetTripToEdit = commit(mutations.setTripToEdit);
 export const commitSetTrips = commit(mutations.setTrips);
 export const commitSetUser = commit(mutations.setUser);
 export const commitUpdateTrip = commit(mutations.updateTrip);

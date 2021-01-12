@@ -1,7 +1,9 @@
 import { IBekpackUser, IBekpackTrip } from '@/interfaces';
+import { IPage } from '@/interfaces/common';
 
 export interface BekpackState {
     user: IBekpackUser | null;
-    trips: IBekpackTrip[];
+    trips: IPage<IBekpackTrip>;
+    tripToEdit: IBekpackTrip | null;
     hasBekpackAccount: boolean | null;
 }

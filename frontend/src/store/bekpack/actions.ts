@@ -1,11 +1,12 @@
 import { api } from '@/api';
 import { IBekpackTripCreate, IBekpackTripUpdate, IItemCreate, IItemUpdate } from '@/interfaces';
+import { IPageRead } from '@/interfaces/common';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { ActionContext } from 'vuex';
 import { dispatchCheckApiError } from '../main/actions';
 import { commitAddNotification, commitRemoveNotification } from '../main/mutations';
 import { State } from '../state';
-import { commitDeleteTrip, commitUpdateTrip, commitSetTrips, commitSetUser, commitSetTrip } from './mutations';
+import { commitDeleteTrip, commitUpdateTrip, commitSetTrips, commitSetUser, commitSetTrip, commitSetTripToEdit } from './mutations';
 import { BekpackState } from './state';
 type MainContext = ActionContext<BekpackState, State>;
 
@@ -30,11 +31,21 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionGetMyTrips(context: MainContext) {
+    async actionGetMyTrips(context: MainContext, payload: { page: IPageRead; }) {
         try {
-            const response = await api.getMyBekpackTrips(context.rootState.main.token);
+            const response = await api.getMyBekpackTrips(context.rootState.main.token, payload.page);
             if (response) {
                 commitSetTrips(context, response.data);
+            }
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
+    async actionGetTripToEdit(context: MainContext, payload: { id: number; }) {
+        try {
+            const response = await api.getBekpackTrip(context.rootState.main.token, payload.id);
+            if (response) {
+                commitSetTripToEdit(context, response.data);
             }
         } catch (error) {
             await dispatchCheckApiError(context, error);
@@ -81,6 +92,9 @@ export const actions = {
                 await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
             commitDeleteTrip(context, response.data);
+            // refresh this page of trips
+            const responseRead = await api.getMyBekpackTrips(context.rootState.main.token, context.state.trips);
+            commitSetTrips(context, responseRead.data);
             commitRemoveNotification(context, loadingNotification);
             commitAddNotification(context, { content: 'Item successfully deleted', color: 'success' });
         } catch (error) {
@@ -89,9 +103,10 @@ export const actions = {
     },
 };
 const { dispatch } = getStoreAccessors<BekpackState, State>('');
+export const dispatchCreateBekpackUser = dispatch(actions.actionCreateUser);
 export const dispatchCreateTrip = dispatch(actions.actionCreateTrip);
 export const dispatchDeleteTrip = dispatch(actions.actionDeleteTrip);
-export const dispatchGetMyTrips = dispatch(actions.actionGetMyTrips);
 export const dispatchGetBekpackUser = dispatch(actions.actionGetUser);
-export const dispatchCreateBekpackUser = dispatch(actions.actionCreateUser);
+export const dispatchGetMyTrips = dispatch(actions.actionGetMyTrips);
+export const dispatchGetTripToEdit = dispatch(actions.actionGetTripToEdit);
 export const dispatchUpdateTrip = dispatch(actions.actionUpdateTrip);

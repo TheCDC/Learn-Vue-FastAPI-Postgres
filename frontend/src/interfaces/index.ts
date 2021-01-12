@@ -53,6 +53,7 @@ export interface IBekpackTrip {
     is_active: boolean;
     name: string;
     owner_id: number;
+    time_created: Date;
 }
 
 export interface IBekpackTripCreate {

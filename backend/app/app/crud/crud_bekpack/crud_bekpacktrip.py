@@ -31,10 +31,14 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
         return (
             db.query(self.model)
             .filter(BekpackTrip.owner_id == owner_id)
+            .order_by(BekpackTrip.time_created.desc())
             .offset(skip)
             .limit(limit)
             .all()
         )
+
+    def get_all(self, db: Session,) -> List[BekpackTrip]:
+        return db.query(self.model).order_by(BekpackTrip.time_created.desc()).all()
 
     def get_joined_by_member(
         self, db: Session, *, member_id: int, skip: int = 0, limit: int = 100

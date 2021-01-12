@@ -35,8 +35,10 @@
 </template>
 <script lang="ts">
 import { IBekpackTrip, IBekpackTripUpdate } from "@/interfaces";
+import { IPage, IPageRead } from "@/interfaces/common";
 import {
   dispatchGetMyTrips,
+  dispatchGetTripToEdit,
   dispatchUpdateTrip,
 } from "@/store/bekpack/actions";
 import { readTripsOne } from "@/store/bekpack/getters";
@@ -46,10 +48,12 @@ export default class EditItem extends Vue {
   public name = "";
   public description = "";
   public color = "";
-
   public valid = true;
   public async mounted() {
-    await dispatchGetMyTrips(this.$store);
+    await dispatchGetTripToEdit(this.$store, {
+      id: +this.$router.currentRoute.params.id,
+    });
+
     this.reset();
   }
   public cancel() {

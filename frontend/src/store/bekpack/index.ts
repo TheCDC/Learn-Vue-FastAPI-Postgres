@@ -5,7 +5,8 @@ import { BekpackState } from './state';
 
 const defaultState: BekpackState = {
     user: null,
-    trips: [],
+    trips: { items: [], page: 0, size: 0, total: 0 },
+    tripToEdit: null,
     hasBekpackAccount: null,
 };
 
