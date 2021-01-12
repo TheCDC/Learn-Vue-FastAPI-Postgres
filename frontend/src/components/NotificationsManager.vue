@@ -28,7 +28,9 @@ export default class NotificationsManager extends Vue {
 
   public async hide() {
     this.show = false;
-    await new Promise((resolve, reject) => setTimeout(() => resolve(), 500));
+    await new Promise<void>((resolve, reject) =>
+      setTimeout(() => resolve(), 500)
+    );
   }
 
   public async close() {

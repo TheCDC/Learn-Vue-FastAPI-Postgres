@@ -51,17 +51,17 @@ export default new Router({
             },
             {
               path: 'items',
-              component: () => import(/* webpackChunkName: "main-items" */ './views/main/items/Items.vue')
+              component: () => import(/* webpackChunkName: "main-items" */ './views/main/items/Items.vue'),
             },
             {
               path: 'items/create',
               name: 'main-items-create',
-              component: () => import(/* webpackChunkName: "main-items-create" */ './views/main/items/CreateItem.vue')
+              component: () => import(/* webpackChunkName: "main-items-create" */ './views/main/items/CreateItem.vue'),
             },
             {
               path: 'items/edit/:id',
               name: 'main-items-edit',
-              component: () => import(/* webpackChunkName: "main-items-create" */ './views/main/items/EditItem.vue')
+              component: () => import(/* webpackChunkName: "main-items-create" */ './views/main/items/EditItem.vue'),
             },
             {
               path: 'dashboard',

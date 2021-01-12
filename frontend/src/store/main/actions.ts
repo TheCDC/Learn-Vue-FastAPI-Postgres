@@ -18,7 +18,7 @@ import { AppNotification, MainState } from './state';
 type MainContext = ActionContext<MainState, State>;
 
 export const actions = {
-    async actionLogIn(context: MainContext, payload: { username: string; password: string }) {
+    async actionLogIn(context: MainContext, payload: { username: string; password: string; }) {
         try {
             const response = await api.logInGetToken(payload.username, payload.password);
             const token = response.data.access_token;
@@ -114,7 +114,7 @@ export const actions = {
             router.push('/main');
         }
     },
-    async removeNotification(context: MainContext, payload: { notification: AppNotification, timeout: number }) {
+    async removeNotification(context: MainContext, payload: { notification: AppNotification, timeout: number; }) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 commitRemoveNotification(context, payload.notification);
@@ -122,7 +122,7 @@ export const actions = {
             }, payload.timeout);
         });
     },
-    async passwordRecovery(context: MainContext, payload: { username: string }) {
+    async passwordRecovery(context: MainContext, payload: { username: string; }) {
         const loadingNotification = { content: 'Sending password recovery email', showProgress: true };
         try {
             commitAddNotification(context, loadingNotification);
@@ -138,7 +138,7 @@ export const actions = {
             commitAddNotification(context, { color: 'error', content: 'Incorrect username' });
         }
     },
-    async resetPassword(context: MainContext, payload: { password: string, token: string }) {
+    async resetPassword(context: MainContext, payload: { password: string, token: string; }) {
         const loadingNotification = { content: 'Resetting password', showProgress: true };
         try {
             commitAddNotification(context, loadingNotification);

@@ -1,6 +1,17 @@
 import axios from 'axios';
 import { apiUrl } from '@/env';
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate, IItemCreate, IItemUpdate, IBekpackTripCreate, IBekpackTripUpdate, IItem, IBekpackUser, IBekpackTrip } from './interfaces';
+import {
+  IUserProfile,
+  IUserProfileUpdate,
+  IUserProfileCreate,
+  IItemCreate,
+  IItemUpdate,
+  IBekpackTripCreate,
+  IBekpackTripUpdate,
+  IItem,
+  IBekpackUser,
+  IBekpackTrip,
+} from './interfaces';
 
 function authHeaders(token: string) {
   return {

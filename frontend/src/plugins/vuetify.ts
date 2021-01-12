@@ -3,7 +3,7 @@ import Vuetify from 'vuetify';
 
 import '@mdi/font/css/materialdesignicons.css'; // Ensure you are using css-loader
 const opts = {
-  iconfont: 'md'
+  iconfont: 'md',
 };
 Vue.use(Vuetify);
 

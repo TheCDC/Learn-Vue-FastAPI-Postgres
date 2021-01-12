@@ -17,7 +17,7 @@ export const getters = {
     firstNotification: (state: MainState) => state.notifications.length > 0 && state.notifications[0],
 };
 
-const {read} = getStoreAccessors<MainState, State>('');
+const { read } = getStoreAccessors<MainState, State>('');
 
 export const readDashboardMiniDrawer = read(getters.dashboardMiniDrawer);
 export const readDashboardShowDrawer = read(getters.dashboardShowDrawer);

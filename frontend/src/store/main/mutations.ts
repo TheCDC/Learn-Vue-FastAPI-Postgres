@@ -31,7 +31,7 @@ export const mutations = {
     },
 };
 
-const {commit} = getStoreAccessors<MainState | any, State>('');
+const { commit } = getStoreAccessors<MainState | any, State>('');
 
 export const commitSetDashboardMiniDrawer = commit(mutations.setDashboardMiniDrawer);
 export const commitSetDashboardShowDrawer = commit(mutations.setDashboardShowDrawer);

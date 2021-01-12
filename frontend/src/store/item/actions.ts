@@ -36,7 +36,7 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionUpdateItem(context: MainContext, payload: { id: number, item: IItemUpdate }) {
+    async actionUpdateItem(context: MainContext, payload: { id: number, item: IItemUpdate; }) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);
@@ -52,7 +52,7 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionDeleteItem(context: MainContext, payload: { id: number }) {
+    async actionDeleteItem(context: MainContext, payload: { id: number; }) {
         try {
 
             const loadingNotification = { content: 'deleting', showProgress: true };
