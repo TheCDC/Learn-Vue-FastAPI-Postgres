@@ -1,7 +1,7 @@
 from typing import Dict
 from app.tests.api.api_v1.bekpack.utils import get_bekpack_user
 from app.tests.crud.bekpack.utils import get_random_color
-from app.tests.utils.utils import random_lower_string
+from app.tests.utils.utils import random_lower_name, random_lower_string
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
@@ -21,7 +21,11 @@ def test_create_delete_bekpacktrip(
     assert content["is_active"] == True
     user_id_old = content["id"]
     # create trip
-    trip_data = {"name": random_lower_string(), "color": get_random_color()}
+    trip_data = {
+        "name": random_lower_name(),
+        "color": get_random_color(),
+        "description": random_lower_string(),
+    }
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
         headers=normal_user_token_headers_random,
@@ -30,13 +34,17 @@ def test_create_delete_bekpacktrip(
     content = response.json()
     trip_id = content["id"]
     assert "id" in content
-    for k, v in trip_data.items():
-        assert content[k] == v
+    for key, value in trip_data.items():
+        assert content[key] == value
     # delete trip
     response = client.delete(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id}",
         headers=normal_user_token_headers_random,
     )
+    content = response.json()
+    assert "id" in content
+
+    assert content["id"] == trip_id
     # then delete user
     response = client.delete(
         f"{settings.API_V1_STR}/bekpack/bekpackusers/{user_id_old}",
@@ -56,7 +64,7 @@ def test_update_bekpacktrip(
     content = response.json()
     user_id_old = content["id"]
     # create trip
-    trip_data = {"name": random_lower_string(), "color": get_random_color()}
+    trip_data = {"name": random_lower_name(), "color": get_random_color()}
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
         headers=normal_user_token_headers_random,
@@ -65,13 +73,14 @@ def test_update_bekpacktrip(
     content = response.json()
     trip_id_created = content["id"]
     # update trip
-    content_update = {"color": get_random_color(), "name": "newname"}
+    content_update = {"color": get_random_color(), "name": random_lower_name()}
     response = client.put(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id_created}",
         headers=normal_user_token_headers_random,
         json=content_update,
     )
     content = response.json()
+    # assertions
     for k, v in content_update.items():
         assert content[k] == v
     # delete trip

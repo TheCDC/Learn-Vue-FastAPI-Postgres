@@ -7,4 +7,10 @@ class TimestampsMixin:
     time_created = Column(
         DateTime, default=utcnow(), server_default=utcnow(), nullable=False, index=True
     )
-    time_updated = Column(DateTime, onupdate=utcnow(), index=True)
+    time_updated = Column(
+        DateTime,
+        default=utcnow(),
+        onupdate=utcnow(),
+        server_default=utcnow(),
+        index=True,
+    )

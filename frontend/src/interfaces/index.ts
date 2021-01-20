@@ -54,6 +54,7 @@ export interface IBekpackTrip {
     name: string;
     owner_id: number;
     time_created: Date;
+    time_updated: Date;
 }
 
 export interface IBekpackTripCreate {

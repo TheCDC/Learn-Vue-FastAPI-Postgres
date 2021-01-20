@@ -1,9 +1,11 @@
 from app.schemas.bekpack.bekpacktrip import BekpackTripUpdate
 from app.tests.utils.user import create_random_user
 from app.tests.utils.item import random_lower_string
+from app.tests.utils.utils import random_lower_name
 from sqlalchemy.orm import Session
 from app.schemas import BekpackTripCreate
 from app.crud import bekpacktrip
+from app.crud import bekpackuser
 from app.models.bekpack import BekpackUser
 from .utils import get_random_color, get_bekpack_user
 
@@ -11,13 +13,13 @@ from .utils import get_random_color, get_bekpack_user
 def test_create_bekpaktrip(db: Session):
     bp_user = get_bekpack_user(db)
     btc = BekpackTripCreate(
-        name=random_lower_string(),
+        name=random_lower_name(),
         description=random_lower_string(),
         color=get_random_color(),
     )
     bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=bp_user.id)
     assert bpt.owner_id == bp_user.id
-    u: BekpackUser = db.query(BekpackUser).filter(BekpackUser.id == bp_user.id).one()
+    u: BekpackUser = bekpackuser.get(db=db, id=bp_user.id)
     # trip added to users's list of owned trips
     assert bpt.id in list(i.id for i in u.owned_trips)
     # user added to list of trip's members
@@ -27,7 +29,7 @@ def test_create_bekpaktrip(db: Session):
 def test_create_multiple_bekpacktrip(db: Session):
     bp_user = get_bekpack_user(db)
     # create five trips
-    names = [random_lower_string() for i in range(5)]
+    names = [random_lower_name() for i in range(5)]
     trips_created = sorted(
         [
             bekpacktrip.create_with_owner(
@@ -58,7 +60,7 @@ def test_create_multiple_bekpacktrip(db: Session):
 def test_delete_bekpaktrip(db: Session):
     bp_user = get_bekpack_user(db)
     btc = BekpackTripCreate(
-        name=random_lower_string(),
+        name=random_lower_name(),
         description=random_lower_string(),
         color=get_random_color(),
     )
@@ -76,7 +78,7 @@ def test_delete_bekpaktrip(db: Session):
 def test_add_members(db: Session):
     owner = get_bekpack_user(db)
     btc = BekpackTripCreate(
-        name=random_lower_string(),
+        name=random_lower_name(),
         description=random_lower_string(),
         color=get_random_color(),
     )
@@ -94,16 +96,16 @@ def test_update_bekpacktrip(db: Session):
     owner = get_bekpack_user(db)
     newowner = get_bekpack_user(db)
     btc = BekpackTripCreate(
-        name=random_lower_string(),
+        name=random_lower_name(),
         description=random_lower_string(),
         color=get_random_color(),
     )
     trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
-    newname = random_lower_string()
+    new_name = random_lower_name()
     newcolor = get_random_color()
-    newis_active = False
+    new_is_active = False
     btc_2 = BekpackTripUpdate(
-        name=newname, color=newcolor, is_active=newis_active, owner_id=newowner.id
+        name=new_name, color=newcolor, is_active=new_is_active, owner_id=newowner.id
     )
     trip_updated = bekpacktrip.update(db=db, db_obj=trip_created, obj_in=btc_2)
     # assert same record
@@ -111,18 +113,15 @@ def test_update_bekpacktrip(db: Session):
     assert trip_created.owner_id == trip_updated.owner_id
     # assert properties changed
     assert trip_updated.owner_id == newowner.id
-    assert trip_updated.name == newname
-    assert trip_updated.is_active == newis_active
+    assert trip_updated.name == new_name
+    assert trip_updated.is_active == new_is_active
     assert trip_updated.color.lower() == newcolor.lower()
 
 
 def test_change_owner(db: Session):
     owner = get_bekpack_user(db)
     newowner = get_bekpack_user(db)
-    name = random_lower_string()
-    btc = BekpackTripCreate(
-        name=random_lower_string(), description=random_lower_string()
-    )
+    btc = BekpackTripCreate(name=random_lower_name(), description=random_lower_string())
     created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
     update = BekpackTripUpdate(owner_id=newowner.id)
     updated = bekpacktrip.update(db, db_obj=created, obj_in=update)

@@ -87,7 +87,9 @@ def delete_bekpacktrip(
     trip = crud_bekpacktrip.get(db=db, id=id)
     if not trip:
         raise HTTPException(status_code=404, detail="BekpackTrip not found")
-    if not crud_user.is_superuser(current_user) and (trip.owner_id != current_user.id):
+    if not crud_user.is_superuser(current_user) and (
+        trip.owner.owner_id != current_user.id
+    ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     trip = crud_bekpacktrip.remove(db=db, id=id)
     return trip
@@ -102,9 +104,13 @@ def create_bekpacktrip(
 ) -> Any:
     """Create new BekpackTrip"""
     try:
-        owner = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
+        owner_bekpack_user = crud_bekpackuser.get_by_owner(
+            db=db, owner_id=current_user.id
+        )
     except sqlalchemy.orm.exc.NoResultFound:
         raise HTTPException(status_code=404, detail="User not registered for BekPack")
-    trip = crud_bekpacktrip.create_with_owner(db=db, obj_in=trip_in, owner_id=owner.id)
+    trip = crud_bekpacktrip.create_with_owner(
+        db=db, obj_in=trip_in, owner_id=owner_bekpack_user.id
+    )
 
     return trip

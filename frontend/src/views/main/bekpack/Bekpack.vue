@@ -40,12 +40,15 @@
         :loading="loading"
       >
         <template v-slot:[`item.name`]="{ item }">
-          <v-chip class="ma-2" :color="item.color">
-            {{ item.name | truncate(100, "...") }}
-          </v-chip>
+          <v-badge class="ma-2" :color="item.color" inline left>
+            {{ item.name | truncate(64, "...") }}
+          </v-badge>
         </template>
         <template v-slot:[`item.description`]="{ item }">
           {{ item.description | truncate(100, "...") }}
+        </template>
+        <template v-slot:[`item.time_updated`]="{ item }">
+          {{ new Date(item.time_updated) }}
         </template>
         <template v-slot:[`item.time_created`]="{ item }">
           {{ new Date(item.time_created) }}
@@ -114,7 +117,9 @@ export default class Bekpack extends Vue {
   public async load() {
     this.loading = true;
     await dispatchGetBekpackUser(this.$store);
-    await dispatchGetMyTrips(this.$store, { page: this.page });
+    await dispatchGetMyTrips(this.$store, {
+      page: { page: this.page.page, size: this.page.size },
+    });
     this.loading = false;
   }
 
@@ -131,19 +136,35 @@ export default class Bekpack extends Vue {
   get trips() {
     return readTrips(this.$store);
   }
-  public async deleteTrip(t: IBekpackTrip) {
-    await dispatchDeleteTrip(this.$store, t);
+  public async deleteTrip(trip: IBekpackTrip) {
+    await dispatchDeleteTrip(this.$store, trip);
   }
   public headers = [
     { text: "name", sortable: false, value: "name", align: "left" },
     {
-      text: "description",
-      sortable: false,
-      value: "description",
       align: "left",
+      sortable: false,
+      text: "description",
+      value: "description",
     },
-    { text: "Time Created", value: "time_created", align: "left" },
-    { text: "Actions", sortable: false, value: "id", align: "right" },
+    {
+      align: "left",
+      sortable: false,
+      text: "Updated At",
+      value: "time_updated",
+    },
+    {
+      align: "left",
+      sortable: false,
+      text: "Created At",
+      value: "time_created",
+    },
+    {
+      align: "right",
+      sortable: false,
+      text: "Actions",
+      value: "id",
+    },
   ];
 }
 </script>
