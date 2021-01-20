@@ -7,7 +7,19 @@
 	"settings": {
 		"editor.formatOnSave": true,
 		"files.insertFinalNewline": true,
-		"files.trimFinalNewlines": true
+		"files.trimFinalNewlines": true,
+		"python.analysis.typeCheckingMode": "basic",
+		"cSpell.words": [
+			"Bekpack",
+			"bekpacktrip",
+			"bekpacktripitemlist",
+			"bekpackuser",
+			"deps",
+			"noqa",
+			"ondelete",
+			"pyright",
+			"pytest"
+		]
 	},
 	"extensions": {
 		"recommendations": [

@@ -10,7 +10,7 @@ from app.models.bekpack import BekpackUser
 from .utils import get_random_color, get_bekpack_user
 
 
-def test_create_bekpaktrip(db: Session):
+def test_create_beckpacktrip(db: Session):
     bp_user = get_bekpack_user(db)
     btc = BekpackTripCreate(
         name=random_lower_name(),
@@ -19,7 +19,7 @@ def test_create_bekpaktrip(db: Session):
     )
     bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=bp_user.id)
     assert bpt.owner_id == bp_user.id
-    u: BekpackUser = bekpackuser.get(db=db, id=bp_user.id)
+    u = bekpackuser.get(db=db, id=bp_user.id)
     # trip added to users's list of owned trips
     assert bpt.id in list(i.id for i in u.owned_trips)
     # user added to list of trip's members
@@ -57,7 +57,7 @@ def test_create_multiple_bekpacktrip(db: Session):
         assert c.members == r.members
 
 
-def test_delete_bekpaktrip(db: Session):
+def test_delete_bekpacktrip(db: Session):
     bp_user = get_bekpack_user(db)
     btc = BekpackTripCreate(
         name=random_lower_name(),

@@ -18,7 +18,7 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
             db.query(BekpackUser).filter(BekpackUser.id == owner_id).one()
         )
 
-        db_obj = self.model(**obj_in_data, owner_id=owner_id)
+        db_obj = self.model(**obj_in_data, owner_id=owner_id)  # type: ignore
         # trip owner is also a member by default
         db_obj.members.append(owner)
         db.add(db_obj)
@@ -26,7 +26,12 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
         db.refresh(db_obj)
         return db_obj
 
-    def get_by_owner(self, db: Session, *, owner_id: int,) -> List[BekpackTrip]:
+    def get_by_owner(
+        self,
+        db: Session,
+        *,
+        owner_id: int,
+    ) -> List[BekpackTrip]:
         return (
             db.query(self.model)
             .filter(BekpackTrip.owner_id == owner_id)
@@ -34,7 +39,10 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
             .all()
         )
 
-    def get_all(self, db: Session,) -> List[BekpackTrip]:
+    def get_all(
+        self,
+        db: Session,
+    ) -> List[BekpackTrip]:
         return db.query(self.model).order_by(BekpackTrip.time_updated.desc()).all()
 
     def get_joined_by_member(

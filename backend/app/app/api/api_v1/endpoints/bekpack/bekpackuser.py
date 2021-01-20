@@ -1,16 +1,15 @@
 from typing import Any, List
 
 import sqlalchemy
-from app import models
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.crud import bekpackuser as crud_bekpackuser
-from app.crud import bekpacktrip as crud_bekpacktrip
-from app.crud import user as crud_user
-from app.models.bekpack import BekpackUser
-from app.models import User
+
 import app.schemas as schemas
 from app.api import deps
+from app.crud import bekpacktrip as crud_bekpacktrip
+from app.crud import bekpackuser as crud_bekpackuser
+from app.crud import user as crud_user
+from app.models import User
 
 router = APIRouter()
 

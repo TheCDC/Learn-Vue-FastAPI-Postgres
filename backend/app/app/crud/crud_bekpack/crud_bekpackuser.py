@@ -10,7 +10,7 @@ from app.schemas import BekPackUserCreate, BekPackUserUpdate
 
 class CRUDBekpackUser(CRUDBase[BekpackUser, BekPackUserCreate, BekPackUserUpdate]):
     def create_with_owner(self, db: Session, *, owner_id: int) -> BekpackUser:
-        db_obj = self.model(owner_id=owner_id)
+        db_obj = self.model(owner_id=owner_id)  # type: ignore
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
