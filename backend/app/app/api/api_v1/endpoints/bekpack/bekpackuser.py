@@ -85,7 +85,10 @@ def get_my_owned_BekPackTrips(
     if not bp_user:
         raise HTTPException(status_code=404, detail="BekpackUser not found")
     return crud_bekpacktrip.get_by_owner(
-        db=db, owner_id=bp_user.id, skip=skip, limit=limit
+        db=db,
+        owner_id=bp_user.id,
+        skip=skip,
+        limit=limit,  # TODO: replace skip/limit with fastapi_pagination
     )
 
 
