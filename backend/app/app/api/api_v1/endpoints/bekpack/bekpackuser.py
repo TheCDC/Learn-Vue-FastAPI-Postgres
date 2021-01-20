@@ -1,4 +1,6 @@
+from app.app.models.bekpack import BekpackTrip
 from typing import Any, List
+from fastapi_pagination.bases import AbstractPage
 
 import sqlalchemy
 from app import models
@@ -20,7 +22,7 @@ def create_bekpackuser(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-) -> Any:
+) -> BekpackUser:
     """Create new BekpackUser"""
     try:
         bp_user = crud_bekpackuser.create_with_owner(db=db, owner_id=current_user.id)
@@ -34,7 +36,7 @@ def get_bekpackuser_me(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-) -> Any:
+) -> BekpackUser:
     """Get a BekpackUser"""
     try:
         bp_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
@@ -54,7 +56,7 @@ def delete_bekpackuser_me(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-) -> Any:
+) -> BekpackUser:
     """Delete a BekpackUser"""
     try:
         bp_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
@@ -77,7 +79,7 @@ def get_my_owned_BekPackTrips(
     current_user: User = Depends(deps.get_current_active_user),
     skip: int = 0,
     limit: int = 100,
-) -> Any:
+) -> AbstractPage[BekpackTrip]:
     """Get a BekpackUser"""
     try:
         bp_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)

@@ -3,7 +3,9 @@ from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+import app.crud as crud
+import app.models as models
+import app.schemas as schemas
 from app.crud import user as crud_user
 from app.crud import item as crud_item
 from app.api import deps

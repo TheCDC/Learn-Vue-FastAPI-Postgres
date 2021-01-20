@@ -1,6 +1,8 @@
 from typing import Any, List
+from fastapi_pagination.bases import AbstractPage
 
 import sqlalchemy
+from sqlalchemy.orm.exc import NoResultFound
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_pagination import Page, pagination_params
 from fastapi_pagination.paginator import paginate
@@ -12,6 +14,7 @@ from app.crud import bekpacktrip as crud_bekpacktrip
 from app.crud import bekpackuser as crud_bekpackuser
 from app.crud import user as crud_user
 from app.models import User
+from app.models import bekpack
 
 router = APIRouter()
 
@@ -25,13 +28,13 @@ def get_my_bakpacktrips(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-) -> List[schemas.BekpackTrip]:
+) -> AbstractPage[bekpack.BekpackTrip]:
     try:
         if crud_user.is_superuser(current_user):
             return paginate(crud_bekpacktrip.get_all(db=db))
         else:
             owner = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
-    except sqlalchemy.orm.exc.NoResultFound:
+    except NoResultFound:
         raise HTTPException(status_code=404, detail="User not registered for BekPack")
     records = crud_bekpacktrip.get_by_owner(db=db, owner_id=owner.id)
     return paginate(records)
@@ -43,7 +46,7 @@ def get_bekpacktrip_by_id(
     db: Session = Depends(deps.get_db),
     id: int,
     current_user: User = Depends(deps.get_current_active_user),
-) -> schemas.BekpackTrip:
+) -> bekpack.BekpackTrip:
     trip = crud_bekpacktrip.get(db=db, id=id)
     if not trip:
         raise HTTPException(status_code=404, detail="BekpackTrip not found")
@@ -107,7 +110,7 @@ def create_bekpacktrip(
         owner_bekpack_user = crud_bekpackuser.get_by_owner(
             db=db, owner_id=current_user.id
         )
-    except sqlalchemy.orm.exc.NoResultFound:
+    except NoResultFound:
         raise HTTPException(status_code=404, detail="User not registered for BekPack")
     trip = crud_bekpacktrip.create_with_owner(
         db=db, obj_in=trip_in, owner_id=owner_bekpack_user.id
