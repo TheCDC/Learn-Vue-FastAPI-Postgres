@@ -47,5 +47,9 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
         )
         return [a.trip for a in associations]
 
+    def is_owned_by_bekpackuser(self, db: Session, *, id: int, member_id: int,) -> bool:
+        t = self.get(db=db, id=id)
+        return t.owner_id == member_id
+
 
 bekpacktrip = CRUDBekpackTrip(BekpackTrip)

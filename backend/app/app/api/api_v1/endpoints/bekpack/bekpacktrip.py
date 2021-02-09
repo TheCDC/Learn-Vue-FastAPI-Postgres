@@ -1,4 +1,5 @@
 from typing import Any, List
+from app.models.bekpack import BekpackUser
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,6 +9,7 @@ from sqlalchemy.orm import Session
 
 import app.schemas as schemas
 from app.api import deps
+import app.api.api_v1.endpoints.bekpack.deps as deps_bekpack
 from app.crud import bekpacktrip as crud_bekpacktrip
 from app.crud import bekpackuser as crud_bekpackuser
 from app.crud import user as crud_user
@@ -24,16 +26,12 @@ router = APIRouter()
 def get_my_bakpacktrips(
     *,
     db: Session = Depends(deps.get_db),
+    bekpack_user: BekpackUser = Depends(deps_bekpack.get_bekpack_user),
     current_user: User = Depends(deps.get_current_active_user),
 ) -> List[schemas.BekpackTrip]:
-    try:
-        if crud_user.is_superuser(current_user):
-            return paginate(crud_bekpacktrip.get_all(db=db))
-        else:
-            owner = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
-    except sqlalchemy.orm.exc.NoResultFound:
-        raise HTTPException(status_code=404, detail="User not registered for BekPack")
-    records = crud_bekpacktrip.get_by_owner(db=db, owner_id=owner.id)
+    if crud_user.is_superuser(current_user):
+        return paginate(crud_bekpacktrip.get_all(db=db))
+    records = crud_bekpacktrip.get_by_owner(db=db, owner_id=bekpack_user.id)
     return paginate(records)
 
 
@@ -43,12 +41,13 @@ def get_bekpacktrip_by_id(
     db: Session = Depends(deps.get_db),
     id: int,
     current_user: User = Depends(deps.get_current_active_user),
+    bekpack_user: BekpackUser = Depends(deps_bekpack.get_bekpack_user),
 ) -> schemas.BekpackTrip:
     trip = crud_bekpacktrip.get(db=db, id=id)
     if not trip:
         raise HTTPException(status_code=404, detail="BekpackTrip not found")
     if not crud_user.is_superuser(current_user) and (
-        trip.owner.owner_id != current_user.id
+        not crud_bekpacktrip.is_owned_by_bekpackuser(db=db, member_id=bekpack_user.id)
     ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return trip
@@ -61,14 +60,17 @@ def update_bekpacktrip(
     trip_in: schemas.BekpackTripUpdate,
     id: int,
     current_user: User = Depends(deps.get_current_active_user),
+    bekpack_user: BekpackUser = Depends(deps_bekpack.get_bekpack_user),
 ) -> Any:
     trip = crud_bekpacktrip.get(db=db, id=id)
     if not trip:
         raise HTTPException(status_code=404, detail="BekpackTrip not found")
     if not crud_user.is_superuser(current_user) and (
-        trip.owner.owner_id != current_user.id
+        not crud_bekpacktrip.is_owned_by_bekpackuser(
+            db=db, id=trip.id, member_id=bekpack_user.id
+        )
     ):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+        raise HTTPException(status_code=403, detail="Not enough permissions")
     trip = crud_bekpacktrip.update(db=db, db_obj=trip, obj_in=trip_in)
     return trip
 
