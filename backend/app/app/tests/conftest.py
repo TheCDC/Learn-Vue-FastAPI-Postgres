@@ -34,6 +34,6 @@ def normal_user_token_headers(client: TestClient, db: Session) -> Dict[str, str]
     )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def normal_user_token_headers_random(client: TestClient, db: Session) -> Dict[str, str]:
     return authentication_token_from_email(client=client, email=random_email(), db=db)

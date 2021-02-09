@@ -28,5 +28,10 @@ class CRUDBekpackTripItemList(
             .all()
         )
 
+    def is_owned_by_bekpackuser(
+        self, db: Session, *, list_id: int, member_id: int
+    ) -> bool:
+        self.get(db=db, id=id).parent_trip.owner.id == member_id
+
 
 bekpacktripitemlist = CRUDBekpackTripItemList(BekpackTripItemList)
