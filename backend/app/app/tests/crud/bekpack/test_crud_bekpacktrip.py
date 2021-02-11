@@ -1,13 +1,18 @@
-from app.schemas.bekpack.bekpacktrip import BekpackTripUpdate
-from app.tests.utils.user import create_random_user
-from app.tests.utils.item import random_lower_string
-from app.tests.utils.utils import random_lower_name
+from typing import List
+
 from sqlalchemy.orm import Session
+
+from app import crud
+from app.crud import bekpacktrip, bekpackuser
+from app.models.bekpack import BekpackTrip, BekPackTrip_Members, BekpackUser
 from app.schemas import BekpackTripCreate
-from app.crud import bekpacktrip
-from app.crud import bekpackuser
-from app.models.bekpack import BekpackUser
-from .utils import get_random_color, get_bekpack_user
+from app.schemas.bekpack.bekpacktrip import BekpackTripUpdate
+from app.tests.utils.bekpack import create_random_trip
+from app.tests.utils.item import random_lower_string
+from app.tests.utils.user import create_random_user
+from app.tests.utils.utils import random_lower_name
+
+from .utils import get_bekpack_user, get_random_color
 
 
 def test_create_bekpaktrip(db: Session):
@@ -75,7 +80,7 @@ def test_delete_bekpaktrip(db: Session):
     assert bpt_deleted.owner_id == bp_user.id
 
 
-def test_add_members(db: Session):
+def test_add_members_bekpaktrip(db: Session):
     owner = get_bekpack_user(db)
     btc = BekpackTripCreate(
         name=random_lower_name(),
@@ -118,10 +123,28 @@ def test_update_bekpacktrip(db: Session):
     assert trip_updated.color.lower() == newcolor.lower()
 
 
-def test_change_owner(db: Session):
+def test_change_owner_bekpaktrip(db: Session):
     owner = get_bekpack_user(db)
     newowner = get_bekpack_user(db)
     btc = BekpackTripCreate(name=random_lower_name(), description=random_lower_string())
     created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
     update = BekpackTripUpdate(owner_id=newowner.id)
     updated = bekpacktrip.update(db, db_obj=created, obj_in=update)
+
+
+def test_get_joined_by_member_bekpaktrip(db: Session):
+    owner = get_bekpack_user(db)
+    trips = [create_random_trip(db=db, bekpack_user=owner) for _ in range(10)]
+    found: List[BekpackTrip] = crud.bekpacktrip.get_joined_by_member(
+        db=db, member_id=owner.id
+    )
+    found_ids = [i.id for i in found]
+    assert set(found_ids) == set(t.id for t in trips)
+
+
+def test_get_by_owner_bekpaktrip(db: Session):
+    owner = get_bekpack_user(db)
+    trips = [create_random_trip(db=db, bekpack_user=owner) for _ in range(10)]
+    found: List[BekpackTrip] = crud.bekpacktrip.get_by_owner(db=db, owner_id=owner.id)
+    found_ids = [i.id for i in found]
+    assert set(found_ids) == set(t.id for t in trips)
