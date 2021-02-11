@@ -37,15 +37,14 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
     def get_all(self, db: Session,) -> List[BekpackTrip]:
         return db.query(self.model).order_by(BekpackTrip.time_updated.desc()).all()
 
-    def get_joined_by_member(
-        self, db: Session, *, member_id: int, skip: int = 0, limit: int = 100
-    ) -> List[BekpackTrip]:
+    def get_joined_by_member(self, db: Session, *, member_id: int) -> List[BekpackTrip]:
         associations: List[BekPackTrip_Members] = (
-            db.query(BekPackTrip_Members)
+            db.query(self.model)
+            .join(BekPackTrip_Members)
             .filter(BekPackTrip_Members.user_id == member_id)
-            .all()
+            .filter(self.model.id == BekPackTrip_Members.trip_id)
         )
-        return [a.trip for a in associations]
+        return associations
 
     def is_owned_by_bekpackuser(self, db: Session, *, id: int, member_id: int,) -> bool:
         t = self.get(db=db, id=id)
