@@ -52,10 +52,10 @@ class BekpackTrip(Base, TimestampsMixin):
         back_populates="joined_trips",
     )
     owner = relationship(BekpackUser, back_populates="owned_trips")
-    items_lists = relationship("BekpackTripItemList", back_populates="parent_trip")
+    items_lists = relationship("BekpackItemList", back_populates="parent_trip")
 
 
-class BekpackTripItemList(Base):
+class BekpackItemList(Base):
     id = Column(Integer, primary_key=True, index=True, unique=True)
     name = Column(String)
     parent_trip_id = Column(
@@ -90,7 +90,7 @@ class BekpackListItem(Base):
     name = Column(String)
     parent_list_id = Column(
         Integer,
-        ForeignKey(BekpackTripItemList.id, ondelete="cascade"),
+        ForeignKey(BekpackItemList.id, ondelete="cascade"),
         index=True,
         nullable=False,
     )

@@ -7,7 +7,7 @@ from app.models.bekpack import (
     BekpackUser,
     BekpackTrip,
     BekPackTrip_Members,
-    BekpackTripItemList,
+    BekpackItemList,
     BekpackBag,
     BekpackListItem,
 )

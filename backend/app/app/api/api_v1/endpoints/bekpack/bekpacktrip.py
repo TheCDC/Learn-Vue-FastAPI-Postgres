@@ -10,7 +10,7 @@ import app.api.api_v1.endpoints.bekpack.deps as deps_bekpack
 import app.schemas as schemas
 from app.api import deps
 from app.crud import bekpacktrip as crud_bekpacktrip
-from app.crud import bekpacktripitemlist as crud_bekpackitemlist
+from app.crud import bekpackitemlist as crud_bekpackitemlist
 from app.crud import bekpackuser as crud_bekpackuser
 from app.crud import user as crud_user
 from app.models import User
@@ -58,7 +58,7 @@ def get_bekpacktrip_by_id(
 
 @router.get(
     "/{trip_id}/lists",
-    response_model=Page[schemas.BekpackTripItemList],
+    response_model=Page[schemas.BekpackItemList],
     dependencies=[Depends(pagination_params)],
 )
 def get_bekpacktrip_lists(
@@ -68,9 +68,9 @@ def get_bekpacktrip_lists(
     current_user: User = Depends(deps.get_current_active_user),
     trip_id: int,
 ) -> List[schemas.BekpackTrip]:
-    if not crud_user.is_superuser(
-        current_user
-    ) and not crud_bekpacktrip.is_owned_by_bekpackuser(
+    if not crud_user.is_superuser(current_user):
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    elif not crud_bekpacktrip.is_owned_by_bekpackuser(
         db=db, id=trip_id, member_id=bekpack_user.id
     ):
         raise HTTPException(status_code=403, detail="Not enough permissions")

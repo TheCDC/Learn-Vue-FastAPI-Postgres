@@ -1,3 +1,3 @@
 from .crud_bekpackuser import bekpackuser
 from .crud_bekpacktrip import bekpacktrip
-from .crud_bekpacktripitemlist import bekpacktripitemlist
+from .crud_bekpackitemlist import bekpackitemlist

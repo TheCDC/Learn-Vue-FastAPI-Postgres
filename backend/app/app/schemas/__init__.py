@@ -22,11 +22,11 @@ from .bekpack.bekpacktrip import (
     BekpackTripUpdate,
 )
 
-from .bekpack.bekpacktripitemlist import (
-    BekpackTripItemList,
-    BekpackTripItemListCreate,
-    BekpackTripItemListInDBBase,
-    BekpackTripItemListUpdate,
+from .bekpack.bekpackitemlist import (
+    BekpackItemList,
+    BekpackItemListCreate,
+    BekpackItemListInDBBase,
+    BekpackItemListUpdate,
 )
 
 from .bekpack.bekpackuser import (

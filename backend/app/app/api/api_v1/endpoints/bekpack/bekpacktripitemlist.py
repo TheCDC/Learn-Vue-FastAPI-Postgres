@@ -10,7 +10,7 @@ import app.api.api_v1.endpoints.bekpack.deps as deps_bekpack
 import app.schemas as schemas
 from app.api import deps
 from app.crud import bekpacktrip as crud_bekpacktrip
-from app.crud import bekpacktripitemlist as crud_bekpackitemlist
+from app.crud import bekpackitemlist as crud_bekpackitemlist
 from app.crud import bekpackuser as crud_bekpackuser
 from app.crud import user as crud_user
 from app.models import User
@@ -21,7 +21,7 @@ router = APIRouter()
 
 @router.get(
     "/{list_id}",
-    response_model=Page[schemas.BekpackTripItemList],
+    response_model=Page[schemas.BekpackItemList],
     dependencies=[Depends(pagination_params)],
 )
 def get_bekpacktrip_lists(

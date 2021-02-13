@@ -4,26 +4,26 @@ from app.schemas.bekpack.bekpackbag import BekpackBagInDBBase
 from pydantic import BaseModel
 
 # Shared properties
-class BekpackTripItemListBase(BaseModel):
+class BekpackItemListBase(BaseModel):
     name: Optional[str] = None
     parent_trip_id: Optional[int] = None
     parent_user_id: Optional[int] = None
 
 
 # Properties to receive via API on creation
-class BekpackTripItemListCreate(BekpackTripItemListBase):
+class BekpackItemListCreate(BekpackItemListBase):
     name: str
     parent_trip_id: int
     parent_user_id: int
 
 
 # Properties to receive via API on update
-class BekpackTripItemListUpdate(BekpackTripItemListBase):
+class BekpackItemListUpdate(BekpackItemListBase):
     pass
 
 
 # Properties shared by models stored in DB
-class BekpackTripItemListInDBBase(BekpackTripItemListBase):
+class BekpackItemListInDBBase(BekpackItemListBase):
     id: int
     name: str
 
@@ -32,7 +32,7 @@ class BekpackTripItemListInDBBase(BekpackTripItemListBase):
 
 
 # Properties to return to client
-class BekpackTripItemList(BekpackTripItemListInDBBase):
+class BekpackItemList(BekpackItemListInDBBase):
     pass
 
 
