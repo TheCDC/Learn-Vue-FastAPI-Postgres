@@ -1,20 +1,34 @@
 from typing import Optional
+
+from pydantic import BaseModel, validator
+from pydantic.color import Color
+
+from app.crud.encoders import convert_color
 from app.schemas.bekpack.bekpackbag import BekpackBagInDBBase
 
-from pydantic import BaseModel
 
 # Shared properties
 class BekpackItemListBase(BaseModel):
+    color: Optional[Color]
     name: Optional[str] = None
-    parent_trip_id: Optional[int] = None
-    parent_user_id: Optional[int] = None
+
+    @validator("color")
+    def validate(cls, c: Color):
+        if isinstance(c, Color):
+            return c.as_hex()
+        elif isinstance(c, str):
+            return Color(c)
+        return c
+
+    class Config:
+        orm_mode = True
+        json_encoders = {Color: convert_color}
 
 
 # Properties to receive via API on creation
 class BekpackItemListCreate(BekpackItemListBase):
     name: str
-    parent_trip_id: int
-    parent_user_id: int
+    color: Color = "blue"
 
 
 # Properties to receive via API on update

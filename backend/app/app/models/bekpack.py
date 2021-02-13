@@ -56,12 +56,12 @@ class BekpackTrip(Base, TimestampsMixin):
 
 
 class BekpackItemList(Base):
-    id = Column(Integer, primary_key=True, index=True, unique=True)
+    id = Column(Integer, primary_key=True, index=True)
     parent_trip_id = Column(
         Integer, ForeignKey(BekpackTrip.id, ondelete="cascade"), index=True
     )
     parent_user_id = Column(
-        Integer, ForeignKey(BekpackUser.id, ondelete="cascade"), primary_key=True
+        Integer, ForeignKey(BekpackUser.id, ondelete="cascade"), index=True
     )
     color = Column(String)
     name = Column(String)

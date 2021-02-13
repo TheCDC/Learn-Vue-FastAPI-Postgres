@@ -1,8 +1,8 @@
 """Bekpack
 
-Revision ID: e5d3ce0fa804
+Revision ID: 1ed0238e6d2d
 Revises: d4867f3a4c0a
-Create Date: 2021-02-13 02:30:29.731671
+Create Date: 2021-02-13 02:43:10.271630
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e5d3ce0fa804'
+revision = '1ed0238e6d2d'
 down_revision = 'd4867f3a4c0a'
 branch_labels = None
 depends_on = None
@@ -60,15 +60,16 @@ def upgrade():
     op.create_table('bekpackitemlist',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('parent_trip_id', sa.Integer(), nullable=True),
-    sa.Column('parent_user_id', sa.Integer(), nullable=False),
+    sa.Column('parent_user_id', sa.Integer(), nullable=True),
     sa.Column('color', sa.String(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['parent_trip_id'], ['bekpacktrip.id'], ondelete='cascade'),
     sa.ForeignKeyConstraint(['parent_user_id'], ['bekpackuser.id'], ondelete='cascade'),
-    sa.PrimaryKeyConstraint('id', 'parent_user_id')
+    sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_bekpackitemlist_id'), 'bekpackitemlist', ['id'], unique=True)
+    op.create_index(op.f('ix_bekpackitemlist_id'), 'bekpackitemlist', ['id'], unique=False)
     op.create_index(op.f('ix_bekpackitemlist_parent_trip_id'), 'bekpackitemlist', ['parent_trip_id'], unique=False)
+    op.create_index(op.f('ix_bekpackitemlist_parent_user_id'), 'bekpackitemlist', ['parent_user_id'], unique=False)
     op.create_table('bekpacktrip_members',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('trip_id', sa.Integer(), nullable=True),
@@ -116,6 +117,7 @@ def downgrade():
     op.drop_index(op.f('ix_bekpacktrip_members_user_id'), table_name='bekpacktrip_members')
     op.drop_index(op.f('ix_bekpacktrip_members_trip_id'), table_name='bekpacktrip_members')
     op.drop_table('bekpacktrip_members')
+    op.drop_index(op.f('ix_bekpackitemlist_parent_user_id'), table_name='bekpackitemlist')
     op.drop_index(op.f('ix_bekpackitemlist_parent_trip_id'), table_name='bekpackitemlist')
     op.drop_index(op.f('ix_bekpackitemlist_id'), table_name='bekpackitemlist')
     op.drop_table('bekpackitemlist')

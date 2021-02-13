@@ -1,22 +1,31 @@
-from .validators import validate_color
-from typing import Set, Optional
+from typing import Optional, Set
 
-from pydantic import BaseModel, validator, ValidationError
+from pydantic import BaseModel, ValidationError, validator
+from pydantic.color import Color
+
+from app.crud.encoders import convert_color
+from .validators import validate_color
+
 
 # Shared properties
 class BekpackBagBase(BaseModel):
-    color: Optional[str] = "#F57900"
-
-    @validator("color")
-    def validate_color(cls, v: str):
-        if not validate_color(v):
-            raise ValidationError("Color string must be '#XXXXXX' where X [a-fA-F0-9]")
-        return v
-
+    color: Optional[Color]
     items: Optional[Set[int]] = None
     name: Optional[str] = None
     owner_id: Optional[int] = None
     owner_trip_id: Optional[int] = None
+
+    @validator("color")
+    def validate(cls, c: Color):
+        if isinstance(c, Color):
+            return c.as_hex()
+        elif isinstance(c, str):
+            return Color(c)
+        return c
+
+    class Config:
+        orm_mode = True
+        json_encoders = {Color: convert_color}
 
 
 # Properties to receive via API on creation
