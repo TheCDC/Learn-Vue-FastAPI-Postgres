@@ -17,7 +17,9 @@ class CRUDBekpackUser(CRUDBase[BekpackUser, BekPackUserCreate, BekPackUserUpdate
         return db_obj
 
     def get_by_owner(self, db: Session, *, owner_id: int) -> BekpackUser:
-        return db.query(self.model).filter(BekpackUser.owner_id == owner_id).one()
+        return (
+            db.query(self.model).filter(BekpackUser.owner_id == owner_id).one_or_none()
+        )
 
 
 bekpackuser = CRUDBekpackUser(BekpackUser)
