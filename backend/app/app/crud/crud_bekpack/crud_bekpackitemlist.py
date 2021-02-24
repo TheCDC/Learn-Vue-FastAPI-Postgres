@@ -31,11 +31,6 @@ class CRUDBekpackItemList(
     def get_by_owner(self, db: Session, *, owner_id: int) -> List[BekpackItemList]:
         return db.query(self.model).filter(self.model.parent_user_id == owner_id).all()
 
-    def is_owned_by_bekpackuser(
-        self, db: Session, *, list_id: int, member_id: int
-    ) -> bool:
-        return self.get(db=db, id=id).parent_trip.owner.id == member_id
-
     def user_can_see(self, db: Session, *, list_id: int, bekpack_user_id: int) -> bool:
         itemlist: BekpackItemList = db.query(self.model).filter(id=list_id).one()
         potential_membership = (
