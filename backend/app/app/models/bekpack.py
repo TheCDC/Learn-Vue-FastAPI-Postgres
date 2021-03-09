@@ -34,6 +34,7 @@ class BekpackUser(Base):
     )
     owned_bags = relationship("BekpackBag", back_populates="owner")
     owned_trips = relationship("BekpackTrip", back_populates="owner")
+    owner = relationship("User")
 
 
 class BekpackTrip(Base, TimestampsMixin):

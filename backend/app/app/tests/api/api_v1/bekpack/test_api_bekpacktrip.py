@@ -49,7 +49,7 @@ def test_create_bekpacktrip(
     assert content["id"] == trip_id
 
 
-def test_get_bekpacktrip_multi(
+def test_get_bekpacktrip_mine_multi(
     client: TestClient, normal_user_token_headers_random: Dict[str, str], db: Session
 ) -> None:
     # create the user
@@ -69,7 +69,7 @@ def test_get_bekpacktrip_multi(
     # get trip
 
     response = client.get(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/mine/all",
         headers=normal_user_token_headers_random,
     )
     content = response.json()
@@ -103,7 +103,7 @@ def test_get_bekpacktrip_unauthorized(
     db: Session,
 ) -> None:
     # register both users for bekpack
-    response = get_bekpack_user(client, normal_user_token_headers_random, db)
+    response_first_user = get_bekpack_user(client, normal_user_token_headers_random, db)
     response = get_bekpack_user(client, normal_user_token_headers, db)
     user = response.json()
 

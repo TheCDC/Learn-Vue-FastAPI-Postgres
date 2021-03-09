@@ -29,6 +29,7 @@
 
     <div>
       <v-data-table
+        v-if="trips"
         :headers="headers"
         :items="trips.items"
         :footer-props="{

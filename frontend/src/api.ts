@@ -96,7 +96,7 @@ export const api = {
   },
   async getMyBekpackTrips(token: string, page: IPageRead) {
     return axios.get<IPage<IBekpackTrip>>(
-      `${apiUrl}/api/v1/bekpack/bekpacktrips/`, paginated(authHeaders(token), page)).catch((error) => {
+      `${apiUrl}/api/v1/bekpack/bekpacktrips/mine/all`, paginated(authHeaders(token), page)).catch((error) => {
         if (error.response.status !== 404) {
           return error;
         }

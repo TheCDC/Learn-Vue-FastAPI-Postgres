@@ -1,4 +1,6 @@
 from typing import Any, List
+from app.api.api_v1 import DefaultCrudRouter
+from app.crud.crud_bekpack.crud_bekpacktrip import CRUDBekpackTrip
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,45 +17,30 @@ from app.crud import bekpackuser as crud_bekpackuser
 from app.crud import user as crud_user
 from app.models import User
 from app.models.bekpack import BekpackUser
+from app import models, crud, schemas
 
-router = APIRouter()
+router = DefaultCrudRouter[
+    models.BekpackTrip, CRUDBekpackTrip, schemas.BekpackTrip, schemas.BekpackTripUpdate
+](
+    model=models.BekpackTrip,
+    crud=crud.bekpacktrip,
+    read_schema=schemas.BekpackTrip,
+    update_schema=schemas.BekpackTripUpdate,
+)
 
 
 @router.get(
-    "/",
+    "/mine/all",
     response_model=Page[schemas.BekpackTrip],
     dependencies=[Depends(pagination_params)],
 )
 def get_my_bakpacktrips(
     *,
     db: Session = Depends(deps.get_db),
-    bekpack_user: BekpackUser = Depends(deps_bekpack.get_bekpack_user),
     current_user: User = Depends(deps.get_current_active_user),
 ) -> List[schemas.BekpackTrip]:
-    if crud_user.is_superuser(current_user):
-        return paginate(crud_bekpacktrip.get_all(db=db))
-    records = crud_bekpacktrip.get_by_owner(db=db, owner_id=bekpack_user.id)
+    records = crud_bekpacktrip.get_by_owner(db=db, owner_id=current_user.id)
     return paginate(records)
-
-
-@router.get("/{id}", response_model=schemas.BekpackTrip)
-def get_bekpacktrip_by_id(
-    *,
-    db: Session = Depends(deps.get_db),
-    id: int,
-    current_user: User = Depends(deps.get_current_active_user),
-    bekpack_user: BekpackUser = Depends(deps_bekpack.get_bekpack_user),
-) -> schemas.BekpackTrip:
-    trip = crud_bekpacktrip.get(db=db, id=id)
-    if not trip:
-        raise HTTPException(status_code=404, detail="BekpackTrip not found")
-    if not crud_user.is_superuser(current_user) and (
-        not crud_bekpacktrip.is_owned_by_bekpackuser(
-            db=db, member_id=bekpack_user.id, id=id
-        )
-    ):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    return trip
 
 
 @router.get(
@@ -64,63 +51,14 @@ def get_bekpacktrip_by_id(
 def get_bekpacktrip_lists(
     *,
     db: Session = Depends(deps.get_db),
-    bekpack_user: BekpackUser = Depends(deps_bekpack.get_bekpack_user),
     current_user: User = Depends(deps.get_current_active_user),
     trip_id: int,
 ) -> List[schemas.BekpackTrip]:
-    if not crud_user.is_superuser(current_user):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    elif not crud_bekpacktrip.is_owned_by_bekpackuser(
-        db=db, id=trip_id, member_id=bekpack_user.id
-    ):
+    if not crud_bekpacktrip.user_can_read(db=db, id=id, user=current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     records = crud_bekpackitemlist.get_by_trip(db=db, trip_id=trip_id)
     return paginate(records)
-
-
-@router.put("/{id}", response_model=schemas.BekpackTrip)
-def update_bekpacktrip(
-    *,
-    db: Session = Depends(deps.get_db),
-    trip_in: schemas.BekpackTripUpdate,
-    id: int,
-    current_user: User = Depends(deps.get_current_active_user),
-    bekpack_user: BekpackUser = Depends(deps_bekpack.get_bekpack_user),
-) -> Any:
-    trip = crud_bekpacktrip.get(db=db, id=id)
-    if not trip:
-        raise HTTPException(status_code=404, detail="BekpackTrip not found")
-    if not crud_user.is_superuser(current_user) and (
-        not crud_bekpacktrip.is_owned_by_bekpackuser(
-            db=db, id=trip.id, member_id=bekpack_user.id
-        )
-    ):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    trip = crud_bekpacktrip.update(db=db, db_obj=trip, obj_in=trip_in)
-    return trip
-
-
-@router.delete("/{id}", response_model=schemas.BekpackTrip)
-def delete_bekpacktrip(
-    *,
-    db: Session = Depends(deps.get_db),
-    id: int,
-    current_user: User = Depends(deps.get_current_active_user),
-) -> Any:
-    pass
-    """
-    Delete a BekpackTrip.
-    """
-    trip = crud_bekpacktrip.get(db=db, id=id)
-    if not trip:
-        raise HTTPException(status_code=404, detail="BekpackTrip not found")
-    if not crud_user.is_superuser(current_user) and (
-        trip.owner.owner_id != current_user.id
-    ):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    trip = crud_bekpacktrip.remove(db=db, id=id)
-    return trip
 
 
 @router.post("/", response_model=schemas.BekpackTrip)

@@ -32,6 +32,7 @@ def test_create_bekpaktrip(db: Session):
 
 
 def test_create_multiple_bekpacktrip(db: Session):
+
     bp_user = get_bekpack_user(db)
     # create five trips
     names = [random_lower_name() for i in range(5)]
@@ -51,7 +52,8 @@ def test_create_multiple_bekpacktrip(db: Session):
         key=lambda trip: trip.id,
     )
     trips_retrieved = sorted(
-        bekpacktrip.get_by_owner(db, owner_id=bp_user.id), key=lambda trip: trip.id
+        bekpacktrip.get_by_owner(db, owner_id=bp_user.owner_id),
+        key=lambda trip: trip.id,
     )
     # same number of trips retrieved and created
     assert len(trips_retrieved) == len(trips_created)
@@ -143,8 +145,19 @@ def test_get_joined_by_member_bekpaktrip(db: Session):
 
 
 def test_get_by_owner_bekpaktrip(db: Session):
-    owner = get_bekpack_user(db)
-    trips = [create_random_trip(db=db, bekpack_user=owner) for _ in range(10)]
-    found: List[BekpackTrip] = crud.bekpacktrip.get_by_owner(db=db, owner_id=owner.id)
+    owner_bpuser = get_bekpack_user(db)
+    trips = [create_random_trip(db=db, bekpack_user=owner_bpuser) for _ in range(10)]
+    found: List[BekpackTrip] = crud.bekpacktrip.get_by_owner(
+        db=db, owner_id=owner_bpuser.owner_id
+    )
     found_ids = [i.id for i in found]
     assert set(found_ids) == set(t.id for t in trips)
+
+
+def test_user_can_read_bekpacktrip(db: Session):
+    bpuser1 = get_bekpack_user(db)
+    bpuser2 = get_bekpack_user(db)
+
+    trip = create_random_trip(db, bpuser1)
+    assert crud.bekpacktrip.user_can_read(db, trip.id, bpuser1.owner)
+    assert not crud.bekpacktrip.user_can_read(db, trip.id, bpuser2.owner)

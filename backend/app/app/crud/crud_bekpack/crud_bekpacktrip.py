@@ -1,11 +1,11 @@
 from typing import List
-from fastapi.encoders import jsonable_encoder
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
+from app import models
 from app.crud.base import CRUDBase
-from app.models.bekpack import BekpackTrip, BekpackUser
-from app.models.bekpack import BekpackTrip, BekpackUser, BekPackTrip_Members
+from app.models.bekpack import BekpackTrip, BekPackTrip_Members, BekpackUser
 from app.schemas import BekpackTripCreate, BekpackTripUpdate
 
 
@@ -29,7 +29,8 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
     def get_by_owner(self, db: Session, *, owner_id: int,) -> List[BekpackTrip]:
         return (
             db.query(self.model)
-            .filter(BekpackTrip.owner_id == owner_id)
+            .join(BekpackUser, BekpackUser.owner_id == owner_id)
+            .filter(BekpackTrip.owner_id == BekpackUser.id)
             .order_by(BekpackTrip.time_updated.desc())
             .all()
         )
@@ -46,9 +47,37 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
         )
         return associations
 
-    def is_owned_by_bekpackuser(self, db: Session, *, id: int, member_id: int,) -> bool:
-        t = self.get(db=db, id=id)
-        return t.owner_id == member_id
+    def user_can_read(self, db: Session, id: int, user: models.User) -> bool:
+        obj = (
+            db.query(self.model)
+            .join(models.BekpackUser, BekpackUser.owner_id == user.id)
+            .join(BekPackTrip_Members, BekpackTrip.id == id)
+            .filter(
+                (BekPackTrip_Members.trip_id == id)
+                & (BekPackTrip_Members.user_id == models.BekpackUser.id)
+            )
+            .one_or_none()
+        )
+        if not obj:
+            return False
+        return True
+
+    def user_can_write(self, db: Session, id: int, user: models.User) -> bool:
+        if user.is_superuser:
+            return True
+        obj = (
+            db.query(self.model)
+            .join(models.BekpackUser, BekpackUser.owner_id == user.id)
+            .join(BekPackTrip_Members, BekpackTrip.id == id)
+            .filter(
+                (BekPackTrip_Members.trip_id == id)
+                & (BekPackTrip_Members.user_id == models.BekpackUser.id)
+            )
+            .one_or_none()
+        )
+        if not obj:
+            return False
+        return True
 
 
 bekpacktrip = CRUDBekpackTrip(BekpackTrip)

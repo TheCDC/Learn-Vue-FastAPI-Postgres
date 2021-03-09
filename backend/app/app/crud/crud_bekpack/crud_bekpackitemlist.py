@@ -43,7 +43,9 @@ class CRUDBekpackItemList(
             return True
         return False
 
-    def user_can_edit(self, db: Session, *, list_id: int, bekpack_user_id: int) -> bool:
+    def user_can_write(
+        self, db: Session, *, list_id: int, bekpack_user_id: int
+    ) -> bool:
         itemlist: BekpackItemList = db.query(self.model).filter(id=list_id).one()
         return itemlist.parent_user_id == bekpack_user_id
 
