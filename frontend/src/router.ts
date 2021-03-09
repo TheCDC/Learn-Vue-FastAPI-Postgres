@@ -34,20 +34,26 @@ export default new Router({
           children: [
             {
               path: 'bekpack',
-              name: 'bekpack',
-              component: () => import(/* webpackChunkName: "bekpack" */ './views/main/bekpack/Bekpack.vue'),
+              component: () => import(/* webpackChunkName: "bekpack" */ './views/main/bekpack/BekpackMain.vue'),
               children: [
+
+                {
+                  path: '',
+                  name: 'bekpack-home',
+                  component: () => import(/* webpackChunkName: "bekpack" */ './views/main/bekpack/Bekpack.vue'),
+
+                },
+                {
+                  path: 'createTrip',
+                  name: 'bekpack-create-trip',
+                  component: () => import(/* webpackChunkName: "bekpack-create-trip" */ './views/main/bekpack/CreateTrip.vue'),
+                },
+                {
+                  path: 'editTrip/:id',
+                  name: 'bekpack-edit-trip',
+                  component: () => import(/* webpackChunkName: "bekpack-edit-trip" */ './views/main/bekpack/EditTrip.vue'),
+                },
               ],
-            },
-            {
-              path: 'bekpack/createTrip',
-              name: 'bekpack-create-trip',
-              component: () => import(/* webpackChunkName: "bekpack-create-trip" */ './views/main/bekpack/CreateTrip.vue'),
-            },
-            {
-              path: 'bekpack/editTrip/:id',
-              name: 'bekpack-edit-trip',
-              component: () => import(/* webpackChunkName: "bekpack-edit-trip" */ './views/main/bekpack/EditTrip.vue'),
             },
             {
               path: 'items',

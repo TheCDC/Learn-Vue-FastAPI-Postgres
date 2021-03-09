@@ -10,7 +10,7 @@
       <v-layout column fill-height>
         <v-list>
           <v-subheader>Main menu</v-subheader>
-          <v-list-item to="/main/bekpack">
+          <v-list-item :to="{ name: 'bekpack-home' }">
             <v-list-item-action>
               <v-icon>web</v-icon>
             </v-list-item-action>
