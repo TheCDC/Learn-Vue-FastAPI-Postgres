@@ -55,16 +55,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { api } from "@/api";
-import { appName } from "@/env";
-import { readLoginError } from "@/store/main/getters";
-import { dispatchLogIn } from "@/store/main/actions";
+import { Component, Vue } from 'vue-property-decorator';
+import { api } from '@/api';
+import { appName } from '@/env';
+import { readLoginError } from '@/store/main/getters';
+import { dispatchLogIn } from '@/store/main/actions';
 
 @Component
 export default class Login extends Vue {
-  public email: string = "";
-  public password: string = "";
+  public email: string = '';
+  public password: string = '';
   public appName = appName;
 
   public get loginError() {

@@ -84,31 +84,67 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import {
   dispatchCreateBekpackUser,
   dispatchDeleteTrip,
   dispatchGetBekpackUser,
   dispatchGetMyTrips,
-} from "@/store/bekpack/actions";
+} from '@/store/bekpack/actions';
 import {
   readTrips,
   readUser,
   readUserHasAccount,
-} from "@/store/bekpack/getters";
-import { IBekpackTrip } from "@/interfaces";
-import { IPageRead } from "@/interfaces/common";
+} from '@/store/bekpack/getters';
+import { IBekpackTrip } from '@/interfaces';
+import { IPageRead } from '@/interfaces/common';
 @Component
 export default class Bekpack extends Vue {
+  get user() {
+    return readUser(this.$store);
+  }
+  get hasAccount() {
+    return readUserHasAccount(this.$store);
+  }
+  get trips() {
+    return readTrips(this.$store);
+  }
   public page: IPageRead = { page: 0, size: 10 };
   public tablePaginationoptions = {};
   public loading: boolean = false;
-  @Watch("tablePaginationoptions")
+  public headers = [
+    { text: 'name', sortable: false, value: 'name', align: 'left' },
+    {
+      align: 'left',
+      sortable: false,
+      text: 'description',
+      value: 'description',
+    },
+    {
+      align: 'left',
+      sortable: false,
+      text: 'Updated At',
+      value: 'time_updated',
+    },
+    {
+      align: 'left',
+      sortable: false,
+      text: 'Created At',
+      value: 'time_created',
+    },
+    {
+      align: 'right',
+      sortable: false,
+      text: 'Actions',
+      value: 'id',
+    },
+  ];
+  @Watch('tablePaginationoptions')
   public async onChildChanged(
     val: { page: number; itemsPerPage: number },
-    oldVal: object
+    oldVal: object,
   ) {
-    this.page.page = val.page - 1; //pagination options page number is 1-indexed but API is 0-indexed
+    this.page.page = val.page - 1; // pagination options page number is 1-indexed but API is 0-indexed
     this.page.size = val.itemsPerPage;
     await this.load();
   }
@@ -128,44 +164,8 @@ export default class Bekpack extends Vue {
     await dispatchCreateBekpackUser(this.$store);
     await this.load();
   }
-  get user() {
-    return readUser(this.$store);
-  }
-  get hasAccount() {
-    return readUserHasAccount(this.$store);
-  }
-  get trips() {
-    return readTrips(this.$store);
-  }
   public async deleteTrip(trip: IBekpackTrip) {
     await dispatchDeleteTrip(this.$store, trip);
   }
-  public headers = [
-    { text: "name", sortable: false, value: "name", align: "left" },
-    {
-      align: "left",
-      sortable: false,
-      text: "description",
-      value: "description",
-    },
-    {
-      align: "left",
-      sortable: false,
-      text: "Updated At",
-      value: "time_updated",
-    },
-    {
-      align: "left",
-      sortable: false,
-      text: "Created At",
-      value: "time_created",
-    },
-    {
-      align: "right",
-      sortable: false,
-      text: "Actions",
-      value: "id",
-    },
-  ];
 }
 </script>

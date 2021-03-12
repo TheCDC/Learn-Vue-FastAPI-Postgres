@@ -56,42 +56,42 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Store } from "vuex";
-import { IUserProfileUpdate } from "@/interfaces";
-import { appName } from "@/env";
-import { commitAddNotification } from "@/store/main/mutations";
-import { dispatchResetPassword } from "@/store/main/actions";
+import { Component, Vue } from 'vue-property-decorator';
+import { Store } from 'vuex';
+import { IUserProfileUpdate } from '@/interfaces';
+import { appName } from '@/env';
+import { commitAddNotification } from '@/store/main/mutations';
+import { dispatchResetPassword } from '@/store/main/actions';
 
 @Component
 export default class UserProfileEdit extends Vue {
   public appName = appName;
   public valid = true;
-  public password1 = "";
-  public password2 = "";
+  public password1 = '';
+  public password2 = '';
 
   public mounted() {
     this.checkToken();
   }
 
   public reset() {
-    this.password1 = "";
-    this.password2 = "";
+    this.password1 = '';
+    this.password2 = '';
     this.$validator.reset();
   }
 
   public cancel() {
-    this.$router.push("/");
+    this.$router.push('/');
   }
 
   public checkToken() {
     const token = this.$router.currentRoute.query.token as string;
     if (!token) {
       commitAddNotification(this.$store, {
-        content: "No token provided in the URL, start a new password recovery",
-        color: "error",
+        content: 'No token provided in the URL, start a new password recovery',
+        color: 'error',
       });
-      this.$router.push("/recover-password");
+      this.$router.push('/recover-password');
     } else {
       return token;
     }
@@ -105,7 +105,7 @@ export default class UserProfileEdit extends Vue {
           token,
           password: this.password1,
         });
-        this.$router.push("/");
+        this.$router.push('/');
       }
     }
   }

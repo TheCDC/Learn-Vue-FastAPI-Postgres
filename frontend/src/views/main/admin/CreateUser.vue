@@ -72,24 +72,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue } from 'vue-property-decorator';
 import {
   IUserProfile,
   IUserProfileUpdate,
   IUserProfileCreate,
-} from "@/interfaces";
-import { dispatchGetUsers, dispatchCreateUser } from "@/store/admin/actions";
+} from '@/interfaces';
+import { dispatchGetUsers, dispatchCreateUser } from '@/store/admin/actions';
 
 @Component
 export default class CreateUser extends Vue {
   public valid = false;
-  public fullName: string = "";
-  public email: string = "";
+  public fullName: string = '';
+  public email: string = '';
   public isActive: boolean = true;
   public isSuperuser: boolean = false;
   public setPassword = false;
-  public password1: string = "";
-  public password2: string = "";
+  public password1: string = '';
+  public password2: string = '';
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
@@ -97,10 +97,10 @@ export default class CreateUser extends Vue {
   }
 
   public reset() {
-    this.password1 = "";
-    this.password2 = "";
-    this.fullName = "";
-    this.email = "";
+    this.password1 = '';
+    this.password2 = '';
+    this.fullName = '';
+    this.email = '';
     this.isActive = true;
     this.isSuperuser = false;
     this.$validator.reset();
@@ -125,7 +125,7 @@ export default class CreateUser extends Vue {
       updatedProfile.is_superuser = this.isSuperuser;
       updatedProfile.password = this.password1;
       await dispatchCreateUser(this.$store, updatedProfile);
-      this.$router.push("/main/admin/users");
+      this.$router.push('/main/admin/users');
     }
   }
 }

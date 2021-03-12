@@ -33,20 +33,20 @@ interface IChatError {
 }
 @Component
 export default class ChatSocket extends Vue {
-  message: string = "";
-  received: IMessage[] = [];
-  chatErrors: IChatError[] = [];
-  connection: WebSocket = new WebSocket("wss://echo.websocket.org");
+  public message: string = "";
+  public received: IMessage[] = [];
+  public chatErrors: IChatError[] = [];
+  public connection: WebSocket = new WebSocket("wss://echo.websocket.org");
   public reset() {
     this.received = [];
     this.chatErrors = [];
-    console.log("Starting connection to WebSocket Server");
+    // console.log('Starting connection to WebSocket Server');
     new WebSocket("wss://echo.websocket.org");
     this.connection.onmessage = ((v: ChatSocket) => {
       return function (event) {
         try {
           const val = event as IMessage;
-          console.log(val);
+          // console.log(val);
           v.received.unshift(val);
         } catch (error) {
           v.chatErrors.push({ message: error.toString() });
@@ -57,8 +57,8 @@ export default class ChatSocket extends Vue {
     this.connection.onopen = ((cs: ChatSocket) => {
       return (event) => {
         try {
-          console.log(event);
-          console.log("Successfully connected to the echo websocket server...");
+          // console.log(event);
+          // console.log('Successfully connected to the echo websocket server...');
         } catch (error) {
           cs.chatErrors.push({ message: error.toString() });
         }
@@ -71,8 +71,8 @@ export default class ChatSocket extends Vue {
   public mounted() {
     this.reset();
   }
-  created() {}
-  sendMessage() {
+  public created() {}
+  public sendMessage() {
     try {
       this.connection.send(this.message);
       this.message = "";

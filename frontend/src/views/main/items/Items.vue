@@ -49,16 +49,13 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { dispatchDeleteItem, dispatchGetItems } from "@/store/item/actions";
-import { readItems, readItemsOneUser } from "@/store/item/getters";
-import { readUserProfile } from "@/store/main/getters";
-import { IItem } from "@/interfaces";
+import { Component, Vue } from 'vue-property-decorator';
+import { dispatchDeleteItem, dispatchGetItems } from '@/store/item/actions';
+import { readItems, readItemsOneUser } from '@/store/item/getters';
+import { readUserProfile } from '@/store/main/getters';
+import { IItem } from '@/interfaces';
 @Component
 export default class Items extends Vue {
-  public async mounted() {
-    await dispatchGetItems(this.$store);
-  }
   get items() {
     const user = readUserProfile(this.$store);
     if (user) {
@@ -71,18 +68,21 @@ export default class Items extends Vue {
   get user() {
     return readUserProfile(this.$store);
   }
+  public headers = [
+    { text: 'title', sortable: true, value: 'title', align: 'left' },
+    {
+      text: 'description',
+      sortable: true,
+      value: 'description',
+      align: 'left',
+    },
+    { text: 'Actions', sortable: false, value: 'id' },
+  ];
+  public async mounted() {
+    await dispatchGetItems(this.$store);
+  }
   public async deleteItem(item: IItem) {
     await dispatchDeleteItem(this.$store, item);
   }
-  public headers = [
-    { text: "title", sortable: true, value: "title", align: "left" },
-    {
-      text: "description",
-      sortable: true,
-      value: "description",
-      align: "left",
-    },
-    { text: "Actions", sortable: false, value: "id" },
-  ];
 }
 </script>

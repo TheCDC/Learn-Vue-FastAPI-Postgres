@@ -86,21 +86,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { IUserProfile, IUserProfileUpdate } from "@/interfaces";
-import { dispatchGetUsers, dispatchUpdateUser } from "@/store/admin/actions";
-import { readAdminOneUser } from "@/store/admin/getters";
+import { Component, Vue } from 'vue-property-decorator';
+import { IUserProfile, IUserProfileUpdate } from '@/interfaces';
+import { dispatchGetUsers, dispatchUpdateUser } from '@/store/admin/actions';
+import { readAdminOneUser } from '@/store/admin/getters';
 
 @Component
 export default class EditUser extends Vue {
   public valid = true;
-  public fullName: string = "";
-  public email: string = "";
+  public fullName: string = '';
+  public email: string = '';
   public isActive: boolean = true;
   public isSuperuser: boolean = false;
   public setPassword = false;
-  public password1: string = "";
-  public password2: string = "";
+  public password1: string = '';
+  public password2: string = '';
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
@@ -109,8 +109,8 @@ export default class EditUser extends Vue {
 
   public reset() {
     this.setPassword = false;
-    this.password1 = "";
-    this.password2 = "";
+    this.password1 = '';
+    this.password2 = '';
     this.$validator.reset();
     if (this.user) {
       this.fullName = this.user.full_name;
@@ -142,7 +142,7 @@ export default class EditUser extends Vue {
         id: this.user!.id,
         user: updatedProfile,
       });
-      this.$router.push("/main/admin/users");
+      this.$router.push('/main/admin/users');
     }
   }
 

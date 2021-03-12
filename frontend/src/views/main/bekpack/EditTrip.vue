@@ -33,20 +33,20 @@
   </v-container>
 </template>
 <script lang="ts">
-import { IBekpackTrip, IBekpackTripUpdate } from "@/interfaces";
-import { IPage, IPageRead } from "@/interfaces/common";
+import { IBekpackTrip, IBekpackTripUpdate } from '@/interfaces';
+import { IPage, IPageRead } from '@/interfaces/common';
 import {
   dispatchGetMyTrips,
   dispatchGetTripToEdit,
   dispatchUpdateTrip,
-} from "@/store/bekpack/actions";
-import { readTripsOne, readTripToEdit } from "@/store/bekpack/getters";
-import { Component, Vue } from "vue-property-decorator";
+} from '@/store/bekpack/actions';
+import { readTripsOne, readTripToEdit } from '@/store/bekpack/getters';
+import { Component, Vue } from 'vue-property-decorator';
 @Component
 export default class EditItem extends Vue {
-  public name = "";
-  public description = "";
-  public color = "";
+  public name = '';
+  public description = '';
+  public color = '';
   public valid = true;
   public async mounted() {
     await dispatchGetTripToEdit(this.$store, {
@@ -63,8 +63,8 @@ export default class EditItem extends Vue {
     return readTripToEdit(this.$store);
   }
   public reset() {
-    this.name = "";
-    this.description = "";
+    this.name = '';
+    this.description = '';
     if (this.item) {
       this.name = this.item.name;
       this.description = this.item.description;
@@ -82,7 +82,7 @@ export default class EditItem extends Vue {
         id: this.item!.id,
         item: updatedTrip,
       });
-      this.$router.push("/main/bekpack");
+      this.$router.push('/main/bekpack');
     }
   }
 }

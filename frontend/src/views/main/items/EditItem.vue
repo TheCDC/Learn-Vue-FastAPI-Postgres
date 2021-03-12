@@ -26,14 +26,14 @@
   </v-container>
 </template>
 <script lang="ts">
-import { IItem, IItemUpdate } from "@/interfaces";
-import { dispatchGetItems, dispatchUpdateItem } from "@/store/item/actions";
-import { readItemsOne } from "@/store/item/getters";
-import { Component, Vue } from "vue-property-decorator";
+import { IItem, IItemUpdate } from '@/interfaces';
+import { dispatchGetItems, dispatchUpdateItem } from '@/store/item/actions';
+import { readItemsOne } from '@/store/item/getters';
+import { Component, Vue } from 'vue-property-decorator';
 @Component
 export default class EditItem extends Vue {
-  public title = "";
-  public description = "";
+  public title = '';
+  public description = '';
   public valid = true;
   public async mounted() {
     await dispatchGetItems(this.$store);
@@ -47,8 +47,8 @@ export default class EditItem extends Vue {
     return readItemsOne(this.$store)(+this.$router.currentRoute.params.id);
   }
   public reset() {
-    this.title = "";
-    this.description = "";
+    this.title = '';
+    this.description = '';
     if (this.item) {
       this.title = this.item.title;
       this.description = this.item.description;
@@ -64,7 +64,7 @@ export default class EditItem extends Vue {
         id: this.item!.id,
         item: updatedItem,
       });
-      this.$router.push("/main/items");
+      this.$router.push('/main/items');
     }
   }
 }

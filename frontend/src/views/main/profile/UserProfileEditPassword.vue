@@ -57,25 +57,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Store } from "vuex";
-import { IUserProfileUpdate } from "@/interfaces";
-import { readUserProfile } from "@/store/main/getters";
-import { dispatchUpdateUserProfile } from "@/store/main/actions";
+import { Component, Vue } from 'vue-property-decorator';
+import { Store } from 'vuex';
+import { IUserProfileUpdate } from '@/interfaces';
+import { readUserProfile } from '@/store/main/getters';
+import { dispatchUpdateUserProfile } from '@/store/main/actions';
 
 @Component
 export default class UserProfileEdit extends Vue {
   public valid = true;
-  public password1 = "";
-  public password2 = "";
+  public password1 = '';
+  public password2 = '';
 
   get userProfile() {
     return readUserProfile(this.$store);
   }
 
   public reset() {
-    this.password1 = "";
-    this.password2 = "";
+    this.password1 = '';
+    this.password2 = '';
     this.$validator.reset();
   }
 
@@ -88,7 +88,7 @@ export default class UserProfileEdit extends Vue {
       const updatedProfile: IUserProfileUpdate = {};
       updatedProfile.password = this.password1;
       await dispatchUpdateUserProfile(this.$store, updatedProfile);
-      this.$router.push("/main/profile");
+      this.$router.push('/main/profile');
     }
   }
 }

@@ -34,20 +34,20 @@
 </template>
 
 <script lang="ts">
-import { IBekpackTripCreate } from "@/interfaces";
-import { dispatchCreateTrip } from "@/store/bekpack/actions";
-import { Component, Vue } from "vue-property-decorator";
+import { IBekpackTripCreate } from '@/interfaces';
+import { dispatchCreateTrip } from '@/store/bekpack/actions';
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class BekpackTripCreate extends Vue {
-  public title = "";
-  public description = "";
-  public color = "";
+  public title = '';
+  public description = '';
+  public color = '';
   public valid = false;
 
   public reset() {
-    this.title = "";
-    this.description = "";
+    this.title = '';
+    this.description = '';
   }
   public cancel() {
     this.$router.back();
@@ -60,7 +60,7 @@ export default class BekpackTripCreate extends Vue {
         color: this.color,
       };
       await dispatchCreateTrip(this.$store, newTrip);
-      this.$router.push("/main/bekpack");
+      this.$router.push('/main/bekpack');
     }
   }
 }
