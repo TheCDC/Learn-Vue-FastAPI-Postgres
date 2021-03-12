@@ -8,15 +8,12 @@ from fastapi_pagination import Page, pagination_params
 from fastapi_pagination.paginator import paginate
 from sqlalchemy.orm import Session
 
-import app.api.api_v1.endpoints.bekpack.deps as deps_bekpack
 import app.schemas as schemas
 from app.api import deps
 from app.crud import bekpacktrip as crud_bekpacktrip
 from app.crud import bekpackitemlist as crud_bekpackitemlist
 from app.crud import bekpackuser as crud_bekpackuser
-from app.crud import user as crud_user
 from app.models import User
-from app.models.bekpack import BekpackUser
 from app import models, crud, schemas
 
 router = DefaultCrudRouter[
@@ -38,7 +35,7 @@ def get_my_bakpacktrips(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-) -> List[schemas.BekpackTrip]:
+) -> Page[schemas.BekpackTrip]:
     records = crud_bekpacktrip.get_by_owner(db=db, owner_id=current_user.id)
     return paginate(records)
 

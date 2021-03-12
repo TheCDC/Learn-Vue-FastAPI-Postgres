@@ -6,6 +6,7 @@ from pydantic.color import Color
 
 from ...crud.encoders import convert_color
 
+BekpackUser = ForwardRef("BekpackUser")
 
 # Shared properties
 class BekpackTripBase(BaseModel):
@@ -18,7 +19,7 @@ class BekpackTripBase(BaseModel):
         json_encoders = {Color: convert_color}
 
     @validator("color")
-    def validate(cls, c: Color):
+    def validate(cls, c):
         if isinstance(c, Color):
             return c.as_hex()
         elif isinstance(c, str):
@@ -46,15 +47,16 @@ class BekpackTripUpdate(BekpackTripBase):
 class BekpackTripInDBBase(BekpackTripBase):
     id: int
     name: str
-    owner_id: int
+    owner_id: Optional[int]
 
 
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
     # bags: List[BekpackBag]
-    members: List[ForwardRef("BekPackUser")]
-    time_updated: datetime
+    # members: List[BekpackUser]
+    # owner: BekpackUser
     # time_created: datetime
+    pass
 
 
 # Additional properties stored in DB

@@ -38,10 +38,10 @@ from .bekpack.bekpackitemlist import (
 )
 
 from .bekpack.bekpackuser import (
-    BekPackUser,
-    BekPackUserCreate,
-    BekPackUserInDB,
-    BekPackUserUpdate,
+    BekpackUser,
+    BekpackUserCreate,
+    BekpackUserInDB,
+    BekpackUserUpdate,
 )
 
 

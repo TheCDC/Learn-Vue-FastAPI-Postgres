@@ -15,7 +15,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.BekPackUser)
+@router.post("/", response_model=schemas.BekpackUser)
 def create_bekpackuser(
     *,
     db: Session = Depends(deps.get_db),
@@ -29,7 +29,7 @@ def create_bekpackuser(
     return bp_user
 
 
-@router.get("/me", response_model=schemas.BekPackUser)
+@router.get("/me", response_model=schemas.BekpackUser)
 def get_bekpackuser_me(
     *,
     db: Session = Depends(deps.get_db),
@@ -49,7 +49,7 @@ def get_bekpackuser_me(
     return bp_user
 
 
-@router.delete("/me", response_model=schemas.BekPackUser)
+@router.delete("/me", response_model=schemas.BekpackUser)
 def delete_bekpackuser_me(
     *,
     db: Session = Depends(deps.get_db),
@@ -110,7 +110,7 @@ def get_my_joined_BekPackTrips(
     )
 
 
-@router.get("/{id}", response_model=schemas.BekPackUser)
+@router.get("/{id}", response_model=schemas.BekpackUser)
 def get_bekpackuser_by_id(
     *,
     db: Session = Depends(deps.get_db),
@@ -128,7 +128,7 @@ def get_bekpackuser_by_id(
     return bp_user
 
 
-@router.delete("/{id}", response_model=schemas.BekPackUser)
+@router.delete("/{id}", response_model=schemas.BekpackUser)
 def delete_bekpackuser(
     *,
     db: Session = Depends(deps.get_db),

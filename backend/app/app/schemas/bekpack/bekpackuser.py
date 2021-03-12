@@ -1,8 +1,8 @@
-from typing import Optional, Set
+from typing import ForwardRef, List, Optional, Set
 
 from pydantic import BaseModel
 
-
+BekpackTrip = ForwardRef("BekpackTrip")
 # Shared properties
 class BekPackUserBase(BaseModel):
     class Config:
@@ -10,12 +10,12 @@ class BekPackUserBase(BaseModel):
 
 
 # Properties to receive via API on creation
-class BekPackUserCreate(BekPackUserBase):
+class BekpackUserCreate(BekPackUserBase):
     pass
 
 
 # Properties to receive via API on update
-class BekPackUserUpdate(BekPackUserBase):
+class BekpackUserUpdate(BekPackUserBase):
     is_active: Optional[bool]
     joined_trips: Optional[Set[int]]
     owner_id: Optional[int]
@@ -32,13 +32,14 @@ class BekPackUserInDBBase(BekPackUserBase):
 
 
 # Additional properties to return via API
-class BekPackUser(BekPackUserBase):
+class BekpackUser(BekPackUserBase):
 
     id: int
     is_active: bool = True
     owner_id: int
+    # joined_trips: List[BekpackTrip]
 
 
 # Additional properties stored in DB
-class BekPackUserInDB(BekPackUserInDBBase):
+class BekpackUserInDB(BekPackUserInDBBase):
     pass

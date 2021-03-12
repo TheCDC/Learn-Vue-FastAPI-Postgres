@@ -1,7 +1,7 @@
 from app.tests.utils.user import create_random_user
 from sqlalchemy.orm import Session
 from app.crud import bekpackuser
-from app.schemas import BekPackUserCreate
+from app.schemas import BekpackUserCreate
 from app.models.bekpack import BekpackTrip, BekpackUser
 from random import choice
 

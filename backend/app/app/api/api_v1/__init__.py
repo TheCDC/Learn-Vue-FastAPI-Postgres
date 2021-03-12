@@ -98,7 +98,7 @@ class DefaultCrudRouter(
             objects = self.crud.search(
                 db=db, filter_string=filter_string, user=current_user
             )
-            # print(objects)
+            print(self.read_type, objects)
             return paginate(objects)
 
         @self.get(

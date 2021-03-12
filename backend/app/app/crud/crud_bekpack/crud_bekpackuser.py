@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 from app import models
 from app.crud.base import CRUDBase
 from app.models.bekpack import BekpackUser
-from app.schemas import BekPackUserCreate, BekPackUserUpdate
+from app.schemas import BekpackUserCreate, BekpackUserUpdate
 
 
-class CRUDBekpackUser(CRUDBase[BekpackUser, BekPackUserCreate, BekPackUserUpdate]):
+class CRUDBekpackUser(CRUDBase[BekpackUser, BekpackUserCreate, BekpackUserUpdate]):
     def create_with_owner(self, db: Session, *, owner_id: int) -> BekpackUser:
         db_obj = self.model(owner_id=owner_id)
         db.add(db_obj)

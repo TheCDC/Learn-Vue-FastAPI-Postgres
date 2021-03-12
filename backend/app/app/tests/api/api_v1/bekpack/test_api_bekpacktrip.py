@@ -89,15 +89,18 @@ def test_get_bekpacktrip_select_by_string_superuser(
         ),
     )
     response = client.get(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/select/by_string?{trip.name}",
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/select/by_string?filter_string={trip.name}",
         headers=superuser_token_headers,
     )
     assert response.status_code == 200
     content = response.json()
     print(content)
-    found = [schemas.BekpackTrip(**i) for i in content["items"] if i["id"] == trip.id][
-        0
+
+    found_records = [
+        schemas.BekpackTrip(**i) for i in content["items"] if i["id"] == trip.id
     ]
+    assert len(found_records) > 0
+    found = found_records[0]
     assert found
     assert found.name == trip.name
     assert found.description == trip.description

@@ -14,12 +14,11 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
     def _get_base_query_user_can_read(
         self, db: Session, *, models_to_include: List[Base] = [], user: models.User
     ):
-        included = Query(entities=[models.BekpackTrip] + models_to_include, session=db)
 
         if user.is_superuser:
             return db.query(self.model)
 
-        included = Query(entities=[models.BekpackTrip] + models_to_include, session=db)
+        included = Query(entities=[models.BekpackTrip] + models_to_include, session=db,)
         return (
             included.join(BekpackTrip_Members)
             .join(models.BekpackUser)

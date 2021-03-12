@@ -5,7 +5,7 @@ from pydantic import BaseModel, validator
 from pydantic.color import Color
 
 from ...crud.encoders import convert_color
-from ..bekpack.bekpackuser import BekPackUser
+from ..bekpack.bekpackuser import BekpackUser
 from ..bekpack.bekpacktrip import BekpackTrip
 
 # Shared properties
@@ -14,7 +14,7 @@ class BekpackTrip_MembersBase(BaseModel):
     trip_id: Optional[int]
     user_id: Optional[int]
     trip: Optional[BekpackTrip]
-    user: Optional[BekPackUser]
+    user: Optional[BekpackUser]
 
 
 # Properties to receive on item creation
