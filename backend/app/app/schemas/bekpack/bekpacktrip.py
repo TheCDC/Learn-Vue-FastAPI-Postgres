@@ -53,7 +53,7 @@ class BekpackTripInDBBase(BekpackTripBase):
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
     # bags: List[BekpackBag]
-    # members: List[BekpackUser]
+    members: List[BekpackUser]
     # owner: BekpackUser
     # time_created: datetime
     pass

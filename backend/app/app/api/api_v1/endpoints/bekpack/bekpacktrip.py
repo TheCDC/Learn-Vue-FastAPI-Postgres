@@ -17,12 +17,12 @@ from app.models import User
 from app import models, crud, schemas
 
 router = DefaultCrudRouter[
-    models.BekpackTrip, CRUDBekpackTrip, schemas.BekpackTrip, schemas.BekpackTripUpdate
+    models.BekpackTrip, CRUDBekpackTrip, schemas.BekpackTrip, schemas.BekpackBagUpdate
 ](
     model=models.BekpackTrip,
     crud=crud.bekpacktrip,
     read_schema=schemas.BekpackTrip,
-    update_schema=schemas.BekpackTripUpdate,
+    update_schema=schemas.BekpackBagUpdate,
 )
 
 

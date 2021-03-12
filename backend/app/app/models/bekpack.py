@@ -34,7 +34,7 @@ class BekpackUser(Base):
     )
     owned_bags = relationship("BekpackBag", back_populates="owner")
     owned_trips = relationship("BekpackTrip", back_populates="owner")
-    owner = relationship("User")
+    owner = relationship("User", lazy="joined",)
 
 
 class BekpackTrip(Base, TimestampsMixin):
@@ -51,6 +51,7 @@ class BekpackTrip(Base, TimestampsMixin):
         BekpackUser,
         secondary=BekpackTrip_Members.__table__,
         back_populates="joined_trips",
+        lazy="joined",
     )
     owner = relationship(BekpackUser, back_populates="owned_trips")
     items_lists = relationship("BekpackItemList", back_populates="parent_trip")
