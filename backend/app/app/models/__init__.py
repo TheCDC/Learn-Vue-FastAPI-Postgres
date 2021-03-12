@@ -5,7 +5,7 @@ from .bekpack import (
     BekpackTrip,
     BekpackBag,
     BekpackBag,
-    BekPackTrip_Members,
+    BekpackTrip_Members,
     BekpackItemList,
     BekpackListItem,
 )

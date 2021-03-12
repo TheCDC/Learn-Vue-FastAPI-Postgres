@@ -23,7 +23,7 @@ def read_users(
     """
     Retrieve users.
     """
-    users = crud.user.get_multi(db, skip=skip, limit=limit)
+    users = crud.user.get_multi_paginate(db, skip=skip, limit=limit)
     return users
 
 

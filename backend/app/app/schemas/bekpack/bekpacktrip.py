@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import ForwardRef, List, Optional
 
 from pydantic import BaseModel, validator
 from pydantic.color import Color
@@ -52,8 +52,9 @@ class BekpackTripInDBBase(BekpackTripBase):
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
     # bags: List[BekpackBag]
-    # members: List[BekPackUser]
+    members: List[ForwardRef("BekPackUser")]
     time_updated: datetime
+    # time_created: datetime
 
 
 # Additional properties stored in DB

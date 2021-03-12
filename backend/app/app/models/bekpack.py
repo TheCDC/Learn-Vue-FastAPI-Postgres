@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
 
 
-class BekPackTrip_Members(Base):
+class BekpackTrip_Members(Base):
     id = Column(Integer, primary_key=True)
     trip_id = Column(
         Integer, ForeignKey("bekpacktrip.id", ondelete="CASCADE"), index=True
@@ -29,7 +29,7 @@ class BekpackUser(Base):
     is_active = Column(Boolean(), default=True)
     joined_trips = relationship(
         "BekpackTrip",
-        secondary=BekPackTrip_Members.__table__,
+        secondary=BekpackTrip_Members.__table__,
         back_populates="members",
     )
     owned_bags = relationship("BekpackBag", back_populates="owner")
@@ -49,7 +49,7 @@ class BekpackTrip(Base, TimestampsMixin):
     bags = relationship("BekpackBag", back_populates="owner_trip")
     members = relationship(
         BekpackUser,
-        secondary=BekPackTrip_Members.__table__,
+        secondary=BekpackTrip_Members.__table__,
         back_populates="joined_trips",
     )
     owner = relationship(BekpackUser, back_populates="owned_trips")

@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from app.models.bekpack import BekPackTrip_Members, BekpackItemList, BekpackTrip
+from app.models.bekpack import BekpackTrip_Members, BekpackItemList, BekpackTrip
 from app.schemas import BekpackItemListCreate, BekpackItemListUpdate
 
 
@@ -36,7 +36,7 @@ class CRUDBekpackItemList(
         potential_membership = (
             db.query(self.model)
             .join(BekpackTrip, BekpackTrip.id == itemlist.trip_id)
-            .join(BekPackTrip_Members, BekPackTrip_Members.user_id == bekpack_user_id)
+            .join(BekpackTrip_Members, BekpackTrip_Members.user_id == bekpack_user_id)
             .one_or_none()
         )
         if potential_membership:

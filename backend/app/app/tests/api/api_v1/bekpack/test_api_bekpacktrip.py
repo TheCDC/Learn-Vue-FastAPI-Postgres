@@ -9,6 +9,7 @@ from app.schemas.bekpack.bekpacktrip import BekpackTrip, BekpackTripCreate
 from app.tests.api.api_v1.bekpack.utils import get_bekpack_user
 from app.tests.crud.bekpack.utils import get_random_color
 from app.tests.utils.utils import random_lower_name, random_lower_string
+from app import schemas, crud
 
 
 def test_create_bekpacktrip(
@@ -49,6 +50,83 @@ def test_create_bekpacktrip(
     assert content["id"] == trip_id
 
 
+def test_get_bekpacktrip_select_by_ids_superuser(
+    client: TestClient, superuser_token_headers: Dict[str, str], db: Session
+) -> None:
+    trips = [
+        bekpacktrip.create(
+            db=db,
+            obj_in=BekpackTripCreate(
+                name=random_lower_name(),
+                color=get_random_color(),
+                description=random_lower_string(),
+            ),
+        )
+        for _ in range(5)
+    ]
+
+    query_params_string = "".join(["&ids=" + str(t.id) for t in trips])
+    response = client.get(
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/select/by_ids?{query_params_string}",
+        headers=superuser_token_headers,
+    )
+    print(response.content)
+    assert response.status_code == 200
+    content = response.json()
+    assert len(content) == len(trips)
+    assert set(t["id"] for t in content) == set(t.id for t in trips)
+
+
+def test_get_bekpacktrip_select_by_string_superuser(
+    client: TestClient, superuser_token_headers: Dict[str, str], db: Session
+) -> None:
+    trip = bekpacktrip.create(
+        db=db,
+        obj_in=BekpackTripCreate(
+            name=random_lower_name(),
+            color=get_random_color(),
+            description=random_lower_string(),
+        ),
+    )
+    response = client.get(
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/select/by_string?{trip.name}",
+        headers=superuser_token_headers,
+    )
+    assert response.status_code == 200
+    content = response.json()
+    print(content)
+    found = [schemas.BekpackTrip(**i) for i in content["items"] if i["id"] == trip.id][
+        0
+    ]
+    assert found
+    assert found.name == trip.name
+    assert found.description == trip.description
+
+
+def test_delete_bekpacktrip_multi_by_ids(
+    client: TestClient, superuser_token_headers: Dict[str, str], db: Session
+) -> None:
+    trips = [
+        bekpacktrip.create(
+            db=db,
+            obj_in=BekpackTripCreate(
+                name=random_lower_name(),
+                color=get_random_color(),
+                description=random_lower_string(),
+            ),
+        )
+        for _ in range(5)
+    ]
+    response = client.delete(
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
+        headers=superuser_token_headers,
+        json=[t.id for t in trips],
+    )
+    assert response.status_code == 200
+    content = response.json()
+    assert content == len(trips)
+
+
 def test_get_bekpacktrip_mine_multi(
     client: TestClient, normal_user_token_headers_random: Dict[str, str], db: Session
 ) -> None:
@@ -62,7 +140,7 @@ def test_get_bekpacktrip_mine_multi(
             color=get_random_color(),
             description=random_lower_string(),
         )
-        for i in range(5)
+        for _ in range(5)
     ]
     for t in trips:
         bekpacktrip.create(db=db, obj_in=t)

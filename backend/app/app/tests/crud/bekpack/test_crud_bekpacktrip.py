@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.crud import bekpacktrip, bekpackuser
-from app.models.bekpack import BekpackTrip, BekPackTrip_Members, BekpackUser
+from app.models.bekpack import BekpackTrip, BekpackTrip_Members, BekpackUser
 from app.schemas import BekpackTripCreate
 from app.schemas.bekpack.bekpacktrip import BekpackTripUpdate
 from app.tests.utils.bekpack import create_random_trip
@@ -159,5 +159,5 @@ def test_user_can_read_bekpacktrip(db: Session):
     bpuser2 = get_bekpack_user(db)
 
     trip = create_random_trip(db, bpuser1)
-    assert crud.bekpacktrip.user_can_read(db, trip.id, bpuser1.owner)
-    assert not crud.bekpacktrip.user_can_read(db, trip.id, bpuser2.owner)
+    assert crud.bekpacktrip.user_can_read(db=db, object=trip, user=bpuser1.owner)
+    assert not crud.bekpacktrip.user_can_read(db=db, object=trip, user=bpuser2.owner)

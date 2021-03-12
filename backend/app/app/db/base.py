@@ -6,7 +6,7 @@ from app.models.user import User  # noqa
 from app.models.bekpack import (
     BekpackUser,
     BekpackTrip,
-    BekPackTrip_Members,
+    BekpackTrip_Members,
     BekpackItemList,
     BekpackBag,
     BekpackListItem,

@@ -1,12 +1,11 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Any, Generic, List, Optional, Type, TypeVar
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_pagination import Page, pagination_params
 from fastapi_pagination.page import Page
 from fastapi_pagination.paginator import paginate
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.functions import user
 
 from app.api import deps
 from app.crud.base import CRUDBase
@@ -20,16 +19,18 @@ CRUDType = TypeVar("CRUDType", bound=CRUDBase)
 
 
 class DefaultCrudRouter(
-    Generic[ModelType, CRUDType, ReadSchemaType, UpdateSchemaType,], APIRouter
+    Generic[ModelType, CRUDType, ReadSchemaType, UpdateSchemaType], APIRouter
 ):
     """
     Default router for a model
+
     Provides the following functions, one per route
+    - get_one
+    - get_multi_by_ids
     - get_all
-	- get_one
-	- update_one
-	- delete_one
-	- delete_many
+    - update_one
+    - delete_one
+    - delete_multi_by_ids
     """
 
     def __init__(
@@ -38,11 +39,13 @@ class DefaultCrudRouter(
         model: Type[ModelType],
         crud: CRUDType,
         read_schema: ReadSchemaType,
-        update_schema: UpdateSchemaType
+        update_schema: UpdateSchemaType,
     ):
         """
         APIRouter object with default methods to Create, Read, Update, Delete.
+
         **Parameters**
+
         * `model`: A SQLAlchemy model class
         """
         super().__init__()
@@ -73,13 +76,55 @@ class DefaultCrudRouter(
             current_user: User = Depends(deps.get_current_active_user),
         ):
             """Get one record"""
-            obj = self.crud.get(db=db, id=id)
-            if not obj:
+            object = self.crud.get(db=db, id=id)
+            if not object:
                 raise HTTPException(status_code=404)
 
-            if self.crud.user_can_read(db=db, id=id, user=current_user):
-                return obj
+            if self.crud.user_can_read(db=db, object=object, user=current_user):
+                return object
             raise HTTPException(status_code=403, detail="Not authorized")
+
+        @self.get(
+            "/select/by_string",
+            response_model=Page[self.read_type],
+            dependencies=[Depends(pagination_params)],
+        )
+        def filter_by_string(
+            filter_string: str = "",
+            db: Session = Depends(deps.get_db),
+            current_user: User = Depends(deps.get_current_active_user),
+        ):
+            """Filter by a string"""
+            objects = self.crud.search(
+                db=db, filter_string=filter_string, user=current_user
+            )
+            # print(objects)
+            return paginate(objects)
+
+        @self.get(
+            "/select/by_ids", response_model=List[self.read_type],
+        )
+        def get_multi_by_ids(
+            ids: List[int] = Query([]),
+            db: Session = Depends(deps.get_db),
+            current_user: User = Depends(deps.get_current_active_user),
+        ):
+            """Get multiple records"""
+            # TODO: optimize this to a single SQL query using _get_base_query_user_can_read
+
+            objects = self.crud.get_multi_by_ids(db=db, ids=ids)
+            if any(not o for o in objects) or len(objects) < len(ids):
+                ids_not_found = list(set(ids) - set(i.id for i in objects))
+                raise HTTPException(
+                    status_code=404, detail=f"ids not found: {ids_not_found}"
+                )
+            if not all(
+                self.crud.user_can_read(db=db, user=current_user, object=object)
+                for object in objects
+            ):
+                raise HTTPException(status_code=403, detail="Not authorized")
+
+            return objects
 
         @self.put(
             "/{id}", response_model=self.read_type,
@@ -91,13 +136,12 @@ class DefaultCrudRouter(
             current_user: User = Depends(deps.get_current_active_user),
         ):
             """Update one record."""
-            obj = self.crud.get(db=db, id=id)
-            if not obj:
+            object = self.crud.get(db=db, id=id)
+            if not object:
                 raise HTTPException(status_code=404)
-            if not self.crud.user_can_write(db=db, id=id, user=current_user):
+            if not self.crud.user_can_write(db=db, object=object, user=current_user):
                 raise HTTPException(status_code=403, detail="Not authorized")
-            print(repr(obj), obj_in)
-            return self.crud.update(db=db, db_obj=obj, obj_in=obj_in)
+            return self.crud.update(db=db, db_obj=object, obj_in=obj_in)
 
         @self.delete("/{id}", response_model=self.read_type)
         def delete_one(
@@ -106,28 +150,31 @@ class DefaultCrudRouter(
             current_user: User = Depends(deps.get_current_active_user),
         ) -> Any:
             """Delete one record."""
-            obj = self.crud.get(db=db, id=id)
-            if not obj:
+            object = self.crud.get(db=db, id=id)
+            if not object:
                 raise HTTPException(status_code=404)
-            if not self.crud.user_can_write(db=db, user=current_user, id=id):
+            if not self.crud.user_can_write(db=db, user=current_user, object=object):
                 raise HTTPException(status_code=403, detail="Not authorized")
             return self.crud.remove(db=db, id=id)
 
-        @self.delete("/", response_model=List[self.read_type])
-        def delete_many(
-            ids: List[int],
+        @self.delete("/", response_model=int)
+        def delete_multi_by_ids(
+            ids: List[int] = list(),
             db: Session = Depends(deps.get_db),
             current_user: User = Depends(deps.get_current_active_user),
         ) -> Any:
             """Delete multiple records.
+
             """
-            objs = self.crud.get_multi(db=db, ids=ids)
-            if any(not o for o in objs):
+            # TODO: optimize this to a single SQL query using _get_base_query_user_can_write
+            # TODO: implement _get_base_query_user_can_write
+            objects = self.crud.get_multi_by_ids(db=db, ids=ids)
+            if len(objects) < len(ids):
                 raise HTTPException(status_code=404)
-            # TODO: optimize this to a single SQL query
             if any(
-                not self.crud.user_can_write(db=db, user=current_user, id=id)
-                for id in ids
+                not self.crud.user_can_write(db=db, user=current_user, object=object)
+                for object in objects
             ):
                 raise HTTPException(status_code=403, detail="Not authorized")
-            return self.crud.remove(db=db, id=id)
+            ret = self.crud.remove_multi(db=db, ids=ids)
+            return ret

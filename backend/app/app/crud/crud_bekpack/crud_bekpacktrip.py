@@ -1,15 +1,31 @@
 from typing import List
+from app.db.base_class import Base
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 
 from app import models
 from app.crud.base import CRUDBase
-from app.models.bekpack import BekpackTrip, BekPackTrip_Members, BekpackUser
+from app.models.bekpack import BekpackTrip, BekpackTrip_Members, BekpackUser
 from app.schemas import BekpackTripCreate, BekpackTripUpdate
 
 
 class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate]):
+    def _get_base_query_user_can_read(
+        self, db: Session, *, models_to_include: List[Base] = [], user: models.User
+    ):
+        included = Query(entities=[models.BekpackTrip] + models_to_include, session=db)
+
+        if user.is_superuser:
+            return db.query(self.model)
+
+        included = Query(entities=[models.BekpackTrip] + models_to_include, session=db)
+        return (
+            included.join(BekpackTrip_Members)
+            .join(models.BekpackUser)
+            .filter(BekpackUser.owner_id == user.id)
+        )
+
     def create_with_owner(
         self, db: Session, *, obj_in: BekpackTripCreate, owner_id: int
     ) -> BekpackTrip:
@@ -39,22 +55,26 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
         return db.query(self.model).order_by(BekpackTrip.time_updated.desc()).all()
 
     def get_joined_by_member(self, db: Session, *, member_id: int) -> List[BekpackTrip]:
-        associations: List[BekPackTrip_Members] = (
+        associations: List[BekpackTrip_Members] = (
             db.query(self.model)
-            .join(BekPackTrip_Members)
-            .filter(BekPackTrip_Members.user_id == member_id)
-            .filter(self.model.id == BekPackTrip_Members.trip_id)
+            .join(BekpackTrip_Members)
+            .filter(BekpackTrip_Members.user_id == member_id)
+            .filter(self.model.id == BekpackTrip_Members.trip_id)
         )
         return associations
 
-    def user_can_read(self, db: Session, id: int, user: models.User) -> bool:
+    def user_can_read(
+        self, db: Session, object: BekpackTrip, user: models.User
+    ) -> bool:
+        if user.is_superuser:
+            return True
         obj = (
             db.query(self.model)
             .join(models.BekpackUser, BekpackUser.owner_id == user.id)
-            .join(BekPackTrip_Members, BekpackTrip.id == id)
+            .join(BekpackTrip_Members, BekpackTrip.id == object.id)
             .filter(
-                (BekPackTrip_Members.trip_id == id)
-                & (BekPackTrip_Members.user_id == models.BekpackUser.id)
+                (BekpackTrip_Members.trip_id == object.id)
+                & (BekpackTrip_Members.user_id == models.BekpackUser.id)
             )
             .one_or_none()
         )
@@ -62,16 +82,18 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
             return False
         return True
 
-    def user_can_write(self, db: Session, id: int, user: models.User) -> bool:
+    def user_can_write(
+        self, db: Session, object: BekpackTrip, user: models.User
+    ) -> bool:
         if user.is_superuser:
             return True
         obj = (
             db.query(self.model)
             .join(models.BekpackUser, BekpackUser.owner_id == user.id)
-            .join(BekPackTrip_Members, BekpackTrip.id == id)
+            .join(BekpackTrip_Members, BekpackTrip.id == object.id)
             .filter(
-                (BekPackTrip_Members.trip_id == id)
-                & (BekPackTrip_Members.user_id == models.BekpackUser.id)
+                (BekpackTrip_Members.trip_id == object.id)
+                & (BekpackTrip_Members.user_id == models.BekpackUser.id)
             )
             .one_or_none()
         )

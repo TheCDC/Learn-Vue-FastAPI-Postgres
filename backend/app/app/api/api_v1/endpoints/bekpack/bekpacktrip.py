@@ -54,7 +54,7 @@ def get_bekpacktrip_lists(
     current_user: User = Depends(deps.get_current_active_user),
     trip_id: int,
 ) -> List[schemas.BekpackTrip]:
-    if not crud_bekpacktrip.user_can_read(db=db, id=id, user=current_user):
+    if not crud_bekpacktrip.user_can_read(db=db, object=id, user=current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     records = crud_bekpackitemlist.get_by_trip(db=db, trip_id=trip_id)
