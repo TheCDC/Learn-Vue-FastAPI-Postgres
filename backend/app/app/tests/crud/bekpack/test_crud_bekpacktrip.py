@@ -22,9 +22,25 @@ def test_create_bekpaktrip(db: Session):
         description=random_lower_string(),
         color=get_random_color(),
     )
-    bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=bp_user.id)
+    bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner=bp_user.owner)
     assert bpt.owner_id == bp_user.id
     u: BekpackUser = bekpackuser.get(db=db, id=bp_user.id)
+    # trip added to users's list of owned trips
+    assert bpt.id in list(i.id for i in u.owned_trips)
+    # user added to list of trip's members
+    assert u.id in list(i.id for i in bpt.members)
+
+
+def test_create_bekpaktrip_unregistered(db: Session):
+    owner = create_random_user(db)
+    btc = BekpackTripCreate(
+        name=random_lower_name(),
+        description=random_lower_string(),
+        color=get_random_color(),
+    )
+    bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner=owner)
+    assert bpt.owner.owner_id == owner.id
+    u: BekpackUser = bekpackuser.get(db=db, id=bpt.owner.id)
     # trip added to users's list of owned trips
     assert bpt.id in list(i.id for i in u.owned_trips)
     # user added to list of trip's members
@@ -45,7 +61,7 @@ def test_create_multiple_bekpacktrip(db: Session):
                     description=random_lower_string(),
                     color=get_random_color(),
                 ),
-                owner_id=bp_user.id,
+                owner=bp_user.owner,
             )
             for name in names
         ],
@@ -71,7 +87,7 @@ def test_delete_bekpaktrip(db: Session):
         description=random_lower_string(),
         color=get_random_color(),
     )
-    bpt_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=bp_user.id)
+    bpt_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=bp_user.owner)
     bpt_deleted = bekpacktrip.remove(db=db, id=bpt_created.id)
     bpt_nonexistent = bekpacktrip.get(db=db, id=bpt_created.id)
     # assert deleted record can't be found
@@ -83,18 +99,18 @@ def test_delete_bekpaktrip(db: Session):
 
 
 def test_add_members_bekpaktrip(db: Session):
-    owner = get_bekpack_user(db)
+    bp_owner = get_bekpack_user(db)
     btc = BekpackTripCreate(
         name=random_lower_name(),
         description=random_lower_string(),
         color=get_random_color(),
     )
-    trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
+    trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=bp_owner.owner)
     other_members = [get_bekpack_user(db) for i in range(5)]
     for m in other_members:
         trip_created.members.append(m)
     trip_retrieved = bekpacktrip.get(db, id=trip_created.id)
-    required_members_ids = [m.id for m in other_members] + [owner.id]
+    required_members_ids = [m.id for m in other_members] + [bp_owner.id]
     for m_r in trip_retrieved.members:
         assert m_r.id in required_members_ids
 
@@ -107,7 +123,7 @@ def test_update_bekpacktrip(db: Session):
         description=random_lower_string(),
         color=get_random_color(),
     )
-    trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
+    trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=owner)
     new_name = random_lower_name()
     newcolor = get_random_color()
     new_is_active = False
@@ -126,11 +142,11 @@ def test_update_bekpacktrip(db: Session):
 
 
 def test_change_owner_bekpaktrip(db: Session):
-    owner = get_bekpack_user(db)
-    newowner = get_bekpack_user(db)
+    bp_user_owner = get_bekpack_user(db)
+    bp_user_newowner = get_bekpack_user(db)
     btc = BekpackTripCreate(name=random_lower_name(), description=random_lower_string())
-    created = bekpacktrip.create_with_owner(db, obj_in=btc, owner_id=owner.id)
-    update = BekpackTripUpdate(owner_id=newowner.id)
+    created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=bp_user_owner.owner)
+    update = BekpackTripUpdate(owner_id=bp_user_newowner.id)
     updated = bekpacktrip.update(db, db_obj=created, obj_in=update)
 
 

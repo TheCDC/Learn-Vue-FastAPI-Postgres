@@ -66,12 +66,7 @@ def create_bekpacktrip(
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     """Create new BekpackTrip"""
-    owner_bekpack_user = crud_bekpackuser.get_by_owner(db=db, owner_id=current_user.id)
-    if not owner_bekpack_user:
-        raise HTTPException(status_code=404, detail="User not registered for BekPack")
 
-    trip = crud_bekpacktrip.create_with_owner(
-        db=db, obj_in=trip_in, owner_id=owner_bekpack_user.id
-    )
+    trip = crud_bekpacktrip.create_with_owner(db=db, obj_in=trip_in, owner=current_user)
 
     return trip

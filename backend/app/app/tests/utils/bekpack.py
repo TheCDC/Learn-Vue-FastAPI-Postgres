@@ -25,7 +25,7 @@ def create_random_trip(db: Session, bekpack_user: BekpackUser = None) -> Bekpack
         name=random_lower_string(), description=random_lower_string()
     )
     trip = crud.bekpacktrip.create_with_owner(
-        db=db, owner_id=bekpack_user.id, obj_in=obj_in
+        db=db, owner=bekpack_user.owner, obj_in=obj_in
     )
     return trip
 

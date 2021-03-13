@@ -27,11 +27,11 @@ class BekpackUser(Base):
     id = Column(Integer, primary_key=True, index=True)
     owner_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), unique=True)
     is_active = Column(Boolean(), default=True)
-    joined_trips = relationship(
-        "BekpackTrip",
-        secondary=BekpackTrip_Members.__table__,
-        back_populates="members",
-    )
+    # joined_trips = relationship(
+    #     "BekpackTrip",
+    #     secondary=BekpackTrip_Members.__table__,
+    #     back_populates="members",
+    # )
     owned_bags = relationship("BekpackBag", back_populates="owner")
     owned_trips = relationship("BekpackTrip", back_populates="owner")
     owner = relationship("User", lazy="joined",)
@@ -50,7 +50,7 @@ class BekpackTrip(Base, TimestampsMixin):
     members = relationship(
         BekpackUser,
         secondary=BekpackTrip_Members.__table__,
-        back_populates="joined_trips",
+        # back_populates="joined_trips",
         lazy="joined",
     )
     owner = relationship(BekpackUser, back_populates="owned_trips")

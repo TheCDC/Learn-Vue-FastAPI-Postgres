@@ -1,25 +1,24 @@
 from typing import Dict
-from app.tests.utils.user import authentication_token_from_email, create_random_user
 
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from app import crud, schemas
 from app.core.config import settings
 from app.crud.crud_bekpack.crud_bekpacktrip import bekpacktrip
 from app.schemas.bekpack.bekpacktrip import BekpackTrip, BekpackTripCreate
-from app.tests.api.api_v1.bekpack.utils import get_bekpack_user
+from app.tests.api.api_v1.bekpack.utils import create_bekpack_user
 from app.tests.crud.bekpack.utils import get_random_color
+from app.tests.utils.user import authentication_token_from_email, create_random_user
 from app.tests.utils.utils import random_lower_name, random_lower_string
-from app import schemas, crud
 
 
 def test_create_bekpacktrip(client: TestClient, db: Session) -> None:
     # create the user
-    bp_user = get_bekpack_user(db=db)
+    bp_user = create_bekpack_user(db=db)
     auth_token = authentication_token_from_email(
         db=db, client=client, email=bp_user.owner.email
     )
-    user_id_old = bp_user.id
     # create trip
     trip_data = {
         "name": random_lower_name(),
@@ -76,6 +75,37 @@ def test_get_bekpacktrip_select_by_ids_superuser(
     assert set(t["id"] for t in content) == set(t.id for t in trips)
 
 
+def test_get_bekpacktrip_select_by_string(client: TestClient, db: Session) -> None:
+    owner = create_random_user(db=db)
+    bp_user = create_bekpack_user(db=db, owner=owner)
+    token = authentication_token_from_email(db=db, client=client, email=owner.email)
+    trip = bekpacktrip.create_with_owner(
+        db=db,
+        obj_in=BekpackTripCreate(
+            name=random_lower_name(),
+            color=get_random_color(),
+            description=random_lower_string(),
+        ),
+        owner=owner,
+    )
+    response = client.get(
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/select/by_string?filter_string={trip.name}",
+        headers=token,
+    )
+    assert response.status_code == 200
+    content = response.json()
+    print(content)
+
+    found_records = [
+        schemas.BekpackTrip(**i) for i in content["items"] if i["id"] == trip.id
+    ]
+    assert len(found_records) > 0
+    found = found_records[0]
+    assert found
+    assert found.name == trip.name
+    assert found.description == trip.description
+
+
 def test_get_bekpacktrip_select_by_string_superuser(
     client: TestClient, superuser_token_headers: Dict[str, str], db: Session
 ) -> None:
@@ -130,12 +160,12 @@ def test_delete_bekpacktrip_multi_by_ids(
 
 
 def test_get_bekpacktrip_mine_multi(client: TestClient, db: Session) -> None:
-    user = create_random_user(db=db)
+    owner = create_random_user(db=db)
     token_headers = authentication_token_from_email(
-        client=client, email=user.email, db=db
+        client=client, email=owner.email, db=db
     )
     # create the user
-    bp_user = get_bekpack_user(owner=user, db=db)
+    bp_user = create_bekpack_user(owner=owner, db=db)
     # create trip
     trips = [
         BekpackTripCreate(
@@ -146,7 +176,7 @@ def test_get_bekpacktrip_mine_multi(client: TestClient, db: Session) -> None:
         for _ in range(5)
     ]
     for t in trips:
-        bekpacktrip.create_with_owner(db=db, obj_in=t, owner_id=bp_user.id)
+        bekpacktrip.create_with_owner(db=db, obj_in=t, owner=owner)
     # get trip
 
     response = client.get(
@@ -158,7 +188,7 @@ def test_get_bekpacktrip_mine_multi(client: TestClient, db: Session) -> None:
     assert trips
 
     got_ids = set(t.id for t in trips)
-    target_ids = set([i.id for i in bekpacktrip.get_by_owner(db=db, owner_id=user.id)])
+    target_ids = set([i.id for i in bekpacktrip.get_by_owner(db=db, owner_id=owner.id)])
     assert got_ids == target_ids
 
 
@@ -176,8 +206,8 @@ def test_get_bekpacktrip_invalid(
 
 def test_get_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> None:
     # register both users for bekpack
-    response_first_user = get_bekpack_user(db=db)
-    user = get_bekpack_user(db=db)
+    response_first_user = create_bekpack_user(db=db)
+    user = create_bekpack_user(db=db)
     normal_user_token_headers = authentication_token_from_email(
         client=client, email=response_first_user.owner.email, db=db
     )
@@ -230,7 +260,7 @@ def test_get_bekpacktrip_all_superuser(
 def test_delete_bekpacktrip(client: TestClient, db: Session) -> None:
 
     # create the user
-    bp_user = get_bekpack_user(db=db)
+    bp_user = create_bekpack_user(db=db)
     auth_token = authentication_token_from_email(
         db=db, client=client, email=bp_user.owner.email
     )
@@ -266,7 +296,7 @@ def test_update_bekpacktrip(
 ) -> None:
 
     # create the user
-    bp_user = get_bekpack_user(db=db)
+    bp_user = create_bekpack_user(db=db)
     auth_token = authentication_token_from_email(
         client=client, db=db, email=bp_user.owner.email
     )
@@ -312,7 +342,7 @@ def test_update_bekpacktrip_nonexistent(
 ) -> None:
 
     # create the user
-    response = get_bekpack_user(db=db)
+    response = create_bekpack_user(db=db)
     # update trip
     content_update = {"color": get_random_color(), "name": random_lower_name()}
     response = client.put(
@@ -328,7 +358,7 @@ def test_delete_bekpacktrip_nonexistent(
 ) -> None:
 
     # create the user
-    response = get_bekpack_user(db=db)
+    response = create_bekpack_user(db=db)
     # update trip
     response = client.delete(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/-1",
@@ -339,8 +369,8 @@ def test_delete_bekpacktrip_nonexistent(
 
 def test_delete_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> None:
     # register both users for bekpack
-    user_first = get_bekpack_user(db=db)
-    user_second = get_bekpack_user(db=db)
+    user_first = create_bekpack_user(db=db)
+    user_second = create_bekpack_user(db=db)
 
     # create trip as nonrandom user
     trip_data = {
@@ -371,8 +401,8 @@ def test_delete_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> No
 
 def test_update_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> None:
     # register both users for bekpack
-    user1 = get_bekpack_user(db=db)
-    user2 = get_bekpack_user(db=db)
+    user1 = create_bekpack_user(db=db)
+    user2 = create_bekpack_user(db=db)
 
     # create trip as nonrandom user
     trip_data = {

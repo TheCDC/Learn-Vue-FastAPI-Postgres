@@ -4,7 +4,7 @@ from app.db.base_class import Base
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session, Query
 
-from app import models
+from app import models, crud
 from app.crud.base import CRUDBase
 from app.models.bekpack import BekpackTrip, BekpackTrip_Members, BekpackUser
 from app.schemas import BekpackTripCreate, BekpackTripUpdate
@@ -26,16 +26,17 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
         )
 
     def create_with_owner(
-        self, db: Session, *, obj_in: BekpackTripCreate, owner_id: int
+        self, db: Session, *, obj_in: BekpackTripCreate, owner: models.User
     ) -> BekpackTrip:
-        obj_in_data = jsonable_encoder(obj_in)
-        owner: BekpackUser = (
-            db.query(BekpackUser).filter(BekpackUser.id == owner_id).one()
-        )
+        # bp_user: BekpackUser = (
+        #     db.query(self.model).filter(self.model.owner_id == owner.id).one_or_none()
+        # )
+        bp_user: BekpackUser = crud.bekpackuser.get_by_owner(db=db, owner_id=owner.id)
 
-        db_obj = self.model(**obj_in_data, owner_id=owner_id)
+        obj_in_data = jsonable_encoder(obj_in)
+        db_obj = self.model(**obj_in_data, owner_id=bp_user.id)
         # trip owner is also a member by default
-        db_obj.members.append(owner)
+        db_obj.members.append(bp_user)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
