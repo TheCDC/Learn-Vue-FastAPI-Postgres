@@ -11,11 +11,11 @@ from .bekpack.bekpackbag import (
     BekpackBagInDB,
     BekpackBagUpdate,
 )
-from .bekpack.bekpacklistitem import (
-    BekpackListItem,
-    BekpackListItemCreate,
-    BekpackListItemInDB,
-    BekpackListItemUpdate,
+from .bekpack.bekpackitemlistitem import (
+    BekpackItemListItem,
+    BekpackItemListItemCreate,
+    BekpackItemListItemInDB,
+    BekpackItemListItemUpdate,
 )
 
 from .bekpack.bekpacktrip import (

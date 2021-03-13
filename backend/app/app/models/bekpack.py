@@ -80,12 +80,12 @@ class BekpackBag(Base):
     )
     color = Column(String)
     name = Column(String)
-    items = relationship("BekpackListItem", backref="bag")
+    items = relationship("BekpackItemListItem", backref="bag")
     owner = relationship(BekpackUser, back_populates="owned_bags")
     owner_trip = relationship(BekpackTrip, back_populates="bags")
 
 
-class BekpackListItem(Base):
+class BekpackItemListItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     bag_id = Column(Integer, ForeignKey(BekpackBag.id))
     parent_list_id = Column(

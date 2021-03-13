@@ -9,5 +9,5 @@ from app.models.bekpack import (
     BekpackTrip_Members,
     BekpackItemList,
     BekpackBag,
-    BekpackListItem,
+    BekpackItemListItem,
 )

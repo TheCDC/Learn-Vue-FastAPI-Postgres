@@ -2,7 +2,7 @@ from typing import Set, Optional
 from pydantic import BaseModel
 
 # Shared properties
-class BekpackListItemBase(BaseModel):
+class BekpackItemListItemBase(BaseModel):
     bag_id: Optional[int]
     description: Optional[str]
     list_index: Optional[int]
@@ -12,7 +12,7 @@ class BekpackListItemBase(BaseModel):
 
 
 # Properties to receive via API on creation
-class BekpackListItemCreate(BekpackListItemBase):
+class BekpackItemListItemCreate(BekpackItemListItemBase):
     description: str
     name: str
     parent_list_id: int
@@ -20,12 +20,12 @@ class BekpackListItemCreate(BekpackListItemBase):
 
 
 # Properties to receive via API on update
-class BekpackListItemUpdate(BekpackListItemBase):
+class BekpackItemListItemUpdate(BekpackItemListItemBase):
     pass
 
 
 # Properties shared by models stored in DB
-class BekpackListItemInDBBase(BekpackListItemBase):
+class BekpackItemListItemInDBBase(BekpackItemListItemBase):
     id: int
 
     class Config:
@@ -33,10 +33,10 @@ class BekpackListItemInDBBase(BekpackListItemBase):
 
 
 # Additional properties to return via API
-class BekpackListItem(BekpackListItemInDBBase):
+class BekpackItemListItem(BekpackItemListItemInDBBase):
     pass
 
 
 # Additional properties stored in DB
-class BekpackListItemInDB(BekpackListItemInDBBase):
+class BekpackItemListItemInDB(BekpackItemListItemInDBBase):
     pass
