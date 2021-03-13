@@ -39,6 +39,7 @@
         :server-items-length="trips.total"
         :options.sync="tablePaginationoptions"
         :loading="loading"
+        @click:row="clickRow"
       >
         <template v-slot:[`item.name`]="{ item }">
           <v-badge class="ma-2" :color="item.color" inline left>
@@ -166,6 +167,12 @@ export default class Bekpack extends Vue {
   }
   public async deleteTrip(trip: IBekpackTrip) {
     await dispatchDeleteTrip(this.$store, trip);
+  }
+  public async clickRow(event: IBekpackTrip) {
+    this.$router.push({
+      name: 'bekpack-trip-summary',
+      params: { tripId: event.id.toString() },
+    });
   }
 }
 </script>

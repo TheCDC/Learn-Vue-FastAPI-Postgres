@@ -6,7 +6,7 @@ import { ActionContext } from 'vuex';
 import { dispatchCheckApiError } from '../main/actions';
 import { commitAddNotification, commitRemoveNotification } from '../main/mutations';
 import { State } from '../state';
-import { commitDeleteTrip, commitUpdateTrip, commitSetTrips, commitSetUser, commitSetTrip, commitSetTripToEdit } from './mutations';
+import { commitDeleteTrip, commitSetTrips, commitSetUser, commitSetTrip, commitSetTripToEdit } from './mutations';
 import { BekpackState } from './state';
 type MainContext = ActionContext<BekpackState, State>;
 
@@ -51,6 +51,16 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
+    async actionGetTrip(context: MainContext, payload: { id: number; }) {
+        try {
+            const response = await api.getBekpackTrip(context.rootState.main.token, payload.id);
+            if (response) {
+                commitSetTrip(context, response.data);
+            }
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    },
     async actionCreateTrip(context: MainContext, payload: IBekpackTripCreate) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
@@ -74,7 +84,7 @@ export const actions = {
                 api.updateBekpackTrip(context.rootState.main.token, payload.id, payload.item),
                 await new Promise<void>((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
-            commitUpdateTrip(context, response.data);
+            commitSetTrip(context, response.data);
             commitRemoveNotification(context, loadingNotification);
             commitAddNotification(context, { content: 'Trip successfully updated', color: 'success' });
 
@@ -109,4 +119,5 @@ export const dispatchDeleteTrip = dispatch(actions.actionDeleteTrip);
 export const dispatchGetBekpackUser = dispatch(actions.actionGetUser);
 export const dispatchGetMyTrips = dispatch(actions.actionGetMyTrips);
 export const dispatchGetTripToEdit = dispatch(actions.actionGetTripToEdit);
+export const dispatchGetTrip = dispatch(actions.actionGetTrip);
 export const dispatchUpdateTrip = dispatch(actions.actionUpdateTrip);

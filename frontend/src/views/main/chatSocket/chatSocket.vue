@@ -71,7 +71,6 @@ export default class ChatSocket extends Vue {
   public mounted() {
     this.reset();
   }
-  public created() {}
   public sendMessage() {
     try {
       this.connection.send(this.message);

@@ -82,7 +82,7 @@ export default class EditItem extends Vue {
         id: this.item!.id,
         item: updatedTrip,
       });
-      this.$router.push('/main/bekpack');
+      this.$router.back();
     }
   }
 }

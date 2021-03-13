@@ -53,6 +53,19 @@ export default new Router({
                   name: 'bekpack-edit-trip',
                   component: () => import(/* webpackChunkName: "bekpack-edit-trip" */ './views/main/bekpack/EditTrip.vue'),
                 },
+                {
+                  path: 'trip',
+                  component: () => import(/* webpackChunkName: "bekpack-trip-parent" */ './views/main/bekpack/trip/TripMain.vue'),
+
+                  children: [
+                    {
+                      path: ':tripId',
+                      name: 'bekpack-trip-summary',
+                      component: () => import(/* webpackChunkName: "bekpack-trip-summary" */ './views/main/bekpack/trip/TripSummary.vue'),
+
+                    },
+                  ],
+                },
               ],
             },
             {

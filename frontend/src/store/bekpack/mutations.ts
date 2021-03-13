@@ -15,7 +15,11 @@ export const mutations = {
     },
     setTripsOne(state: BekpackState, payload: IBekpackTrip) {
 
-        state.trips.items.unshift(payload);
+        const others = state.trips.items.filter((u) => {
+            return u.id !== payload.id;
+        });
+        others.unshift(payload);
+        state.trips.items = others;
     },
     setTripToEdit(state: BekpackState, payload: IBekpackTrip) {
         state.tripToEdit = payload;
@@ -42,4 +46,3 @@ export const commitSetTrip = commit(mutations.setTripsOne);
 export const commitSetTripToEdit = commit(mutations.setTripToEdit);
 export const commitSetTrips = commit(mutations.setTrips);
 export const commitSetUser = commit(mutations.setUser);
-export const commitUpdateTrip = commit(mutations.updateTrip);
