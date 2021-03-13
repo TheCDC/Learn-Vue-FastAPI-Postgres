@@ -1,16 +1,28 @@
 from typing import List
+from app.db.base_class import Base
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 
 from app.crud.base import CRUDBase
 from app.models.bekpack import BekpackTrip_Members, BekpackItemList, BekpackTrip
 from app.schemas import BekpackItemListCreate, BekpackItemListUpdate
+from app import crud, schemas, models
 
 
 class CRUDBekpackItemList(
     CRUDBase[BekpackItemList, BekpackItemListCreate, BekpackItemListUpdate]
 ):
+    def _get_base_query_user_can_read(
+        self, db: Session, *, models_to_include: List[Base] = [], user: models.User
+    ):
+
+        if user.is_superuser:
+            return db.query(self.model)
+        return crud.bekpacktrip._get_base_query_user_can_read(
+            db=db, models_to_include=[self.model] + models_to_include, user=user
+        ).join(self.model)
+
     def create_with_trip_owner(
         self, db: Session, *, obj_in: BekpackItemListCreate, owner_id: int, trip_id: int
     ) -> BekpackItemList:
