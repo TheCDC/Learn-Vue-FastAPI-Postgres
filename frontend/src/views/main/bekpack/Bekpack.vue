@@ -50,10 +50,10 @@
           {{ item.description | truncate(100, "...") }}
         </template>
         <template v-slot:[`item.time_updated`]="{ item }">
-          {{ localeDate(item.time_updated ) }}
+          {{ item.time_updated | localeDate }}
         </template>
         <template v-slot:[`item.time_created`]="{ item }">
-          {{ localeDate(item.time_created ) }}
+          {{ item.time_created | localeDate }}
         </template>
         <template v-slot:[`item.id`]="{ item }">
           <v-spacer> </v-spacer>

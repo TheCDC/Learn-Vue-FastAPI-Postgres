@@ -7,9 +7,9 @@
         {{ trip.name }}
       </v-card-title>
       <v-card-subtitle>
-        Created: {{ localeDate(trip.time_created) }}
+        Created: {{ trip.time_created | localeDate }}
 
-        Last modified : {{ localeDate(trip.time_updated) }}
+        Last modified : {{ trip.time_updated | localeDate }}
       </v-card-subtitle>
       <v-card-text>
         {{ trip.description }}
