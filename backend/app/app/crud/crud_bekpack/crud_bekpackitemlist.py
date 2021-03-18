@@ -16,7 +16,6 @@ class CRUDBekpackItemList(
     def _get_base_query_user_can_read(
         self, db: Session, *, models_to_include: List[Base] = [], user: models.User
     ):
-
         if user.is_superuser:
             return db.query(self.model)
         return crud.bekpacktrip._get_base_query_user_can_read(

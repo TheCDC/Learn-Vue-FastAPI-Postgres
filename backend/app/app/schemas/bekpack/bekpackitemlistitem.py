@@ -16,7 +16,7 @@ class BekpackItemListItemCreate(BekpackItemListItemBase):
     description: str
     name: str
     parent_list_id: int
-    quantity: str
+    quantity: int
 
 
 # Properties to receive via API on update

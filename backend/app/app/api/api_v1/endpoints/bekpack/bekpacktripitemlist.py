@@ -1,4 +1,6 @@
 from typing import Any, List
+from app.api.api_v1 import DefaultCrudRouter
+from app.crud.crud_bekpack.crud_bekpackitemlist import CRUDBekpackItemList
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,8 +17,19 @@ from app.crud import bekpackuser as crud_bekpackuser
 from app.crud import user as crud_user
 from app.models import User
 from app.models.bekpack import BekpackUser
+from app import models, crud, schemas
 
-router = APIRouter()
+router = DefaultCrudRouter[
+    models.BekpackItemList,
+    CRUDBekpackItemList,
+    schemas.BekpackItemList,
+    schemas.BekpackItemListUpdate,
+](
+    model=models.BekpackItemList,
+    crud=crud.bekpackitemlist,
+    read_schema=schemas.BekpackItemList,
+    update_schema=schemas.BekpackItemListUpdate,
+)
 
 
 @router.get(
