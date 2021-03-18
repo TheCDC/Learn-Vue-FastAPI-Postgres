@@ -32,19 +32,19 @@
 </template>
 
 <script lang="ts">
-import { IItemCreate } from '@/interfaces';
-import { dispatchCreateItem } from '@/store/item/actions';
-import { Component, Vue } from 'vue-property-decorator';
+import { IItemCreate } from "@/interfaces";
+import { dispatchCreateItem } from "@/store/item/actions";
+import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class ItemsCreate extends Vue {
-  public title = '';
-  public description = '';
+  public title = "";
+  public description = "";
   public valid = false;
 
   public reset() {
-    this.title = '';
-    this.description = '';
+    this.title = "";
+    this.description = "";
   }
   public cancel() {
     this.$router.back();
@@ -56,7 +56,7 @@ export default class ItemsCreate extends Vue {
         description: this.description,
       };
       await dispatchCreateItem(this.$store, newItem);
-      this.$router.push('/main/items');
+      this.$router.push("/main/items");
     }
   }
 }

@@ -41,9 +41,9 @@ export default class ChatSocket extends Vue {
     this.received = [];
     this.chatErrors = [];
     // console.log('Starting connection to WebSocket Server');
-    new WebSocket("wss://echo.websocket.org");
+    const socket = new WebSocket("wss://echo.websocket.org");
     this.connection.onmessage = ((v: ChatSocket) => {
-      return function (event) {
+      return (event: object) => {
         try {
           const val = event as IMessage;
           // console.log(val);

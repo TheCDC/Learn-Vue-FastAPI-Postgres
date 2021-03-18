@@ -13,16 +13,16 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { AppNotification } from '@/store/main/state';
-import { commitRemoveNotification } from '@/store/main/mutations';
-import { readFirstNotification } from '@/store/main/getters';
-import { dispatchRemoveNotification } from '@/store/main/actions';
+import { dispatchRemoveNotification } from "@/store/main/actions";
+import { readFirstNotification } from "@/store/main/getters";
+import { commitRemoveNotification } from "@/store/main/mutations";
+import { AppNotification } from "@/store/main/state";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 @Component
 export default class NotificationsManager extends Vue {
   public show: boolean = false;
-  public text: string = '';
+  public text: string = "";
   public showProgress: boolean = false;
   public currentNotification: AppNotification | false = false;
 
@@ -61,7 +61,7 @@ export default class NotificationsManager extends Vue {
     }
   }
 
-  @Watch('firstNotification')
+  @Watch("firstNotification")
   public async onNotificationChange(
     newNotification: AppNotification | false,
     oldNotification: AppNotification | false,
@@ -78,12 +78,12 @@ export default class NotificationsManager extends Vue {
   }
 
   public get currentNotificationContent() {
-    return (this.currentNotification && this.currentNotification.content) || '';
+    return (this.currentNotification && this.currentNotification.content) || "";
   }
 
   public get currentNotificationColor() {
     return (
-      (this.currentNotification && this.currentNotification.color) || 'info'
+      (this.currentNotification && this.currentNotification.color) || "info"
     );
   }
 }

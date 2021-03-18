@@ -156,23 +156,23 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Component, Vue } from "vue-property-decorator";
 
-import { appName } from '@/env';
+import { appName } from "@/env";
+import { dispatchUserLogOut } from "@/store/main/actions";
 import {
   readDashboardMiniDrawer,
   readDashboardShowDrawer,
   readHasAdminAccess,
-} from '@/store/main/getters';
+} from "@/store/main/getters";
 import {
-  commitSetDashboardShowDrawer,
   commitSetDashboardMiniDrawer,
-} from '@/store/main/mutations';
-import { dispatchUserLogOut } from '@/store/main/actions';
+  commitSetDashboardShowDrawer,
+} from "@/store/main/mutations";
 
 const routeGuardMain = async (to, from, next) => {
-  if (to.path === '/main') {
-    next('/main/dashboard');
+  if (to.path === "/main") {
+    next("/main/dashboard");
   } else {
     next();
   }

@@ -1,5 +1,5 @@
-import { IBekpackUser, IBekpackTrip } from '@/interfaces';
-import { IPage } from '@/interfaces/common';
+import { IBekpackTrip, IBekpackUser } from "@/interfaces";
+import { IPage } from "@/interfaces/common";
 
 export interface BekpackState {
     user: IBekpackUser | null;

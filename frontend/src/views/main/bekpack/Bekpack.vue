@@ -50,10 +50,10 @@
           {{ item.description | truncate(100, "...") }}
         </template>
         <template v-slot:[`item.time_updated`]="{ item }">
-          {{ new Date(item.time_updated) }}
+          {{ localeDate(item.time_updated ) }}
         </template>
         <template v-slot:[`item.time_created`]="{ item }">
-          {{ new Date(item.time_created) }}
+          {{ localeDate(item.time_created ) }}
         </template>
         <template v-slot:[`item.id`]="{ item }">
           <v-spacer> </v-spacer>
@@ -85,20 +85,20 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { IBekpackTrip } from "@/interfaces";
+import { IPageRead } from "@/interfaces/common";
 import {
   dispatchCreateBekpackUser,
   dispatchDeleteTrip,
   dispatchGetBekpackUser,
   dispatchGetMyTrips,
-} from '@/store/bekpack/actions';
+} from "@/store/bekpack/actions";
 import {
   readTrips,
   readUser,
   readUserHasAccount,
-} from '@/store/bekpack/getters';
-import { IBekpackTrip } from '@/interfaces';
-import { IPageRead } from '@/interfaces/common';
+} from "@/store/bekpack/getters";
+import { Component, Vue, Watch } from "vue-property-decorator";
 @Component
 export default class Bekpack extends Vue {
   get user() {
@@ -114,36 +114,36 @@ export default class Bekpack extends Vue {
   public tablePaginationoptions = {};
   public loading: boolean = false;
   public headers = [
-    { text: 'name', sortable: false, value: 'name', align: 'left' },
+    { text: "name", sortable: false, value: "name", align: "left" },
     {
-      align: 'left',
+      align: "left",
       sortable: false,
-      text: 'description',
-      value: 'description',
+      text: "description",
+      value: "description",
     },
     {
-      align: 'left',
+      align: "left",
       sortable: false,
-      text: 'Updated At',
-      value: 'time_updated',
+      text: "Updated At",
+      value: "time_updated",
     },
     {
-      align: 'left',
+      align: "left",
       sortable: false,
-      text: 'Created At',
-      value: 'time_created',
+      text: "Created At",
+      value: "time_created",
     },
     {
-      align: 'right',
+      align: "right",
       sortable: false,
-      text: 'Actions',
-      value: 'id',
+      text: "Actions",
+      value: "id",
     },
   ];
-  @Watch('tablePaginationoptions')
+  @Watch("tablePaginationoptions")
   public async onChildChanged(
     val: { page: number; itemsPerPage: number },
-    oldVal: object,
+    oldVal: object
   ) {
     this.page.page = val.page - 1; // pagination options page number is 1-indexed but API is 0-indexed
     this.page.size = val.itemsPerPage;
@@ -170,7 +170,7 @@ export default class Bekpack extends Vue {
   }
   public async clickRow(event: IBekpackTrip) {
     this.$router.push({
-      name: 'bekpack-trip-summary',
+      name: "bekpack-trip-summary",
       params: { tripId: event.id.toString() },
     });
   }

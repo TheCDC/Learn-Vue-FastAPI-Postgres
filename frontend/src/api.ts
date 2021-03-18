@@ -1,18 +1,18 @@
-import axios from 'axios';
-import { apiUrl } from '@/env';
+import { apiUrl } from "@/env";
+import axios from "axios";
 import {
-  IUserProfile,
-  IUserProfileUpdate,
-  IUserProfileCreate,
-  IItemCreate,
-  IItemUpdate,
+  IBekpackTrip,
   IBekpackTripCreate,
   IBekpackTripUpdate,
-  IItem,
   IBekpackUser,
-  IBekpackTrip,
-} from './interfaces';
-import { IPage, IPageRead } from './interfaces/common';
+  IItem,
+  IItemCreate,
+  IItemUpdate,
+  IUserProfile,
+  IUserProfileCreate,
+  IUserProfileUpdate,
+} from "./interfaces";
+import { IPage, IPageRead } from "./interfaces/common";
 
 
 function authHeaders(token: string) {
@@ -29,8 +29,8 @@ function paginated(headerObject: object, page: IPageRead) {
 export const api = {
   async logInGetToken(username: string, password: string) {
     const params = new URLSearchParams();
-    params.append('username', username);
-    params.append('password', password);
+    params.append("username", username);
+    params.append("password", password);
 
     return axios.post(`${apiUrl}/api/v1/login/access-token`, params);
   },

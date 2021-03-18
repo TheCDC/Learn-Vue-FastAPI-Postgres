@@ -1,12 +1,16 @@
 <template>
   <div>
-    Trip Summary:
     <v-progress-circular :indeterminate="true" v-if="!trip">
     </v-progress-circular>
     <v-card :color="trip.color" v-if="trip">
       <v-card-title>
         {{ trip.name }}
       </v-card-title>
+      <v-card-subtitle>
+        Created: {{ localeDate(trip.time_created) }}
+
+        Last modified : {{ localeDate(trip.time_updated) }}
+      </v-card-subtitle>
       <v-card-text>
         {{ trip.description }}
       </v-card-text>

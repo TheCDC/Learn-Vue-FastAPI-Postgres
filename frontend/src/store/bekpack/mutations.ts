@@ -1,8 +1,8 @@
-import { IBekpackTrip, IBekpackUser } from '@/interfaces';
-import { IPage } from '@/interfaces/common';
-import { getStoreAccessors } from 'typesafe-vuex';
-import { State } from '../state';
-import { BekpackState } from './state';
+import { IBekpackTrip, IBekpackUser } from "@/interfaces";
+import { IPage } from "@/interfaces/common";
+import { getStoreAccessors } from "typesafe-vuex";
+import { State } from "../state";
+import { BekpackState } from "./state";
 
 export const mutations = {
     setUser(state: BekpackState, payload: IBekpackUser) {
@@ -39,7 +39,7 @@ export const mutations = {
     },
 };
 
-const { commit } = getStoreAccessors<BekpackState, State>('');
+const { commit } = getStoreAccessors<BekpackState, State>("");
 
 export const commitDeleteTrip = commit(mutations.deleteTrip);
 export const commitSetTrip = commit(mutations.setTripsOne);

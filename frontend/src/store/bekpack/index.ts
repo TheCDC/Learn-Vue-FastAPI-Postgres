@@ -1,7 +1,7 @@
-import { mutations } from './mutations';
-import { getters } from './getters';
-import { actions } from './actions';
-import { BekpackState } from './state';
+import { actions } from "./actions";
+import { getters } from "./getters";
+import { mutations } from "./mutations";
+import { BekpackState } from "./state";
 
 const defaultState: BekpackState = {
     user: null,

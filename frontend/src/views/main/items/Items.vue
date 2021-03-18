@@ -49,11 +49,11 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { dispatchDeleteItem, dispatchGetItems } from '@/store/item/actions';
-import { readItems, readItemsOneUser } from '@/store/item/getters';
-import { readUserProfile } from '@/store/main/getters';
-import { IItem } from '@/interfaces';
+import { IItem } from "@/interfaces";
+import { dispatchDeleteItem, dispatchGetItems } from "@/store/item/actions";
+import { readItems, readItemsOneUser } from "@/store/item/getters";
+import { readUserProfile } from "@/store/main/getters";
+import { Component, Vue } from "vue-property-decorator";
 @Component
 export default class Items extends Vue {
   get items() {
@@ -69,14 +69,14 @@ export default class Items extends Vue {
     return readUserProfile(this.$store);
   }
   public headers = [
-    { text: 'title', sortable: true, value: 'title', align: 'left' },
+    { text: "title", sortable: true, value: "title", align: "left" },
     {
-      text: 'description',
+      text: "description",
       sortable: true,
-      value: 'description',
-      align: 'left',
+      value: "description",
+      align: "left",
     },
-    { text: 'Actions', sortable: false, value: 'id' },
+    { text: "Actions", sortable: false, value: "id" },
   ];
   public async mounted() {
     await dispatchGetItems(this.$store);

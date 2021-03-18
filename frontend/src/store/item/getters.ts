@@ -1,6 +1,6 @@
-import { getStoreAccessors } from 'typesafe-vuex';
-import { State } from '../state';
-import { ItemState } from './state';
+import { getStoreAccessors } from "typesafe-vuex";
+import { State } from "../state";
+import { ItemState } from "./state";
 
 export const getters = {
     items: (state: ItemState) => state.items,
@@ -18,7 +18,7 @@ export const getters = {
     },
 };
 
-const { read } = getStoreAccessors<ItemState, State>('');
+const { read } = getStoreAccessors<ItemState, State>("");
 export const readItemsOneUser = read(getters.itemsOneUser);
 export const readItems = read(getters.items);
 export const readItemsOne = read(getters.itemsOneItem);

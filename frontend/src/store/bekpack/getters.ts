@@ -1,6 +1,6 @@
-import { getStoreAccessors } from 'typesafe-vuex';
-import { State } from '../state';
-import { BekpackState } from './state';
+import { getStoreAccessors } from "typesafe-vuex";
+import { State } from "../state";
+import { BekpackState } from "./state";
 
 export const getters = {
     trips: (state: BekpackState) => state.trips,
@@ -23,7 +23,7 @@ export const getters = {
     userHasAccount: (state: BekpackState) => state.hasBekpackAccount,
 };
 
-const { read } = getStoreAccessors<BekpackState, State>('');
+const { read } = getStoreAccessors<BekpackState, State>("");
 export const readTrips = read(getters.trips);
 export const readTripsOne = read(getters.tripsOneTrip);
 export const readTripsOneUser = read(getters.tripsOneUser);
