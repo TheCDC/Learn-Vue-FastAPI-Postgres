@@ -2,7 +2,6 @@ from typing import Any, Generic, List, Optional, Type, TypeVar
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_pagination import Page, pagination_params
-from fastapi_pagination.page import Page
 from fastapi_pagination.paginator import paginate
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -11,6 +10,7 @@ from app.api import deps
 from app.crud.base import CRUDBase
 from app.db.base_class import Base
 from app.models import User
+from app import schemas
 
 ModelType = TypeVar("ModelType", bound=Base)
 ReadSchemaType = TypeVar("ReadSchemaType", bound=BaseModel)
@@ -35,11 +35,10 @@ class DefaultCrudRouter(
 
     def __init__(
         self,
-        *,
         model: Type[ModelType],
         crud: CRUDType,
-        read_schema: ReadSchemaType,
-        update_schema: UpdateSchemaType,
+        read_schema: Type[ReadSchemaType],
+        update_schema: Type[UpdateSchemaType],
     ):
         """
         APIRouter object with default methods to Create, Read, Update, Delete.
@@ -51,30 +50,28 @@ class DefaultCrudRouter(
         super().__init__()
         self.model = model
         self.crud = crud
-        self.read_type = read_schema
-        self.update_type = update_schema
-        # def initialize(self):
+        self.read_schema = read_schema
+        self.update_schema = update_schema
+
         @self.get(
             "/",
-            response_model=Page[self.read_type],
+            response_model=Page[self.read_schema],
             dependencies=[Depends(pagination_params)],
         )
         def get_all(
             db: Session = Depends(deps.get_db),
             current_user: User = Depends(deps.get_current_active_superuser),
-        ):
+        ) -> Any:
             return paginate(self.crud.get_multi(db=db))
 
         @self.get(
-            "/{id}",
-            response_model=self.read_type,
-            dependencies=[Depends(pagination_params)],
+            "/{id}", response_model=self.read_schema,
         )
         def get_one(
             id: int,
             db: Session = Depends(deps.get_db),
             current_user: User = Depends(deps.get_current_active_user),
-        ):
+        ) -> Any:
             """Get one record"""
             object = self.crud.get(db=db, id=id)
             if not object:
@@ -86,7 +83,7 @@ class DefaultCrudRouter(
 
         @self.get(
             "/select/by_string",
-            response_model=Page[self.read_type],
+            response_model=Page[self.read_schema],
             dependencies=[Depends(pagination_params)],
         )
         def filter_by_string(
@@ -98,11 +95,10 @@ class DefaultCrudRouter(
             objects = self.crud.search(
                 db=db, filter_string=filter_string, user=current_user
             )
-            print(self.read_type, objects)
             return paginate(objects)
 
         @self.get(
-            "/select/by_ids", response_model=List[self.read_type],
+            "/select/by_ids", response_model=List[self.read_schema],
         )
         def get_multi_by_ids(
             ids: List[int] = Query([]),
@@ -127,11 +123,11 @@ class DefaultCrudRouter(
             return objects
 
         @self.put(
-            "/{id}", response_model=self.read_type,
+            "/{id}", response_model=self.read_schema,
         )
         def update_one(
             id: int,
-            obj_in: self.update_type,
+            obj_in: self.update_schema,
             db: Session = Depends(deps.get_db),
             current_user: User = Depends(deps.get_current_active_user),
         ):
@@ -143,7 +139,7 @@ class DefaultCrudRouter(
                 raise HTTPException(status_code=403, detail="Not authorized")
             return self.crud.update(db=db, db_obj=object, obj_in=obj_in)
 
-        @self.delete("/{id}", response_model=self.read_type)
+        @self.delete("/{id}", response_model=self.read_schema)
         def delete_one(
             id: int,
             db: Session = Depends(deps.get_db),
