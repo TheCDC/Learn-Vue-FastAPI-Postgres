@@ -19,12 +19,14 @@ class BekpackTripBase(BaseModel):
         json_encoders = {Color: convert_color}
 
     @validator("color")
-    def validate(cls, c):
-        if isinstance(c, Color):
-            return c.as_hex()
-        elif isinstance(c, str):
-            return Color(c)
-        return c
+    def color_is_correct_type(cls, v):
+        if isinstance(v, Color):
+            return v.as_hex()
+        elif isinstance(v, str):
+            return Color(v)
+        raise ValueError(
+            f"BekpackTripBase.color is {type(v)}. Expected {Color} or {str}"
+        )
 
 
 # Properties to receive on item creation
@@ -53,9 +55,11 @@ class BekpackTripInDBBase(BekpackTripBase):
 # Properties to return to client
 class BekpackTrip(BekpackTripInDBBase):
     # bags: List[BekpackBag]
-    members: List[BekpackUser]
-    # owner: BekpackUser
-    # time_created: datetime
+    # members: List[BekpackUser]
+    item_lists: List[ForwardRef("BekpackItemList")]
+    owner: BekpackUser
+    time_created: datetime
+    time_updated: datetime
     pass
 
 
