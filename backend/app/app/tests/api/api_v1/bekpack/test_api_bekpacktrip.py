@@ -302,13 +302,18 @@ def test_update_bekpacktrip(
     )
     user_id_old = bp_user.id
     # create trip
-    trip_data = {"name": random_lower_name(), "color": get_random_color()}
+    trip_data = {
+        "name": random_lower_name(),
+        "color": get_random_color(),
+        "description": random_lower_name(),
+    }
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
         headers=auth_token,
         json=trip_data,
     )
     content = response.json()
+    print(content)
     trip_id_created = content["id"]
     # update trip
     content_update = {"color": get_random_color(), "name": random_lower_name()}

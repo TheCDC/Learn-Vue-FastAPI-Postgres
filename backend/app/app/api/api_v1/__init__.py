@@ -62,7 +62,8 @@ class DefaultCrudRouter(
             db: Session = Depends(deps.get_db),
             current_user: User = Depends(deps.get_current_active_superuser),
         ) -> Any:
-            return paginate(self.crud.get_multi(db=db))
+            objects = self.crud.get_multi(db=db)
+            return paginate(objects)
 
         @self.get(
             "/{id}", response_model=self.read_schema,

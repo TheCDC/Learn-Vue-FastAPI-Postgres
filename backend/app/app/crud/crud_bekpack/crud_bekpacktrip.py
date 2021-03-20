@@ -20,8 +20,12 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
 
         included = Query(entities=[models.BekpackTrip] + models_to_include, session=db,)
         return (
-            included.join(BekpackTrip_Members)
-            .join(models.BekpackUser)
+            included.join(
+                BekpackTrip_Members, BekpackTrip_Members.trip_id == self.model.id
+            )
+            .join(
+                models.BekpackUser, BekpackTrip_Members.user_id == models.BekpackUser.id
+            )
             .filter(BekpackUser.owner_id == user.id)
         )
 

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import relationship
 from sqlalchemy_utils.types import ColorType
 
 from app.db.base_class import Base
@@ -67,6 +67,10 @@ class BekpackItemList(Base):
     color = Column(String)
     name = Column(String)
     parent_trip = relationship(BekpackTrip, back_populates="item_lists")
+    parent_user = relationship(BekpackUser)
+    items = relationship(
+        "BekpackItemListItem", back_populates="parent_list", lazy="joined"
+    )
 
 
 class BekpackBag(Base):
@@ -79,7 +83,7 @@ class BekpackBag(Base):
     )
     color = Column(String)
     name = Column(String)
-    items = relationship("BekpackItemListItem", backref="bag")
+    items = relationship("BekpackItemListItem", back_populates="bag")
     owner = relationship(BekpackUser, back_populates="owned_bags")
     owner_trip = relationship(BekpackTrip, back_populates="bags")
 
@@ -97,3 +101,5 @@ class BekpackItemListItem(Base):
     list_index = Column(Integer)
     name = Column(String)
     quantity = Column(Integer)
+    parent_list = relationship(BekpackItemList, back_populates="items")
+    bag = relationship(BekpackBag, back_populates="items")

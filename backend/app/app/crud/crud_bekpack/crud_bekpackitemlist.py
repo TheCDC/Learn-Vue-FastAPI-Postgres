@@ -15,7 +15,7 @@ class CRUDBekpackItemList(
 ):
     def _get_base_query_user_can_read(
         self, db: Session, *, models_to_include: List[Base] = [], user: models.User
-    ):
+    ) -> Query:
         if user.is_superuser:
             return db.query(self.model)
         return crud.bekpacktrip._get_base_query_user_can_read(
@@ -23,11 +23,16 @@ class CRUDBekpackItemList(
         ).join(self.model)
 
     def create_with_trip_owner(
-        self, db: Session, *, obj_in: BekpackItemListCreate, owner_id: int, trip_id: int
+        self,
+        db: Session,
+        *,
+        obj_in: BekpackItemListCreate,
+        parent_user: int,
+        trip_id: int
     ) -> BekpackItemList:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(
-            **obj_in_data, parent_user_id=owner_id, parent_trip_id=trip_id
+            **obj_in_data, parent_user_id=parent_user, parent_trip_id=trip_id
         )
         db.add(db_obj)
         db.commit()
@@ -42,23 +47,48 @@ class CRUDBekpackItemList(
     def get_by_owner(self, db: Session, *, owner_id: int) -> List[BekpackItemList]:
         return db.query(self.model).filter(self.model.parent_user_id == owner_id).all()
 
-    def user_can_see(self, db: Session, *, list_id: int, bekpack_user_id: int) -> bool:
-        itemlist: BekpackItemList = db.query(self.model).filter(id=list_id).one()
-        potential_membership = (
-            db.query(self.model)
-            .join(BekpackTrip, BekpackTrip.id == itemlist.trip_id)
-            .join(BekpackTrip_Members, BekpackTrip_Members.user_id == bekpack_user_id)
+    def user_can_read(self, db: Session, *, id: int, user: models.User) -> bool:
+        if user.is_superuser:
+            return True
+        o = (
+            self._get_base_query_user_can_read(db=db, user=user)
+            .filter(self.model.id == id)
             .one_or_none()
         )
-        if potential_membership:
+        if o:
             return True
         return False
 
-    def user_can_write(
-        self, db: Session, *, list_id: int, bekpack_user_id: int
-    ) -> bool:
-        itemlist: BekpackItemList = db.query(self.model).filter(id=list_id).one()
-        return itemlist.parent_user_id == bekpack_user_id
+    def user_can_write(self, db: Session, *, id: int, user: models.User) -> bool:
+        if user.is_superuser:
+            return True
+        user_owns_parent_trip = (
+            db.query(self.model)
+            .filter(self.model.id == id)
+            .join(
+                models.BekpackTrip, self.model.parent_trip_id == models.BekpackTrip.id
+            )
+            .join(
+                models.BekpackUser, models.BekpackTrip.owner_id == models.BekpackUser.id
+            )
+            .filter(models.BekpackUser.owner_id == user.id)
+            .one_or_none()
+        )
+        if user_owns_parent_trip:
+            return True
+
+        user_parents_this_list = (
+            db.query(self.model)
+            .filter(self.model.id == id)
+            .join(
+                models.BekpackUser, self.model.parent_user_id == models.BekpackUser.id
+            )
+            .filter(models.BekpackUser.owner_id == user.id)
+            .one_or_none()
+        )
+        if user_parents_this_list:
+            return True
+        return False
 
 
 bekpackitemlist = CRUDBekpackItemList(BekpackItemList)

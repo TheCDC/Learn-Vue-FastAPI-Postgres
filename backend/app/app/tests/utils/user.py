@@ -31,6 +31,10 @@ def create_random_user(db: Session) -> User:
     return user
 
 
+def get_superuser(db: Session) -> User:
+    return db.query(User).filter(User.is_superuser == True).first()
+
+
 def authentication_token_from_email(
     *, client: TestClient, email: str, db: Session
 ) -> Dict[str, str]:

@@ -36,13 +36,13 @@ def create_random_itemlist(
     if bekpack_user is None:
         bekpack_user = create_random_bekpackuser(db=db)
     if trip is None:
-        trip = create_random_trip(db=db)
+        trip = create_random_trip(db=db, bekpack_user=bekpack_user)
     itemlist = crud.bekpackitemlist.create_with_trip_owner(
         db=db,
         obj_in=schemas.BekpackItemListCreate(
             name=random_lower_string(), color=get_random_color()
         ),
-        owner_id=trip.owner_id,
+        parent_user=bekpack_user.id,
         trip_id=trip.id,
     )
     return itemlist

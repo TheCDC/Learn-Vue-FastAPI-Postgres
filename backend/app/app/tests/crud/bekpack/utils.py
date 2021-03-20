@@ -13,5 +13,5 @@ def get_bekpack_user(db: Session) -> BekpackUser:
 
 
 def get_random_color() -> str:
-    legal = "1234567890abcdefABCDEF"
+    legal = "1234567890abcdef"
     return "#" + "".join(choice(legal) for _ in range(6))

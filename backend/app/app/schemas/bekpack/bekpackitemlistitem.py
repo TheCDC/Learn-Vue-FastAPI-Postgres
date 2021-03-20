@@ -3,6 +3,8 @@ from pydantic import BaseModel
 
 # Shared properties
 class BekpackItemListItemBase(BaseModel):
+    id: Optional[int]
+
     bag_id: Optional[int]
     description: Optional[str]
     list_index: Optional[int]
@@ -27,6 +29,8 @@ class BekpackItemListItemUpdate(BekpackItemListItemBase):
 # Properties shared by models stored in DB
 class BekpackItemListItemInDBBase(BekpackItemListItemBase):
     id: int
+    parent_list_id: int
+    list_index: Optional[int]
 
     class Config:
         orm_mode = True

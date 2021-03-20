@@ -10,9 +10,9 @@ BekpackUser = ForwardRef("BekpackUser")
 
 # Shared properties
 class BekpackTripBase(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
     color: Optional[Color]
+    description: Optional[str]
+    name: Optional[str]
 
     class Config:
         orm_mode = True
@@ -31,17 +31,17 @@ class BekpackTripBase(BaseModel):
 
 # Properties to receive on item creation
 class BekpackTripCreate(BekpackTripBase):
-    name: str
-    description: str
     color: Color = "blue"
+    description: str
+    name: str
 
 
 # Properties to receive on item update
 class BekpackTripUpdate(BekpackTripBase):
     color: Optional[Color]
+    description: Optional[str]
     is_active: Optional[bool]
     name: Optional[str]
-    description: Optional[str]
     owner_id: Optional[int]
 
 
@@ -57,7 +57,7 @@ class BekpackTrip(BekpackTripInDBBase):
     # bags: List[BekpackBag]
     # members: List[BekpackUser]
     item_lists: List[ForwardRef("BekpackItemList")]
-    owner: BekpackUser
+    owner: Optional[BekpackUser]
     time_created: datetime
     time_updated: datetime
     pass

@@ -141,5 +141,4 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             # select exactly one model type to return from the subquery
             model_alias
         ).select_from(subquery)
-        # print(final_query)
         return final_query.all()

@@ -1,4 +1,4 @@
-from typing import ForwardRef, Optional
+from typing import ForwardRef, List, Optional
 
 from pydantic import BaseModel, validator
 from pydantic.color import Color
@@ -7,18 +7,22 @@ from app.crud.encoders import convert_color
 from app.schemas.bekpack.bekpackbag import BekpackBagInDBBase
 
 BekpackTrip = ForwardRef("BekpackTrip")
+BekpackTripItemList = ForwardRef("BekpackItemList")
+BekpackItemListItem = ForwardRef("BekpackItemListItem")
 # Shared properties
 class BekpackItemListBase(BaseModel):
     color: Optional[Color]
     name: Optional[str] = None
 
     @validator("color")
-    def validate(cls, c: Color):
-        if isinstance(c, Color):
-            return c.as_hex()
-        elif isinstance(c, str):
-            return Color(c)
-        return c
+    def color_is_correct_type(cls, v):
+        if isinstance(v, Color):
+            return v.as_hex()
+        elif isinstance(v, str):
+            return Color(v)
+        raise ValueError(
+            f"BekpackTripBase.color is {type(v)}. Expected {Color} or {str}"
+        )
 
     class Config:
         orm_mode = True
@@ -47,7 +51,7 @@ class BekpackItemListInDBBase(BekpackItemListBase):
 
 # Properties to return to client
 class BekpackItemList(BekpackItemListInDBBase):
-    parent_trip: BekpackTrip
+    items: List[BekpackItemListItem]
 
 
 # Additional properties stored in DB
