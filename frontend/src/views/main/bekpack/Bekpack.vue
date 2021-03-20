@@ -65,7 +65,7 @@
                 v-on="on"
                 :to="{
                   name: 'bekpack-edit-trip',
-                  params: { id: item.id },
+                  params: { tripId: item.id },
                 }"
                 ><v-icon>edit</v-icon>
               </v-btn>

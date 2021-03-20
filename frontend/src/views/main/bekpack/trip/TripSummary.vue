@@ -18,7 +18,7 @@
         <v-btn
           :to="{
             name: 'bekpack-edit-trip',
-            params: { id: trip.id },
+            params: { tripId: trip.id },
           }"
         >
           edit
