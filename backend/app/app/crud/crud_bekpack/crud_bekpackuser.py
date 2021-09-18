@@ -4,12 +4,14 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app import models, crud
-from app.crud.base import CRUDBase
+from app.crud.base import CRUDBaseSecure
 from app.models.bekpack import BekpackUser
 from app.schemas import BekpackUserCreate, BekpackUserUpdate
 
 
-class CRUDBekpackUser(CRUDBase[BekpackUser, BekpackUserCreate, BekpackUserUpdate]):
+class CRUDBekpackUser(
+    CRUDBaseSecure[BekpackUser, BekpackUserCreate, BekpackUserUpdate]
+):
     def create_with_owner(self, db: Session, *, owner_id: int) -> BekpackUser:
         db_obj = self.model(owner_id=owner_id)
         db.add(db_obj)

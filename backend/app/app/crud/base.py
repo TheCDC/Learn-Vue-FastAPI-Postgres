@@ -26,17 +26,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def _get_base_query_user_can_read(
-        self, db: Session, *, models_to_include: Base = [], user: models.User
-    ):
-        raise NotImplementedError(
-            f"_get_base_query_user_can_read not implemented on class {self.__class__.__name__}"
-        )
-
     def get(self, db: Session, id: Any) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == id).first()
 
-    def get_multi(self, db: Session,) -> List[ModelType]:
+    def get_multi(
+        self,
+        db: Session,
+    ) -> List[ModelType]:
         return db.query(self.model).all()
 
     def get_multi_by_ids(self, db: Session, *, ids: List[int]) -> List[ModelType]:
@@ -90,6 +86,19 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.commit()
         return records
 
+
+class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
+    def __init__(self, model: Type[ModelType]):
+        """
+        CRUD object with default methods to Create, Read, Update, Delete (CRUD).
+
+        **Parameters**
+
+        * `model`: A SQLAlchemy model class
+        * `schema`: A Pydantic model (schema) class
+        """
+        self.model = model
+
     def user_can_read(
         self, db: Session, *, object: ModelType, user: models.User
     ) -> bool:
@@ -102,6 +111,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> bool:
         raise NotImplementedError(
             f"user_can_write not implemented on class {self.__class__.__name__}"
+        )
+
+    def _get_base_query_user_can_read(
+        self,
+        db: Session,
+        *,
+        models_to_include: List[Type[Base]] = [],
+        user: models.User,
+    ):
+        raise NotImplementedError(
+            f"_get_base_query_user_can_read not implemented on class {self.__class__.__name__}"
         )
 
     def search(

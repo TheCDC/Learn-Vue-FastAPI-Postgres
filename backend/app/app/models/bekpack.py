@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Union
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -32,9 +32,11 @@ class BekpackUser(Base):
         secondary=BekpackTrip_Members.__table__,
         back_populates="members",
     )
-    owned_bags = relationship("BekpackBag", back_populates="owner")
-    owned_trips = relationship("BekpackTrip", back_populates="owner")
-    owner = relationship("User")
+    owned_bags: List["BekpackBag"] = relationship("BekpackBag", back_populates="owner")
+    owned_trips: List["BekpackTrip"] = relationship(
+        "BekpackTrip", back_populates="owner"
+    )
+    owner: "User" = relationship("User")
 
 
 class BekpackTrip(Base, TimestampsMixin):
@@ -46,14 +48,16 @@ class BekpackTrip(Base, TimestampsMixin):
     description = Column(String)
     is_active = Column(Boolean(), default=True)
     name = Column(String, index=True)
-    bags = relationship("BekpackBag", back_populates="owner_trip")
-    members = relationship(
+    bags: List["BekpackBag"] = relationship("BekpackBag", back_populates="owner_trip")
+    members: List[BekpackUser] = relationship(
         BekpackUser,
         secondary=BekpackTrip_Members.__table__,
         back_populates="joined_trips",
     )
-    owner = relationship(BekpackUser, back_populates="owned_trips")
-    item_lists = relationship("BekpackItemList", back_populates="parent_trip")
+    owner: BekpackUser = relationship(BekpackUser, back_populates="owned_trips")
+    item_lists: List["BekpackItemList"] = relationship(
+        "BekpackItemList", back_populates="parent_trip"
+    )
 
 
 class BekpackItemList(Base):
@@ -66,9 +70,9 @@ class BekpackItemList(Base):
     )
     color = Column(String)
     name = Column(String)
-    parent_trip = relationship(BekpackTrip, back_populates="item_lists")
-    parent_user = relationship(BekpackUser)
-    items = relationship(
+    parent_trip: BekpackTrip = relationship(BekpackTrip, back_populates="item_lists")
+    parent_user: BekpackUser = relationship(BekpackUser)
+    items: List["BekpackItemListItem"] = relationship(
         "BekpackItemListItem", back_populates="parent_list", lazy="joined"
     )
 
@@ -83,9 +87,11 @@ class BekpackBag(Base):
     )
     color = Column(String)
     name = Column(String)
-    items = relationship("BekpackItemListItem", back_populates="bag")
-    owner = relationship(BekpackUser, back_populates="owned_bags")
-    owner_trip = relationship(BekpackTrip, back_populates="bags")
+    items: List["BekpackItemListItem"] = relationship(
+        "BekpackItemListItem", back_populates="bag"
+    )
+    owner: BekpackUser = relationship(BekpackUser, back_populates="owned_bags")
+    owner_trip: BekpackTrip = relationship(BekpackTrip, back_populates="bags")
 
 
 class BekpackItemListItem(Base):
@@ -101,5 +107,5 @@ class BekpackItemListItem(Base):
     list_index = Column(Integer)
     name = Column(String)
     quantity = Column(Integer)
-    parent_list = relationship(BekpackItemList, back_populates="items")
-    bag = relationship(BekpackBag, back_populates="items")
+    parent_list: BekpackItemList = relationship(BekpackItemList, back_populates="items")
+    bag: BekpackBag = relationship(BekpackBag, back_populates="items")

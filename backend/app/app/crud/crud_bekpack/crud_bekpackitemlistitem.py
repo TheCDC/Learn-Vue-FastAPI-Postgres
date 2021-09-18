@@ -6,12 +6,12 @@ from sqlalchemy.orm.session import Session
 
 from app import crud, models, schemas
 from app.core.security import SecurityError
-from app.crud.base import CRUDBase
+from app.crud.base import CRUDBaseSecure
 from app.db.base_class import Base
 
 
 class CRUDBekpackItemListItem(
-    CRUDBase[
+    CRUDBaseSecure[
         models.BekpackItemListItem,
         schemas.BekpackItemListItemCreate,
         schemas.BekpackItemListItemUpdate,

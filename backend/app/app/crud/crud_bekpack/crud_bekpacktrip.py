@@ -1,16 +1,18 @@
 from typing import List, Type
-from app.db.base_class import Base
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.orm import Query, Session
 
-from app import models, crud
-from app.crud.base import CRUDBase
+from app import crud, models
+from app.crud.base import CRUDBaseSecure
+from app.db.base_class import Base
 from app.models.bekpack import BekpackTrip, BekpackTrip_Members, BekpackUser
 from app.schemas import BekpackTripCreate, BekpackTripUpdate
 
 
-class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate]):
+class CRUDBekpackTrip(
+    CRUDBaseSecure[BekpackTrip, BekpackTripCreate, BekpackTripUpdate]
+):
     def _get_base_query_user_can_read(
         self,
         db: Session,
