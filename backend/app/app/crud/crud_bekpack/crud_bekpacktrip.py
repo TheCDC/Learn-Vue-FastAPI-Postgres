@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Type
 from app.db.base_class import Base
 
 from fastapi.encoders import jsonable_encoder
@@ -12,13 +12,22 @@ from app.schemas import BekpackTripCreate, BekpackTripUpdate
 
 class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate]):
     def _get_base_query_user_can_read(
-        self, db: Session, *, models_to_include: List[Base] = [], user: models.User
+        self,
+        db: Session,
+        *,
+        models_to_include: List[Type[Base]] = [],
+        user: models.User,
     ):
 
         if user.is_superuser:
             return db.query(self.model)
+        mti: List[Type[Base]] = [self.model]
+        mti.extend(models_to_include)
 
-        included = Query(entities=[models.BekpackTrip] + models_to_include, session=db,)
+        included = Query(
+            entities=mti,
+            session=db,
+        )
         return (
             included.join(
                 BekpackTrip_Members, BekpackTrip_Members.trip_id == self.model.id
@@ -46,7 +55,12 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
         db.refresh(db_obj)
         return db_obj
 
-    def get_by_owner(self, db: Session, *, owner_id: int,) -> List[BekpackTrip]:
+    def get_by_owner(
+        self,
+        db: Session,
+        *,
+        owner_id: int,
+    ) -> List[BekpackTrip]:
         return (
             db.query(self.model)
             .join(BekpackUser, BekpackUser.owner_id == owner_id)
@@ -55,11 +69,14 @@ class CRUDBekpackTrip(CRUDBase[BekpackTrip, BekpackTripCreate, BekpackTripUpdate
             .all()
         )
 
-    def get_all(self, db: Session,) -> List[BekpackTrip]:
+    def get_all(
+        self,
+        db: Session,
+    ) -> List[BekpackTrip]:
         return db.query(self.model).order_by(BekpackTrip.time_updated.desc()).all()
 
     def get_joined_by_member(self, db: Session, *, member_id: int) -> List[BekpackTrip]:
-        associations: List[BekpackTrip_Members] = (
+        associations: List[BekpackTrip] = (
             db.query(self.model)
             .join(BekpackTrip_Members)
             .filter(BekpackTrip_Members.user_id == member_id)

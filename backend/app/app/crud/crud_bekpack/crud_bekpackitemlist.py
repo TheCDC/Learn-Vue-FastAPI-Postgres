@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Type
 from app.db.base_class import Base
 
 from fastapi.encoders import jsonable_encoder
@@ -14,12 +14,18 @@ class CRUDBekpackItemList(
     CRUDBase[BekpackItemList, BekpackItemListCreate, BekpackItemListUpdate]
 ):
     def _get_base_query_user_can_read(
-        self, db: Session, *, models_to_include: List[Base] = [], user: models.User
+        self,
+        db: Session,
+        *,
+        models_to_include: List[Type[Base]] = [],
+        user: models.User
     ) -> Query:
         if user.is_superuser:
             return db.query(self.model)
+        mti: List[Type[Base]] = [self.model]
+        mti.extend(models_to_include)
         return crud.bekpacktrip._get_base_query_user_can_read(
-            db=db, models_to_include=[self.model] + models_to_include, user=user
+            db=db, models_to_include=mti, user=user
         ).join(self.model)
 
     def create_with_trip_owner(

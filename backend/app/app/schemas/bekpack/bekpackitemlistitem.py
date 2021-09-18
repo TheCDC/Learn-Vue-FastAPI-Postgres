@@ -9,7 +9,6 @@ class BekpackItemListItemBase(BaseModel):
     description: Optional[str]
     list_index: Optional[int]
     name: Optional[str]
-    parent_list_id: Optional[int]
     quantity: Optional[int]
 
 
@@ -17,7 +16,6 @@ class BekpackItemListItemBase(BaseModel):
 class BekpackItemListItemCreate(BekpackItemListItemBase):
     description: str
     name: str
-    parent_list_id: int
     quantity: int
 
 
