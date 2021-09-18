@@ -86,17 +86,15 @@ class CRUDBekpackTrip(
         )
         return associations
 
-    def user_can_read(
-        self, db: Session, object: BekpackTrip, user: models.User
-    ) -> bool:
+    def user_can_read(self, db: Session, object_id: int, user: models.User) -> bool:
         if user.is_superuser:
             return True
         obj = (
             db.query(self.model)
             .join(models.BekpackUser, BekpackUser.owner_id == user.id)
-            .join(BekpackTrip_Members, BekpackTrip.id == object.id)
+            .join(BekpackTrip_Members, BekpackTrip.id == object_id)
             .filter(
-                (BekpackTrip_Members.trip_id == object.id)
+                (BekpackTrip_Members.trip_id == object_id)
                 & (BekpackTrip_Members.user_id == models.BekpackUser.id)
             )
             .one_or_none()

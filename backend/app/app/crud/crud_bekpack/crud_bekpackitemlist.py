@@ -4,14 +4,14 @@ from app.db.base_class import Base
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session, Query
 
-from app.crud.base import CRUDBase
+from app.crud.base import CRUDBase, CRUDBaseSecure
 from app.models.bekpack import BekpackTrip_Members, BekpackItemList, BekpackTrip
 from app.schemas import BekpackItemListCreate, BekpackItemListUpdate
 from app import crud, schemas, models
 
 
 class CRUDBekpackItemList(
-    CRUDBase[BekpackItemList, BekpackItemListCreate, BekpackItemListUpdate]
+    CRUDBaseSecure[BekpackItemList, BekpackItemListCreate, BekpackItemListUpdate]
 ):
     def _get_base_query_user_can_read(
         self,

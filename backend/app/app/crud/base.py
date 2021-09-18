@@ -6,8 +6,11 @@ from pydantic import BaseModel
 from sqlalchemy import Column, String
 from sqlalchemy.orm import Session, Query
 from app import models
+from app.core.security import SecurityError
 from app.db.base_class import Base
 from sqlalchemy.orm import aliased
+
+from app.models.user import User
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -119,9 +122,20 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         models_to_include: List[Type[Base]] = [],
         user: models.User,
-    ):
+    ) -> Query:
         raise NotImplementedError(
             f"_get_base_query_user_can_read not implemented on class {self.__class__.__name__}"
+        )
+
+    def _get_base_query_user_can_write(
+        self,
+        db: Session,
+        *,
+        models_to_include: List[Type[Base]] = [],
+        user: models.User,
+    ) -> Query:
+        return self._get_base_query_user_can_read(
+            db=db, models_to_include=models_to_include, user=user
         )
 
     def search(
@@ -162,3 +176,76 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
             model_alias
         ).select_from(subquery)
         return final_query.all()
+
+    def get(self, db: Session, id: Any, user: User) -> Optional[ModelType]:
+        return (
+            self._get_base_query_user_can_read(db=db, user=user)
+            .filter(self.model.id == id)
+            .first()
+        )
+
+    def get_multi(self, db: Session, user: User) -> List[ModelType]:
+        return self._get_base_query_user_can_read(db=db, user=user).all()
+
+    def get_multi_by_ids(
+        self, db: Session, *, ids: List[int], user: User
+    ) -> List[ModelType]:
+        return (
+            self._get_base_query_user_can_read(db=db, user=user)
+            .filter(self.model.id.in_(tuple(ids)))
+            .all()
+        )
+
+    def get_multi_paginate(
+        self, db: Session, *, limit: int = 100, skip: int = 0, user: User
+    ) -> List[ModelType]:
+        return (
+            self._get_base_query_user_can_read(db=db, user=user)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def update(
+        self,
+        db: Session,
+        *,
+        db_obj: ModelType,
+        obj_in: Union[UpdateSchemaType, Dict[str, Any]],
+        user: User,
+    ) -> ModelType:
+        can_read = self._get_base_query_user_can_write(db=db, user=user)
+        if not can_read:
+            raise SecurityError("User cannot update this resource.")
+        obj_data = jsonable_encoder(db_obj)
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        for field in obj_data:
+            if field in update_data:
+                setattr(db_obj, field, update_data[field])
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def remove(self, db: Session, *, id: int, user: User) -> ModelType:
+        permitted = self._get_base_query_user_can_write(db=db, user=user)
+        if not permitted:
+            raise SecurityError("User cannot delete this resource")
+        obj = db.query(self.model).get(id)
+        db.delete(obj)
+        db.commit()
+        return obj
+
+    def remove_multi(
+        self, db: Session, *, ids: List[int], user: User
+    ) -> List[ModelType]:
+        records = (
+            self._get_base_query_user_can_write(db=db, user=user)
+            .filter(self.model.id.in_(tuple(ids)))
+            .delete(synchronize_session=False)  # Don't update deleted objects
+        )
+        db.commit()
+        return records

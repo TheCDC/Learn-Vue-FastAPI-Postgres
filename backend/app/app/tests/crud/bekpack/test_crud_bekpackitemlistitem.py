@@ -3,7 +3,10 @@ from sqlalchemy.orm import Session, aliased
 
 from app import crud, models, schemas
 from app.core.security import SecurityError
-from app.schemas.bekpack.bekpackitemlistitem import BekpackItemListItemCreate
+from app.schemas.bekpack.bekpackitemlistitem import (
+    BekpackItemListItemCreate,
+    BekpackItemListItemUpdate,
+)
 from app.tests.crud.bekpack.utils import get_bekpack_user, get_random_color
 from app.tests.utils.bekpack import (
     create_random_bekpackuser,
@@ -67,3 +70,10 @@ def test_read_bekpackitemlistitem_unauthorized(
         db=db, id=obj.id, user=user_registered_random
     )
     assert not can
+    with pytest.raises(SecurityError):
+        crud.bekpackitemlistitem.update(
+            db=db,
+            db_obj=obj,
+            obj_in=BekpackItemListItemUpdate(),
+            user=user_registered_random,
+        )

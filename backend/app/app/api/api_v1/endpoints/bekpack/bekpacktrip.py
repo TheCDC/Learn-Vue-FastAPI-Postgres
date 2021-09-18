@@ -2,6 +2,7 @@ from typing import Any, List
 
 from fastapi import Depends, HTTPException
 from fastapi_pagination import Page, pagination_params
+from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.paginator import paginate
 from sqlalchemy.orm import Session
 
@@ -31,7 +32,7 @@ def get_my_bakpacktrips(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
-) -> Page[schemas.BekpackTrip]:
+) -> AbstractPage[models.BekpackTrip]:
     records = crud.bekpacktrip.get_by_owner(db=db, owner_id=current_user.id)
     return paginate(records)
 
@@ -46,8 +47,8 @@ def get_bekpacktrip_lists(
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
     trip_id: int,
-) -> Page[schemas.BekpackTrip]:
-    if not crud.bekpacktrip.user_can_read(db=db, object=id, user=current_user):
+) -> AbstractPage[models.BekpackItemList]:
+    if not crud.bekpacktrip.user_can_read(db=db, object_id=trip_id, user=current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     records = crud.bekpackitemlist.get_by_trip(db=db, trip_id=trip_id)
