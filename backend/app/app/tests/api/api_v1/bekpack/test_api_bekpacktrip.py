@@ -9,6 +9,7 @@ from app.crud.crud_bekpack.crud_bekpacktrip import bekpacktrip
 from app.schemas.bekpack.bekpacktrip import BekpackTrip, BekpackTripCreate
 from app.tests.api.api_v1.bekpack.utils import create_bekpack_user
 from app.tests.crud.bekpack.utils import get_random_color
+from app.tests.utils.bekpack import create_random_trip
 from app.tests.utils.user import authentication_token_from_email, create_random_user
 from app.tests.utils.utils import random_lower_name, random_lower_string
 
@@ -31,7 +32,7 @@ def test_create_bekpacktrip(client: TestClient, db: Session) -> None:
         json=trip_data,
     )
     content = trip.json()
-    assert "id" in content
+    assert "id" in content, "post failed"
     trip_id = content["id"]
     assert BekpackTrip(**content)
     assert "id" in content
@@ -40,10 +41,12 @@ def test_create_bekpacktrip(client: TestClient, db: Session) -> None:
     # get trip
 
     trip = client.get(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id}", headers=auth_token,
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id}",
+        headers=auth_token,
     )
+    assert trip.status_code == 200, f"{trip.content}"
     content = trip.json()
-    assert "id" in content
+    assert "id" in content, f"get failed {content}"
     assert content["id"] == trip_id
 
 
@@ -180,7 +183,8 @@ def test_get_bekpacktrip_mine_multi(client: TestClient, db: Session) -> None:
     # get trip
 
     response = client.get(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/mine/all", headers=token_headers,
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/mine/all",
+        headers=token_headers,
     )
     content = response.json()
     assert "items" in content
@@ -204,38 +208,22 @@ def test_get_bekpacktrip_invalid(
     assert response.status_code == 404
 
 
-def test_get_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> None:
+def test_get_bekpacktrip_unauthorized(
+    client: TestClient,
+    db: Session,
+) -> None:
     # register both users for bekpack
-    response_first_user = create_bekpack_user(db=db)
     user = create_bekpack_user(db=db)
-    normal_user_token_headers = authentication_token_from_email(
-        client=client, email=response_first_user.owner.email, db=db
-    )
     normal_user_token_headers_random = authentication_token_from_email(
         client=client, email=user.owner.email, db=db
     )
-    # create trip as nonrandom user
-    trip_data = {
-        "name": random_lower_name(),
-        "color": get_random_color(),
-        "description": random_lower_string(),
-    }
-    response = client.post(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
-        headers=normal_user_token_headers,
-        json=trip_data,
-    )
-    print(response.content)
-    assert response.status_code == 200
-    content = response.json()
-    created_trip_id = content["id"]
-
+    trip = create_random_trip(db=db)
     # get trip as random user
     response = client.get(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{created_trip_id}",
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip.id}",
         headers=normal_user_token_headers_random,
     )
-    assert response.status_code == 403
+    assert response.status_code == 404, f"{response.content}"
 
 
 def test_get_bekpacktrip_all_superuser(
@@ -245,7 +233,8 @@ def test_get_bekpacktrip_all_superuser(
     # get trips
 
     response = client.get(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/", headers=superuser_token_headers,
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
+        headers=superuser_token_headers,
     )
     content = response.json()
     target_num = len(bekpacktrip.get_all(db=db))
@@ -283,7 +272,8 @@ def test_delete_bekpacktrip(client: TestClient, db: Session) -> None:
         assert content[key] == value
     # delete trip
     response = client.delete(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id}", headers=auth_token,
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id}",
+        headers=auth_token,
     )
     content = response.json()
     assert "id" in content
@@ -295,51 +285,24 @@ def test_update_bekpacktrip(
     client: TestClient, normal_user_token_headers_random: Dict[str, str], db: Session
 ) -> None:
 
-    # create the user
-    bp_user = create_bekpack_user(db=db)
-    auth_token = authentication_token_from_email(
-        client=client, db=db, email=bp_user.owner.email
+    trip = create_random_trip(db=db)
+    token = authentication_token_from_email(
+        client=client, db=db, email=trip.owner.owner.email
     )
-    user_id_old = bp_user.id
-    # create trip
-    trip_data = {
-        "name": random_lower_name(),
-        "color": get_random_color(),
-        "description": random_lower_name(),
-    }
-    response = client.post(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/",
-        headers=auth_token,
-        json=trip_data,
-    )
-    content = response.json()
-    print(content)
-    trip_id_created = content["id"]
     # update trip
     content_update = {"color": get_random_color(), "name": random_lower_name()}
     response = client.put(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id_created}",
-        headers=auth_token,
+        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip.id}",
+        headers=token,
         json=content_update,
     )
+    assert response.status_code == 200
     content = response.json()
     assert BekpackTrip(**content)
 
     # assertions
     for k, v in content_update.items():
         assert content[k] == v
-    # delete trip
-    response = client.delete(
-        f"{settings.API_V1_STR}/bekpack/bekpacktrips/{trip_id_created}",
-        headers=auth_token,
-    )
-    # then delete user
-    response = client.delete(
-        f"{settings.API_V1_STR}/bekpack/bekpackusers/{user_id_old}", headers=auth_token,
-    )
-    content_new = response.json()
-    assert "id" in content_new
-    assert content_new["id"] == user_id_old
 
 
 def test_update_bekpacktrip_nonexistent(
@@ -369,10 +332,13 @@ def test_delete_bekpacktrip_nonexistent(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/-1",
         headers=normal_user_token_headers_random,
     )
-    assert response.status_code == 404
+    assert response.status_code == 200
 
 
-def test_delete_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> None:
+def test_delete_bekpacktrip_unauthorized(
+    client: TestClient,
+    db: Session,
+) -> None:
     # register both users for bekpack
     user_first = create_bekpack_user(db=db)
     user_second = create_bekpack_user(db=db)
@@ -390,7 +356,7 @@ def test_delete_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> No
         ),
         json=trip_data,
     )
-    assert response.status_code == 200
+    assert response.status_code == 200, f"{response.content}"
     content = response.json()
     created_trip_id = content["id"]
 
@@ -401,10 +367,13 @@ def test_delete_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> No
             client=client, email=user_second.owner.email, db=db
         ),
     )
-    assert response.status_code == 403
+    assert response.status_code == 404, f"{response.content}"
 
 
-def test_update_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> None:
+def test_update_bekpacktrip_unauthorized(
+    client: TestClient,
+    db: Session,
+) -> None:
     # register both users for bekpack
     user1 = create_bekpack_user(db=db)
     user2 = create_bekpack_user(db=db)
@@ -423,7 +392,7 @@ def test_update_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> No
         json=trip_data,
     )
     print(response.content)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"{response.content}"
     content = response.json()
     created_trip_id = content["id"]
 
@@ -439,4 +408,4 @@ def test_update_bekpacktrip_unauthorized(client: TestClient, db: Session,) -> No
             "description": random_lower_string(),
         },
     )
-    assert response.status_code == 403
+    assert response.status_code == 404, f"{response.content}"

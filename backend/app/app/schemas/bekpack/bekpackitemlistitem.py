@@ -27,7 +27,7 @@ class BekpackItemListItemUpdate(BekpackItemListItemBase):
 class BekpackItemListItemInDBBase(BekpackItemListItemBase):
     id: int
     parent_list_id: int
-    bag_id: int
+    bag_id: Optional[int]
     list_index: Optional[int]
 
     class Config:

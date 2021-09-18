@@ -32,29 +32,6 @@ class CRUDBekpackItemListItem(
             db=db, models_to_include=mti, user=user
         ).join(self.model)
 
-    def user_can_read(self, db: Session, *, id: int, user: models.User) -> bool:
-        if user.is_superuser:
-            return True
-        o = (
-            self._get_base_query_user_can_read(db=db, user=user)
-            .filter(self.model.id == id)
-            .one_or_none()
-        )
-        if o:
-            return True
-        return False
-
-    def user_can_write(self, db: Session, *, id: int, user: models.User) -> bool:
-        if user.is_superuser:
-            return True
-        o = self.get(db=db, id=id)
-        if not o:
-            return False
-
-        return crud.bekpackitemlist.user_can_write(
-            db=db, id=o.parent_list_id, user=user
-        )
-
     def get_multi_by_itemlist(
         self, db: Session, *, parent_itemlist_id: int, user: models.User
     ) -> List[models.BekpackItemListItem]:
@@ -82,7 +59,8 @@ class CRUDBekpackItemListItem(
         bag_id=None,
         user: models.User
     ) -> models.BekpackItemListItem:
-        if crud.bekpackitemlist.user_can_write(db=db, id=parent_itemlist_id, user=user):
+        parent = crud.bekpackitemlist.get(db=db, id=parent_itemlist_id, user=user)
+        if parent:
             obj_in_data = jsonable_encoder(obj_in)
 
             return self.model(

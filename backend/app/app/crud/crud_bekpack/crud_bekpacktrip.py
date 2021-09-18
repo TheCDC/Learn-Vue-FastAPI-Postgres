@@ -2,11 +2,14 @@ from typing import List, Type
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Query, Session
+from sqlalchemy.sql.elements import and_, or_
 
 from app import crud, models
+from app.core.security import SecurityError
 from app.crud.base import CRUDBaseSecure
 from app.db.base_class import Base
 from app.models.bekpack import BekpackTrip, BekpackTrip_Members, BekpackUser
+from app.models.user import User
 from app.schemas import BekpackTripCreate, BekpackTripUpdate
 
 
@@ -21,10 +24,10 @@ class CRUDBekpackTrip(
         user: models.User,
     ):
 
-        if user.is_superuser:
-            return db.query(self.model)
         mti: List[Type[Base]] = [self.model]
         mti.extend(models_to_include)
+        if user.is_superuser:
+            return db.query(self.model)
 
         included = Query(
             entities=mti,
@@ -32,12 +35,32 @@ class CRUDBekpackTrip(
         )
         return (
             included.join(
-                BekpackTrip_Members, BekpackTrip_Members.trip_id == self.model.id
+                BekpackTrip_Members,
             )
             .join(
-                models.BekpackUser, BekpackTrip_Members.user_id == models.BekpackUser.id
+                BekpackUser,
             )
-            .filter(BekpackUser.owner_id == user.id)
+            .filter(
+                or_(
+                    and_(
+                        BekpackTrip_Members.trip_id == self.model.id,
+                        BekpackTrip_Members.user_id == models.BekpackUser.id,
+                        BekpackUser.owner_id == user.id,
+                    ),  # you are a member)
+                    BekpackTrip.owner_id == user.id,  # you are the owner
+                ),
+            )
+        )
+
+    def _get_base_query_user_can_write(
+        self,
+        db: Session,
+        *,
+        models_to_include: List[Type[Base]] = [],
+        user: models.User,
+    ) -> Query:
+        return self._get_base_query_user_can_read(
+            db=db, models_to_include=models_to_include, user=user
         )
 
     def create_with_owner(
@@ -86,41 +109,27 @@ class CRUDBekpackTrip(
         )
         return associations
 
-    def user_can_read(self, db: Session, object_id: int, user: models.User) -> bool:
-        if user.is_superuser:
-            return True
-        obj = (
-            db.query(self.model)
-            .join(models.BekpackUser, BekpackUser.owner_id == user.id)
-            .join(BekpackTrip_Members, BekpackTrip.id == object_id)
-            .filter(
-                (BekpackTrip_Members.trip_id == object_id)
-                & (BekpackTrip_Members.user_id == models.BekpackUser.id)
-            )
+    def add_member(
+        self,
+        db: Session,
+        *,
+        trip_obj: BekpackTrip,
+        bp_user_obj: BekpackUser,
+        user: User,
+    ) -> BekpackTrip:
+        can = (
+            self._get_base_query_user_can_write(db=db, user=user)
+            .filter(BekpackTrip.id == trip_obj.id)
             .one_or_none()
+            != None
         )
-        if not obj:
-            return False
-        return True
-
-    def user_can_write(
-        self, db: Session, object: BekpackTrip, user: models.User
-    ) -> bool:
-        if user.is_superuser:
-            return True
-        obj = (
-            db.query(self.model)
-            .join(models.BekpackUser, BekpackUser.owner_id == user.id)
-            .join(BekpackTrip_Members, BekpackTrip.id == object.id)
-            .filter(
-                (BekpackTrip_Members.trip_id == object.id)
-                & (BekpackTrip_Members.user_id == models.BekpackUser.id)
-            )
-            .one_or_none()
-        )
-        if not obj:
-            return False
-        return True
+        if not can:
+            raise SecurityError("User cannot edit this Trip")
+        trip_obj.members.append(bp_user_obj)
+        db.add(trip_obj)
+        db.commit()
+        db.refresh(trip_obj)
+        return trip_obj
 
 
 bekpacktrip = CRUDBekpackTrip(BekpackTrip)

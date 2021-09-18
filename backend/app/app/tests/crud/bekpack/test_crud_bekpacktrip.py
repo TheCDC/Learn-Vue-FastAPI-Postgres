@@ -1,8 +1,9 @@
 from typing import List
 
+import pytest
 from sqlalchemy.orm import Session
 
-from app import crud
+from app import crud, core
 from app.crud import bekpacktrip, bekpackuser
 from app.models.bekpack import BekpackTrip, BekpackTrip_Members, BekpackUser
 from app.schemas import BekpackTripCreate
@@ -24,7 +25,8 @@ def test_create_bekpaktrip(db: Session):
     )
     bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner=bp_user.owner)
     assert bpt.owner_id == bp_user.id
-    u: BekpackUser = bekpackuser.get(db=db, id=bp_user.id)
+    u = bekpackuser.get(db=db, id=bp_user.id, user=bp_user.owner)
+    assert u
     # trip added to users's list of owned trips
     assert bpt.id in list(i.id for i in u.owned_trips)
     # user added to list of trip's members
@@ -40,7 +42,8 @@ def test_create_bekpaktrip_unregistered(db: Session):
     )
     bpt = bekpacktrip.create_with_owner(db, obj_in=btc, owner=owner)
     assert bpt.owner.owner_id == owner.id
-    u: BekpackUser = bekpackuser.get(db=db, id=bpt.owner.id)
+    u = bekpackuser.get(db=db, id=bpt.owner.id, user=bpt.owner.owner)
+    assert u
     # trip added to users's list of owned trips
     assert bpt.id in list(i.id for i in u.owned_trips)
     # user added to list of trip's members
@@ -88,10 +91,10 @@ def test_delete_bekpaktrip(db: Session):
         color=get_random_color(),
     )
     bpt_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=bp_user.owner)
-    bpt_deleted = bekpacktrip.remove(db=db, id=bpt_created.id)
-    bpt_nonexistent = bekpacktrip.get(db=db, id=bpt_created.id)
-    # assert deleted record can't be found
-    assert bpt_nonexistent is None
+    bpt_deleted = bekpacktrip.remove(db=db, id=bpt_created.id, user=bp_user.owner)
+    with pytest.raises(core.SecurityError):
+        # assert deleted record can't be found
+        bpt_nonexistent = bekpacktrip.get(db=db, id=bpt_created.id, user=bp_user.owner)
     # deleted the very same record that was created
     assert bpt_created.id == bpt_deleted.id
     assert bpt_deleted.name == bpt_created.name
@@ -109,7 +112,8 @@ def test_add_members_bekpaktrip(db: Session):
     other_members = [get_bekpack_user(db) for i in range(5)]
     for m in other_members:
         trip_created.members.append(m)
-    trip_retrieved = bekpacktrip.get(db, id=trip_created.id)
+    trip_retrieved = bekpacktrip.get(db, id=trip_created.id, user=bp_owner.owner)
+    assert trip_retrieved
     required_members_ids = [m.id for m in other_members] + [bp_owner.id]
     for m_r in trip_retrieved.members:
         assert m_r.id in required_members_ids
@@ -123,14 +127,16 @@ def test_update_bekpacktrip(db: Session):
         description=random_lower_string(),
         color=get_random_color(),
     )
-    trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=owner)
+    trip_created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=owner.owner)
     new_name = random_lower_name()
     newcolor = get_random_color()
     new_is_active = False
     btc_2 = BekpackTripUpdate(
         name=new_name, color=newcolor, is_active=new_is_active, owner_id=newowner.id
     )
-    trip_updated = bekpacktrip.update(db=db, db_obj=trip_created, obj_in=btc_2)
+    trip_updated = bekpacktrip.update(
+        db=db, db_obj=trip_created, obj_in=btc_2, user=owner.owner
+    )
     # assert same record
     assert trip_created.id == trip_updated.id
     assert trip_created.owner_id == trip_updated.owner_id
@@ -147,7 +153,9 @@ def test_change_owner_bekpaktrip(db: Session):
     btc = BekpackTripCreate(name=random_lower_name(), description=random_lower_string())
     created = bekpacktrip.create_with_owner(db, obj_in=btc, owner=bp_user_owner.owner)
     update = BekpackTripUpdate(owner_id=bp_user_newowner.id)
-    updated = bekpacktrip.update(db, db_obj=created, obj_in=update)
+    updated = bekpacktrip.update(
+        db, db_obj=created, obj_in=update, user=bp_user_owner.owner
+    )
 
 
 def test_get_joined_by_member_bekpaktrip(db: Session):
@@ -175,5 +183,7 @@ def test_user_can_read_bekpacktrip(db: Session):
     bpuser2 = get_bekpack_user(db)
 
     trip = create_random_trip(db, bpuser1)
-    assert crud.bekpacktrip.user_can_read(db=db, object=trip, user=bpuser1.owner)
-    assert not crud.bekpacktrip.user_can_read(db=db, object=trip, user=bpuser2.owner)
+    crud.bekpacktrip.get(db=db, id=trip.id, user=bpuser1.owner)
+
+    with pytest.raises(core.SecurityError):
+        crud.bekpacktrip.get(db=db, id=trip.id, user=bpuser2.owner)

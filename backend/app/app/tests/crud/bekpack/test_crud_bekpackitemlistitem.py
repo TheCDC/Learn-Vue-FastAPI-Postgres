@@ -66,10 +66,6 @@ def test_read_bekpackitemlistitem_unauthorized(
         parent_itemlist_id=itemlist.id,
         user=owner,
     )
-    can = crud.bekpackitemlistitem.user_can_read(
-        db=db, id=obj.id, user=user_registered_random
-    )
-    assert not can
     with pytest.raises(SecurityError):
         crud.bekpackitemlistitem.update(
             db=db,

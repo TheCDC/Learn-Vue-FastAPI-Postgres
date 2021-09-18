@@ -45,56 +45,19 @@ class CRUDBekpackItemList(
         db.refresh(db_obj)
         return db_obj
 
-    def get_by_trip(self, db: Session, *, trip_id: int) -> List[BekpackItemList]:
+    def get_by_trip(
+        self, db: Session, *, trip_id: int, user: models.User
+    ) -> List[BekpackItemList]:
         return (
-            db.query(self.model).filter(BekpackItemList.parent_trip_id == trip_id).all()
+            self._get_base_query_user_can_read(
+                db=db, user=user, models_to_include=[self.model]
+            )
+            .filter(BekpackItemList.parent_trip_id == trip_id)
+            .all()
         )
 
     def get_by_owner(self, db: Session, *, owner_id: int) -> List[BekpackItemList]:
         return db.query(self.model).filter(self.model.parent_user_id == owner_id).all()
-
-    def user_can_read(self, db: Session, *, id: int, user: models.User) -> bool:
-        if user.is_superuser:
-            return True
-        o = (
-            self._get_base_query_user_can_read(db=db, user=user)
-            .filter(self.model.id == id)
-            .one_or_none()
-        )
-        if o:
-            return True
-        return False
-
-    def user_can_write(self, db: Session, *, id: int, user: models.User) -> bool:
-        if user.is_superuser:
-            return True
-        user_owns_parent_trip = (
-            db.query(self.model)
-            .filter(self.model.id == id)
-            .join(
-                models.BekpackTrip, self.model.parent_trip_id == models.BekpackTrip.id
-            )
-            .join(
-                models.BekpackUser, models.BekpackTrip.owner_id == models.BekpackUser.id
-            )
-            .filter(models.BekpackUser.owner_id == user.id)
-            .one_or_none()
-        )
-        if user_owns_parent_trip:
-            return True
-
-        user_parents_this_list = (
-            db.query(self.model)
-            .filter(self.model.id == id)
-            .join(
-                models.BekpackUser, self.model.parent_user_id == models.BekpackUser.id
-            )
-            .filter(models.BekpackUser.owner_id == user.id)
-            .one_or_none()
-        )
-        if user_parents_this_list:
-            return True
-        return False
 
 
 bekpackitemlist = CRUDBekpackItemList(BekpackItemList)

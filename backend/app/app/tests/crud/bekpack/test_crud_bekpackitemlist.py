@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session, aliased
-
+import pytest
 from app import crud, models, schemas
+from app.core.security import SecurityError
+from app.schemas.bekpack.bekpackitemlist import BekpackItemListUpdate
 from app.tests.crud.bekpack.utils import get_bekpack_user, get_random_color
 from app.tests.utils.bekpack import (
     create_random_bekpackuser,
@@ -41,8 +43,10 @@ def test_get_itemlist_by_owner(db: Session):
 
 def test_itemlist_get_by_trip(db: Session):
     trip = create_random_trip(db=db)
-    itemlists = [create_random_itemlist(db=db, trip=trip) for _ in range(10)]
-    found_lists = crud.bekpackitemlist.get_by_trip(db=db, trip_id=trip.id)
+    itemlists = [create_random_itemlist(db=db, trip=trip) for _ in range(5)]
+    found_lists = crud.bekpackitemlist.get_by_trip(
+        db=db, trip_id=trip.id, user=trip.owner.owner
+    )
     target_ids = set([i.id for i in itemlists])
     found_ids = set([i.id for i in found_lists])
     assert target_ids == found_ids
@@ -62,52 +66,78 @@ def test_crud_bekpacktrip__get_base_query_user_can_read_superuser(db: Session):
 
 
 def test_crud_bekpackitemlist_user_can_read(db: Session):
-    itemlist = create_random_itemlist(db=db,)
-    assert crud.bekpackitemlist.user_can_read(
+    itemlist = create_random_itemlist(
+        db=db,
+    )
+    assert crud.bekpackitemlist.get(
         db=db, id=itemlist.id, user=itemlist.parent_trip.owner.owner
     )
 
 
 def test_crud_bekpackitemlist_user_can_read_unauthorized(db: Session):
-    itemlist = create_random_itemlist(db=db,)
+    itemlist = create_random_itemlist(
+        db=db,
+    )
     user = create_random_user(db=db)
-    assert not crud.bekpackitemlist.user_can_read(db=db, id=itemlist.id, user=user)
+    with pytest.raises(SecurityError):
+        crud.bekpackitemlist.get(db=db, id=itemlist.id, user=user)
 
 
 def test_crud_bekpackitemlist_user_can_read_superuser(db: Session):
-    itemlist = create_random_itemlist(db=db,)
+    itemlist = create_random_itemlist(
+        db=db,
+    )
     su = get_superuser(db=db)
-    assert crud.bekpackitemlist.user_can_read(db=db, id=itemlist.id, user=su)
+    assert crud.bekpackitemlist.get(db=db, id=itemlist.id, user=su)
 
 
 def test_crud_bekpackitemlist_user_can_write_owned_trip(db: Session):
-    itemlist = create_random_itemlist(db=db,)
-    assert crud.bekpackitemlist.user_can_write(
-        db=db, id=itemlist.id, user=itemlist.parent_trip.owner.owner
+    itemlist = create_random_itemlist(
+        db=db,
+    )
+    assert crud.bekpackitemlist.update(
+        db=db,
+        db_obj=itemlist,
+        user=itemlist.parent_trip.owner.owner,
+        obj_in=BekpackItemListUpdate(),
     )
 
 
 def test_crud_bekpackitemlist_user_can_write_owned_list(db: Session):
     trip = create_random_trip(db=db, bekpack_user=create_random_bekpackuser(db=db))
-    trip_owner = trip.owner.owner
-    itemlist = create_random_itemlist(
-        db=db, trip=trip, bekpack_user=create_random_bekpackuser(db=db)
+    nonowner = create_random_bekpackuser(db=db)
+    crud.bekpacktrip.add_member(
+        db=db, trip_obj=trip, bp_user_obj=nonowner, user=trip.owner.owner
     )
-    list_owner = itemlist.parent_user.owner
-    assert itemlist.parent_user_id != trip.owner_id
-    assert crud.bekpackitemlist.user_can_write(db=db, id=itemlist.id, user=list_owner)
+    itemlist = create_random_itemlist(db=db, trip=trip, bekpack_user=nonowner)
+    assert itemlist.parent_user.owner.id != trip.owner.owner.id
+    assert crud.bekpackitemlist.update(
+        db=db, user=trip.owner.owner, obj_in=BekpackItemListUpdate(), db_obj=itemlist
+    )
 
 
 def test_crud_bekpackitemlist_user_can_write_unauthorized(db: Session):
-    itemlist = create_random_itemlist(db=db,)
+    itemlist = create_random_itemlist(
+        db=db,
+    )
     user = create_random_user(db=db)
-    assert not crud.bekpackitemlist.user_can_write(db=db, id=itemlist.id, user=user)
+    with pytest.raises(SecurityError):
+        crud.bekpackitemlist.update(
+            db=db,
+            user=user,
+            obj_in=BekpackItemListUpdate(),
+            db_obj=itemlist,
+        )
 
 
 def test_crud_bekpackitemlist_user_can_write_superuser(db: Session):
-    itemlist = create_random_itemlist(db=db,)
+    itemlist = create_random_itemlist(
+        db=db,
+    )
     su = get_superuser(db=db)
-    assert crud.bekpackitemlist.user_can_write(db=db, id=itemlist.id, user=su)
+    assert crud.bekpackitemlist.update(
+        db=db, user=su, obj_in=BekpackItemListUpdate(), db_obj=itemlist
+    )
 
 
 def test_crud_bekpackitemlist__get_base_query_user_can_read(db: Session):

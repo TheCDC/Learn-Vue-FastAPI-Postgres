@@ -12,7 +12,7 @@ from app import crud
 def user_registered_random(db: Session) -> Generator[User, None, None]:
     bpuser = create_random_bekpackuser(db)
     yield bpuser.owner
-    crud.bekpackuser.remove(db=db, id=bpuser.id)
+    crud.bekpackuser.remove(db=db, id=bpuser.id, user=bpuser.owner)
     crud.user.remove(db=db, id=bpuser.owner.id)
 
 
@@ -20,5 +20,5 @@ def user_registered_random(db: Session) -> Generator[User, None, None]:
 def user_registered_constant(db: Session) -> Generator[User, None, None]:
     bpuser = create_random_bekpackuser(db)
     yield bpuser.owner
-    crud.bekpackuser.remove(db=db, id=bpuser.id)
+    crud.bekpackuser.remove(db=db, id=bpuser.id, user=bpuser.owner)
     crud.user.remove(db=db, id=bpuser.owner.id)

@@ -102,20 +102,6 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def user_can_read(
-        self, db: Session, *, object: ModelType, user: models.User
-    ) -> bool:
-        raise NotImplementedError(
-            f"user_can_read not implemented on class {self.__class__.__name__}"
-        )
-
-    def user_can_write(
-        self, db: Session, *, object: ModelType, user: models.User
-    ) -> bool:
-        raise NotImplementedError(
-            f"user_can_write not implemented on class {self.__class__.__name__}"
-        )
-
     def _get_base_query_user_can_read(
         self,
         db: Session,
@@ -178,11 +164,14 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         return final_query.all()
 
     def get(self, db: Session, id: Any, user: User) -> Optional[ModelType]:
-        return (
+        obj = (
             self._get_base_query_user_can_read(db=db, user=user)
             .filter(self.model.id == id)
-            .first()
+            .one_or_none()
         )
+        if not obj:
+            raise SecurityError("User cannot get object")
+        return obj
 
     def get_multi(self, db: Session, user: User) -> List[ModelType]:
         return self._get_base_query_user_can_read(db=db, user=user).all()
@@ -214,7 +203,11 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         obj_in: Union[UpdateSchemaType, Dict[str, Any]],
         user: User,
     ) -> ModelType:
-        can_read = self._get_base_query_user_can_write(db=db, user=user)
+        can_read = (
+            self._get_base_query_user_can_write(db=db, user=user)
+            .filter(self.model.id == db_obj.id)
+            .one_or_none()
+        )
         if not can_read:
             raise SecurityError("User cannot update this resource.")
         obj_data = jsonable_encoder(db_obj)
@@ -231,10 +224,13 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def remove(self, db: Session, *, id: int, user: User) -> ModelType:
-        permitted = self._get_base_query_user_can_write(db=db, user=user)
-        if not permitted:
+        obj = (
+            self._get_base_query_user_can_write(db=db, user=user)
+            .filter(self.model.id == id)
+            .one_or_none()
+        )
+        if not obj:
             raise SecurityError("User cannot delete this resource")
-        obj = db.query(self.model).get(id)
         db.delete(obj)
         db.commit()
         return obj
