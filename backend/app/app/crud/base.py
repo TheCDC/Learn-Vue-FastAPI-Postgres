@@ -113,6 +113,19 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
             f"_get_base_query_user_can_read not implemented on class {self.__class__.__name__}"
         )
 
+    def _get_query_objects_user_can_read(
+        self, db: Session, *, user: models.User
+    ) -> Query:
+        subquery_visible_objects = (
+            self._get_base_query_user_can_read(db=db, user=user)
+            # make sure the underlying SQL subquery disambiguates common column names across tables
+            .with_labels()
+            # Create queryable "table-like" object
+            .subquery()
+        )
+
+        return db.query(self.model).select_from(subquery_visible_objects)
+
     def _get_base_query_user_can_write(
         self,
         db: Session,
@@ -133,39 +146,25 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         string_columns: List[Column] = [
             c for c in self.model.__table__.columns if isinstance(c.type, String)
         ]
-
+        visible_objects = self._get_query_objects_user_can_read(db=db, user=user)
         # no string columns means no need for filtering
         if len(string_columns) == 0:
-            return db.query(self.model).select_from(base_query.subquery()).all()
+            return visible_objects.all()
 
         query_expression = string_columns[0].ilike(f"%{filter_string}%")
 
         # if only one string column then no need to dynamically build a SQLAlchemy query
         if len(string_columns) == 1:
-            return (
-                db.query(self.model)
-                .select_from(base_query.filter(query_expression).subquery())
-                .all()
-            )
+            return visible_objects.filter(query_expression).all()
         # Dynamically build a SQLALchemy query by OR-ing the string column comparisons together
         # i.e. search for filter_string in ANY of the String columns
         for c in string_columns[1:]:
             query_expression = query_expression | c.ilike(f"%{filter_string}%")
-        subquery = (
-            base_query.filter(query_expression)  # string filtering
-            .with_labels()  # make sure the underlying SQL subquery disambiguates common column names across tables
-            .subquery()  # Create queryable "table-like" object
-        )
-        model_alias = aliased(self.model, subquery)
-        final_query = db.query(
-            # select exactly one model type to return from the subquery
-            model_alias
-        ).select_from(subquery)
-        return final_query.all()
+        return visible_objects.filter(query_expression).all()
 
-    def get(self, db: Session, id: Any, user: User) -> Optional[ModelType]:
+    def get(self, db: Session, id: Any, user: User) -> ModelType:
         obj = (
-            self._get_base_query_user_can_read(db=db, user=user)
+            self._get_query_objects_user_can_read(db=db, user=user)
             .filter(self.model.id == id)
             .one_or_none()
         )
@@ -174,13 +173,13 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         return obj
 
     def get_multi(self, db: Session, user: User) -> List[ModelType]:
-        return self._get_base_query_user_can_read(db=db, user=user).all()
+        return self._get_query_objects_user_can_read(db=db, user=user).all()
 
     def get_multi_by_ids(
         self, db: Session, *, ids: List[int], user: User
     ) -> List[ModelType]:
         return (
-            self._get_base_query_user_can_read(db=db, user=user)
+            self._get_query_objects_user_can_read(db=db, user=user)
             .filter(self.model.id.in_(tuple(ids)))
             .all()
         )
@@ -189,7 +188,7 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         self, db: Session, *, limit: int = 100, skip: int = 0, user: User
     ) -> List[ModelType]:
         return (
-            self._get_base_query_user_can_read(db=db, user=user)
+            self._get_query_objects_user_can_read(db=db, user=user)
             .offset(skip)
             .limit(limit)
             .all()
@@ -203,11 +202,21 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         obj_in: Union[UpdateSchemaType, Dict[str, Any]],
         user: User,
     ) -> ModelType:
-        can_read = (
-            self._get_base_query_user_can_write(db=db, user=user)
-            .filter(self.model.id == db_obj.id)
-            .one_or_none()
+        # can_read = (
+        #     db.query(self.model)
+        #     .select_from(
+        #         self._get_base_query_user_can_write(db=db, user=user)
+        #         .filter(self.model.id == db_obj.id)
+        #         .with_labels()
+        #         .subquery()
+        #     )
+        #     .one_or_none()
+        # )
+        query = self._get_base_query_user_can_write(db=db, user=user).filter(
+            self.model.id == db_obj.id
         )
+        print(query)
+        can_read = query.one_or_none()
         if not can_read:
             raise SecurityError("User cannot update this resource.")
         obj_data = jsonable_encoder(db_obj)
