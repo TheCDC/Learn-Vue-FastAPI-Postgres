@@ -22,11 +22,14 @@ class CRUDBekpackItemList(
     ) -> Query:
         if user.is_superuser:
             return db.query(self.model)
-        mti: List[Type[Base]] = [self.model]
-        mti.extend(models_to_include)
-        return crud.bekpacktrip._get_base_query_user_can_read(
-            db=db, models_to_include=mti, user=user
-        ).join(self.model)
+        mti_with_next_child: List[Type[Base]] = [self.model]
+        mti_with_next_child.extend(models_to_include)
+        q = crud.bekpacktrip._get_base_query_user_can_read(
+            db=db, models_to_include=mti_with_next_child, user=user
+        ).join(self.model, self.model.parent_trip_id == BekpackTrip.id)
+        print(q)
+
+        return q
 
     def create_with_trip_owner(
         self,
@@ -49,9 +52,7 @@ class CRUDBekpackItemList(
         self, db: Session, *, trip_id: int, user: models.User
     ) -> List[BekpackItemList]:
         return (
-            self._get_base_query_user_can_read(
-                db=db, user=user, models_to_include=[self.model]
-            )
+            self._get_query_objects_user_can_read(db=db, user=user)
             .filter(BekpackItemList.parent_trip_id == trip_id)
             .all()
         )
