@@ -3,6 +3,7 @@ import Vuex, { StoreOptions } from "vuex";
 
 import { adminModule } from "./admin";
 import { bekpackModule } from "./bekpack";
+import { bekpackItemlistModule } from "./bekpack/itemlist";
 import { itemModule } from "./item";
 import { mainModule } from "./main";
 import { State } from "./state";
@@ -15,6 +16,7 @@ const storeOptions: StoreOptions<State> = {
     admin: adminModule,
     items: itemModule,
     bekpack: bekpackModule,
+    bekpackItemlist: bekpackItemlistModule,
   },
 };
 

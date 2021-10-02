@@ -50,7 +50,7 @@ export default class EditItem extends Vue {
   public valid = true;
   public async mounted() {
     await dispatchGetTripToEdit(this.$store, {
-      id: +this.$router.currentRoute.params.id,
+      id: +this.$router.currentRoute.params.tripId,
     });
 
     this.reset();
