@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 from fastapi.encoders import jsonable_encoder
@@ -142,26 +143,20 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
     def search(
         self, db: Session, *, filter_string: str, user: models.User
     ) -> List[ModelType]:
+        """Permissions-safe filter records by string"""
+
         base_query: Query = self._get_base_query_user_can_read(db=db, user=user)
-        sbq = str(base_query)
-        # get a list of columns on the model that are String type (searchable)
+        # list of columns on the model that are searchable (String type)
         string_columns: List[Column] = [
             c for c in self.model.__table__.columns if isinstance(c.type, String)
         ]
         visible_objects = self._get_query_objects_user_can_read(db=db, user=user)
-        # no string columns means no need for filtering
-        if len(string_columns) == 0:
-            return visible_objects.all()
 
-        query_expression = string_columns[0].ilike(f"%{filter_string}%")
-
-        # if only one string column then no need to dynamically build a SQLAlchemy query
-        if len(string_columns) == 1:
-            return visible_objects.filter(query_expression).all()
-        # Dynamically build a SQLALchemy query by OR-ing the string column comparisons together
-        # i.e. search for filter_string in ANY of the String columns
-        for c in string_columns[1:]:
-            query_expression = query_expression | c.ilike(f"%{filter_string}%")
+        # dynamically build SQLAlchemy query that checks all string fields on the model
+        query_expression = reduce(
+            lambda acc, next: acc | next,
+            [c.ilike(f"%{filter_string}%") for c in string_columns],
+        )
         return visible_objects.filter(query_expression).all()
 
     def get(self, db: Session, id: int, user: User) -> ModelType:
@@ -174,11 +169,15 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         return obj
 
     def get_multi(self, db: Session, user: User) -> List[ModelType]:
+        """Permissions-safe get all records"""
+
         return self._get_query_objects_user_can_read(db=db, user=user).all()
 
     def get_multi_by_ids(
         self, db: Session, *, ids: List[int], user: User
     ) -> List[ModelType]:
+        """Permissions-safe get multiple records by ids"""
+
         return (
             self._get_query_objects_user_can_read(db=db, user=user)
             .filter(self.model.id.in_(tuple(ids)))
@@ -188,6 +187,8 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
     def get_multi_paginate(
         self, db: Session, *, limit: int = 100, skip: int = 0, user: User
     ) -> List[ModelType]:
+        """Permissions-safe get multiple records paginated"""
+
         return (
             self._get_query_objects_user_can_read(db=db, user=user)
             .offset(skip)
@@ -203,36 +204,19 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         obj_in: Union[UpdateSchemaType, Dict[str, Any]],
         user: User,
     ) -> ModelType:
-        # can_read = (
-        #     db.query(self.model)
-        #     .select_from(
-        #         self._get_base_query_user_can_write(db=db, user=user)
-        #         .filter(self.model.id == db_obj.id)
-        #         .with_labels()
-        #         .subquery()
-        #     )
-        #     .one_or_none()
-        # )
+        """Permissions-safe update record"""
         query = self._get_base_query_user_can_write(db=db, user=user).filter(
             self.model.id == db_obj.id
         )
         can_read = query.one_or_none()
         if not can_read:
             raise SecurityError("User cannot update this resource.")
-        obj_data = jsonable_encoder(db_obj)
-        if isinstance(obj_in, dict):
-            update_data = obj_in
-        else:
-            update_data = obj_in.dict(exclude_unset=True)
-        for field in obj_data:
-            if field in update_data:
-                setattr(db_obj, field, update_data[field])
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+
+        return super().update(db=db, db_obj=db_obj, obj_in=obj_in)
 
     def remove(self, db: Session, *, id: int, user: User) -> ModelType:
+        """Permissions-safe delete record"""
+
         obj = (
             self._get_base_query_user_can_write(db=db, user=user)
             .filter(self.model.id == id)
@@ -240,13 +224,13 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         )
         if not obj:
             raise SecurityError("User cannot delete this resource")
-        db.delete(obj)
-        db.commit()
-        return obj
+        return super().remove(db=db, id=id)
 
     def remove_multi(
         self, db: Session, *, ids: List[int], user: User
     ) -> List[ModelType]:
+        """Permissions-safe delete multiple records"""
+
         records = (
             self._get_base_query_user_can_write(db=db, user=user)
             .filter(self.model.id.in_(tuple(ids)))
