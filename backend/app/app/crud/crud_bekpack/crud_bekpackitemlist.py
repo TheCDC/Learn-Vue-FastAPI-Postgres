@@ -27,7 +27,6 @@ class CRUDBekpackItemList(
         q = crud.bekpacktrip._get_base_query_user_can_read(
             db=db, models_to_include=mti_with_next_child, user=user
         ).join(self.model, self.model.parent_trip_id == BekpackTrip.id)
-        print(q)
 
         return q
 

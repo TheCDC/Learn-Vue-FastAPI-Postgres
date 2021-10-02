@@ -13,9 +13,9 @@ class BekpackItemListItemBase(BaseModel):
 
 # Properties to receive via API on creation
 class BekpackItemListItemCreate(BekpackItemListItemBase):
-    description: str
+    description: str = ""
     name: str
-    quantity: int
+    quantity: int = 1
 
 
 # Properties to receive via API on update

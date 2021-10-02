@@ -36,7 +36,7 @@ class CRUDBekpackItemListItem(
         self, db: Session, *, parent_itemlist_id: int, user: models.User
     ) -> List[models.BekpackItemListItem]:
         return (
-            self._get_base_query_user_can_read(db=db, user=user)
+            self._get_query_objects_user_can_read(db=db, user=user)
             .filter(self.model.parent_list_id == parent_itemlist_id)
             .all()
         )
@@ -45,7 +45,7 @@ class CRUDBekpackItemListItem(
         self, db: Session, *, bag_id: int, user: models.User
     ) -> List[models.BekpackItemListItem]:
         return (
-            self._get_base_query_user_can_read(db=db, user=user)
+            self._get_query_objects_user_can_read(db=db, user=user)
             .filter(self.model.bag_id == bag_id)
             .all()
         )
@@ -60,14 +60,12 @@ class CRUDBekpackItemListItem(
         user: models.User
     ) -> models.BekpackItemListItem:
         parent = crud.bekpackitemlist.get(db=db, id=parent_itemlist_id, user=user)
-        if parent:
-            obj_in_data = jsonable_encoder(obj_in)
-
-            return self.model(
-                **obj_in_data, parent_list_id=parent_itemlist_id, bag_id=bag_id
-            )
-        else:
-            raise SecurityError("User cannot edit this list")
+        obj_in_data = jsonable_encoder(obj_in)
+        db_obj = self.model(**obj_in_data, parent_list_id=parent.id, bag_id=bag_id)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
 
 
 bekpackitemlistitem = CRUDBekpackItemListItem(models.BekpackItemListItem)

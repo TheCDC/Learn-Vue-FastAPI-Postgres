@@ -3,8 +3,10 @@ import string
 from typing import Dict
 
 from fastapi.testclient import TestClient
+from sqlalchemy.orm.session import Session
 
 from app.core.config import settings
+from app import models
 
 
 def random_lower_string(length=32) -> str:

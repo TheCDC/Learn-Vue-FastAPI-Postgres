@@ -133,6 +133,8 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         models_to_include: List[Type[Base]] = [],
         user: models.User,
     ) -> Query:
+        if user.is_superuser:
+            return db.query(self.model)
         return self._get_base_query_user_can_read(
             db=db, models_to_include=models_to_include, user=user
         )
@@ -163,11 +165,10 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         return visible_objects.filter(query_expression).all()
 
     def get(self, db: Session, id: int, user: User) -> ModelType:
-        obj = (
-            self._get_query_objects_user_can_read(db=db, user=user)
-            .filter(self.model.id == id)
-            .one_or_none()
+        q = self._get_query_objects_user_can_read(db=db, user=user).filter(
+            self.model.id == id
         )
+        obj = q.one_or_none()
         if not obj:
             raise SecurityError("User cannot get object")
         return obj
@@ -215,7 +216,6 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         query = self._get_base_query_user_can_write(db=db, user=user).filter(
             self.model.id == db_obj.id
         )
-        print(query)
         can_read = query.one_or_none()
         if not can_read:
             raise SecurityError("User cannot update this resource.")
