@@ -6,12 +6,14 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.tests.utils.item import create_random_item
+from app import crud
 
 
 def test_create_delete_bekpackuser(client: TestClient, db: Session) -> None:
     # create the user
     user = create_random_user(db)
     headers = authentication_token_from_email(client=client, email=user.email, db=db)
+    # enable BekPack for the user
     response = client.post(
         f"{settings.API_V1_STR}/bekpack/bekpackusers/",
         headers=headers,
@@ -24,9 +26,10 @@ def test_create_delete_bekpackuser(client: TestClient, db: Session) -> None:
     assert "is_active" in content
     assert content["is_active"] == True
     id_old = content["id"]
+    assert crud.bekpackuser.get(db=db, id=id_old, user=user)
     # then delete it
     response = client.delete(
-        f"{settings.API_V1_STR}/bekpack/bekpackusers/{id_old}",
+        f"{settings.API_V1_STR}/bekpack/bekpackusers/me/profile",
         headers=headers,
     )
     assert (

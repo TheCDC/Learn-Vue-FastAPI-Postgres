@@ -162,7 +162,7 @@ class CRUDBaseSecure(CRUDBase[ModelType, CreateSchemaType, UpdateSchemaType]):
             query_expression = query_expression | c.ilike(f"%{filter_string}%")
         return visible_objects.filter(query_expression).all()
 
-    def get(self, db: Session, id: Any, user: User) -> ModelType:
+    def get(self, db: Session, id: int, user: User) -> ModelType:
         obj = (
             self._get_query_objects_user_can_read(db=db, user=user)
             .filter(self.model.id == id)

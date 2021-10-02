@@ -70,7 +70,6 @@ def test_get_bekpacktrip_select_by_ids_superuser(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/select/by_ids?{query_params_string}",
         headers=superuser_token_headers,
     )
-    print(response.content)
     assert response.status_code == 200
     content = response.json()
     assert [BekpackTrip(**i) for i in content]
@@ -97,7 +96,6 @@ def test_get_bekpacktrip_select_by_string(client: TestClient, db: Session) -> No
     )
     assert response.status_code == 200
     content = response.json()
-    print(content)
 
     found_records = [
         schemas.BekpackTrip(**i) for i in content["items"] if i["id"] == trip.id
@@ -126,7 +124,6 @@ def test_get_bekpacktrip_select_by_string_superuser(
     )
     assert response.status_code == 200
     content = response.json()
-    print(content)
 
     found_records = [
         schemas.BekpackTrip(**i) for i in content["items"] if i["id"] == trip.id
@@ -327,12 +324,11 @@ def test_delete_bekpacktrip_nonexistent(
 
     # create the user
     response = create_bekpack_user(db=db)
-    # update trip
     response = client.delete(
         f"{settings.API_V1_STR}/bekpack/bekpacktrips/-1",
         headers=normal_user_token_headers_random,
     )
-    assert response.status_code == 200
+    assert response.status_code == 404
 
 
 def test_delete_bekpacktrip_unauthorized(
@@ -391,7 +387,6 @@ def test_update_bekpacktrip_unauthorized(
         ),
         json=trip_data,
     )
-    print(response.content)
     assert response.status_code == 200, f"{response.content}"
     content = response.json()
     created_trip_id = content["id"]

@@ -6,12 +6,25 @@ import sqlalchemy
 from app import models
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.api.api_v1 import DefaultCrudRouter
+from app.crud.crud_bekpack.crud_bekpackuser import CRUDBekpackUser
 from app.models import User
 import app.schemas as schemas
 from app.api import deps
 from app import models, crud, schemas
 
-router = APIRouter()
+
+router = DefaultCrudRouter[
+    models.BekpackUser,
+    CRUDBekpackUser,
+    schemas.BekpackUser,
+    schemas.BekpackUser,
+](
+    model=models.BekpackUser,
+    crud=crud.bekpackuser,
+    read_schema=schemas.BekpackUser,
+    update_schema=schemas.BekpackUser,
+)
 
 
 @router.post("/", response_model=schemas.BekpackUser)
@@ -28,7 +41,7 @@ def create_bekpackuser(
     return bp_user
 
 
-@router.get("/me", response_model=schemas.BekpackUser)
+@router.get("/me/profile", response_model=schemas.BekpackUser)
 def get_bekpackuser_me(
     *,
     db: Session = Depends(deps.get_db),
@@ -48,7 +61,7 @@ def get_bekpackuser_me(
     return bp_user
 
 
-@router.delete("/me", response_model=schemas.BekpackUser)
+@router.delete("/me/profile", response_model=schemas.BekpackUser)
 def delete_bekpackuser_me(
     *,
     db: Session = Depends(deps.get_db),

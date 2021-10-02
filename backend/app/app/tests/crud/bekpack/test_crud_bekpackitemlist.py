@@ -111,7 +111,10 @@ def test_crud_bekpackitemlist_user_can_write_owned_list(db: Session):
     )
     itemlist = create_random_itemlist(db=db, trip=trip, bekpack_user=nonowner)
     assert itemlist.parent_user.owner.id != trip.owner.owner.id
-    assert crud.bekpackitemlist.update(
+    assert nonowner in trip.members
+    nonowner = crud.bekpackuser.get(db=db, id=nonowner.id, user=nonowner.owner)
+    crud.bekpackitemlist.get(db=db, id=itemlist.id, user=nonowner.owner)
+    crud.bekpackitemlist.update(
         db=db, user=trip.owner.owner, obj_in=BekpackItemListUpdate(), db_obj=itemlist
     )
 
