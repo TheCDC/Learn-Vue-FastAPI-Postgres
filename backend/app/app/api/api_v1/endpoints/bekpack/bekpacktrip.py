@@ -1,7 +1,8 @@
 from typing import Any, List
 
 from fastapi import Depends, HTTPException
-from fastapi_pagination import Page, pagination_params
+from fastapi_pagination.page import Page
+from fastapi_pagination.api import pagination_params
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.paginator import paginate
 from sqlalchemy.orm import Session

@@ -35,12 +35,16 @@ class CRUDBekpackItemList(
         db: Session,
         *,
         obj_in: BekpackItemListCreate,
-        parent_user: int,
+        parent_user: models.User,
         trip_id: int
     ) -> BekpackItemList:
+        bp_user: models.BekpackUser = crud.bekpackuser.get_by_owner(
+            db=db, owner_id=parent_user.id
+        )
+
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(
-            **obj_in_data, parent_user_id=parent_user, parent_trip_id=trip_id
+            **obj_in_data, parent_user_id=bp_user.id, parent_trip_id=trip_id
         )
         db.add(db_obj)
         db.commit()

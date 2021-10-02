@@ -44,6 +44,8 @@ class BekpackItemListUpdate(BekpackItemListBase):
 class BekpackItemListInDBBase(BekpackItemListBase):
     id: int
     name: str
+    parent_trip_id: int
+    parent_user_id: int
 
     class Config:
         orm_mode = True

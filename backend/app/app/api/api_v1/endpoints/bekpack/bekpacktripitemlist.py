@@ -2,7 +2,8 @@ from typing import Any, List
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi_pagination import Page, pagination_params
+from fastapi_pagination.page import Page
+from fastapi_pagination.api import pagination_params
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.paginator import paginate
 from sqlalchemy.orm import Session
@@ -28,3 +29,17 @@ router = DefaultCrudRouter[
     read_schema=schemas.BekpackItemList,
     update_schema=schemas.BekpackItemListUpdate,
 )
+
+
+@router.post("/", response_model=schemas.BekpackItemList)
+def create_bekpackitemlist(
+    *,
+    parent_trip_id: int,
+    db: Session = Depends(deps.get_db),
+    obj_in: schemas.BekpackItemListCreate,
+    current_user: User = Depends(deps.get_current_active_user),
+) -> models.BekpackItemList:
+    """Create new BekpackItemListItem"""
+    return crud.bekpackitemlist.create_with_trip_owner(
+        db=db, obj_in=obj_in, trip_id=parent_trip_id, parent_user=current_user
+    )
