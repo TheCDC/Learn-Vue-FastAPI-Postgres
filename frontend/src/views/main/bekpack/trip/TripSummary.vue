@@ -50,29 +50,34 @@
                 params: { itemlistId: itemlist.id },
               }"
             >
-              EDIT
+              <v-icon> edit </v-icon>
             </v-btn>
             <v-spacer />
-            <v-btn @click="deleteChild(itemlist)"> DELETE </v-btn>
+            <v-btn @click="deleteChild(itemlist)">
+              <v-icon> delete </v-icon>
+            </v-btn>
           </v-card-actions>
           <v-data-table
             :items="itemlist.items"
             :headers="[
               { text: 'Name', value: 'name' },
               { text: 'Quantity', value: 'quantity' },
+              { text: 'Bag' },
+              { text: 'Status' },
             ]"
             :disable-pagination="true"
             :hide-default-footer="true"
           >
           </v-data-table>
+          <modal-create-itemlistitem> </modal-create-itemlistitem>
         </v-card-text>
       </v-card>
     </div>
   </div>
 </template>
 <script lang="ts">
+import ModalCreateItemlistitem from "@/components/modal/BekpackItemListItem/ModalCreateItemlistitem.vue";
 import { IBekpackItemList } from "@/interfaces/bekpack.ts/bekpackitemlist";
-import { IBekpackItemListItem } from "@/interfaces/bekpack.ts/bekpackitemlistitem";
 import { IPageRead } from "@/interfaces/common";
 import { dispatchGetTrip } from "@/store/bekpack/actions";
 import { readTripsOne } from "@/store/bekpack/getters";
@@ -81,8 +86,8 @@ import {
   dispatchGetBekpackItemlistMulti,
 } from "@/store/bekpack/itemlist/actions";
 import { readItemlistPage } from "@/store/bekpack/itemlist/getters";
-import { Component, Vue, Watch } from "vue-property-decorator";
-@Component
+import { Component, Vue } from "vue-property-decorator";
+@Component({ components: { ModalCreateItemlistitem } })
 export default class Bekpack extends Vue {
   public pageCursor: IPageRead = { page: 0, size: 64 };
   public mounted() {
