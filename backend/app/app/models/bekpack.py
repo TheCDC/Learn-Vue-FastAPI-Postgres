@@ -73,7 +73,7 @@ class BekpackItemList(Base):
     parent_trip: BekpackTrip = relationship(BekpackTrip, back_populates="item_lists")
     parent_user: BekpackUser = relationship(BekpackUser)
     items: List["BekpackItemListItem"] = relationship(
-        "BekpackItemListItem", back_populates="parent_list", lazy="joined"
+        "BekpackItemListItem", back_populates="parent_list", lazy="subquery"
     )
 
 
@@ -96,7 +96,7 @@ class BekpackBag(Base):
 
 class BekpackItemListItem(Base):
     id = Column(Integer, primary_key=True, index=True)
-    bag_id = Column(Integer, ForeignKey(BekpackBag.id))
+    bag_id = Column(Integer, ForeignKey(BekpackBag.id), index=True)
     parent_list_id = Column(
         Integer,
         ForeignKey(BekpackItemList.id, ondelete="cascade"),
