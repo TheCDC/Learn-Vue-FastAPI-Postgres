@@ -42,7 +42,7 @@ def create_random_itemlist(
         obj_in=schemas.BekpackItemListCreate(
             name=random_lower_string(), color=get_random_color()
         ),
-        parent_user=bekpack_user.id,
-        trip_id=trip.id,
+        parent_user_id=bekpack_user.owner.id,
+        parent_trip_id=trip.id,
     )
     return itemlist

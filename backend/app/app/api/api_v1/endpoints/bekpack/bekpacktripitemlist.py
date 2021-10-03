@@ -41,5 +41,5 @@ def create_bekpackitemlist(
 ) -> models.BekpackItemList:
     """Create new BekpackItemListItem"""
     return crud.bekpackitemlist.create_with_trip_owner(
-        db=db, obj_in=obj_in, trip_id=parent_trip_id, parent_user=current_user
+        db=db, obj_in=obj_in, parent_trip_id=parent_trip_id, parent_user_id=current_user
     )
