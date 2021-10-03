@@ -11,6 +11,7 @@ export interface IBekpackItemListUpdate {
   name?: string;
 }
 export interface IBekpackItemListCreate {
+  parent_trip_id: number;
   color?: string;
   name: string;
 }

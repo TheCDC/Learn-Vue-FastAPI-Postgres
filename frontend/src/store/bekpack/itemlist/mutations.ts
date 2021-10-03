@@ -9,6 +9,7 @@ export const mutations = {
     state: BekpackItemListState,
     payload: { page: IPage<IBekpackItemList> }
   ) {
+    state.itemlistPage = payload.page;
     const idsIncoming = new Set(payload.page.items.map((i) => i.id));
     state.itemlists = state.itemlists.filter((i) => !idsIncoming.has(i.id));
     state.itemlists = [...state.itemlists, ...payload.page.items];

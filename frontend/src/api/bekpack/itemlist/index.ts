@@ -33,7 +33,7 @@ export const api = {
   },
   async createOne(token: string, payload: { item: IBekpackItemListCreate }) {
     return axios.post<IBekpackItemList>(
-      `${apiUrl}/api/v1/bekpack/bekpackitemlists/`,
+      `${apiUrl}/api/v1/bekpack/bekpackitemlists/?parent_trip_id=${payload.item.parent_trip_id}`,
       payload.item,
       authHeaders(token)
     );

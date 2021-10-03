@@ -11,58 +11,90 @@ export default new Router({
   routes: [
     {
       path: "/",
-      component: () => import(/* webpackChunkName: "start" */ "./views/main/Start.vue"),
+      component: () =>
+        import(/* webpackChunkName: "start" */ "./views/main/Start.vue"),
       children: [
         {
           path: "login",
           // route level code-splitting
           // this generates a separate chunk (about.[hash].js) for this route
           // which is lazy-loaded when the route is visited.
-          component: () => import(/* webpackChunkName: "login" */ "./views/Login.vue"),
+          component: () =>
+            import(/* webpackChunkName: "login" */ "./views/Login.vue"),
         },
         {
           path: "recover-password",
-          component: () => import(/* webpackChunkName: "recover-password" */ "./views/PasswordRecovery.vue"),
+          component: () =>
+            import(
+              /* webpackChunkName: "recover-password" */ "./views/PasswordRecovery.vue"
+            ),
         },
         {
           path: "reset-password",
-          component: () => import(/* webpackChunkName: "reset-password" */ "./views/ResetPassword.vue"),
+          component: () =>
+            import(
+              /* webpackChunkName: "reset-password" */ "./views/ResetPassword.vue"
+            ),
         },
         {
           path: "main",
-          component: () => import(/* webpackChunkName: "main" */ "./views/main/Main.vue"),
+          component: () =>
+            import(/* webpackChunkName: "main" */ "./views/main/Main.vue"),
           children: [
             {
               path: "bekpack",
-              component: () => import(/* webpackChunkName: "bekpack" */ "./views/main/bekpack/BekpackMain.vue"),
+              component: () =>
+                import(
+                  /* webpackChunkName: "bekpack" */ "./views/main/bekpack/BekpackMain.vue"
+                ),
               children: [
-
                 {
                   path: "",
                   name: "bekpack-home",
-                  component: () => import(/* webpackChunkName: "bekpack" */ "./views/main/bekpack/Bekpack.vue"),
-
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "bekpack" */ "./views/main/bekpack/Bekpack.vue"
+                    ),
                 },
                 {
                   path: "createTrip",
                   name: "bekpack-create-trip",
-                  component: () => import(/* webpackChunkName: "bekpack-create-trip" */ "./views/main/bekpack/CreateTrip.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "bekpack-create-trip" */ "./views/main/bekpack/CreateTrip.vue"
+                    ),
                 },
                 {
                   path: "editTrip/:tripId",
                   name: "bekpack-edit-trip",
-                  component: () => import(/* webpackChunkName: "bekpack-edit-trip" */ "./views/main/bekpack/EditTrip.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "bekpack-edit-trip" */ "./views/main/bekpack/EditTrip.vue"
+                    ),
                 },
                 {
                   path: "trip",
-                  component: () => import(/* webpackChunkName: "bekpack-trip-parent" */ "./views/main/bekpack/trip/TripMain.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "bekpack-trip-parent" */ "./views/main/bekpack/trip/TripMain.vue"
+                    ),
 
                   children: [
                     {
                       path: ":tripId",
                       name: "bekpack-trip-summary",
-                      component: () => import(/* webpackChunkName: "bekpack-trip-summary" */ "./views/main/bekpack/trip/TripSummary.vue"),
-
+                      component: () =>
+                        import(
+                          /* webpackChunkName: "bekpack-trip-summary" */ "./views/main/bekpack/trip/TripSummary.vue"
+                        ),
+                    },
+                    {
+                      path: ":tripId/createItemlist",
+                      name: "bekpack-create-itemlist",
+                      component: () =>
+                        import(
+                          /* webpackChunkName: "bekpack-create-itemlist" */ "./views/main/bekpack/trip/CreateItemlist.vue"
+                        ),
                     },
                   ],
                 },
@@ -70,26 +102,40 @@ export default new Router({
             },
             {
               path: "items",
-              component: () => import(/* webpackChunkName: "main-items" */ "./views/main/items/Items.vue"),
+              component: () =>
+                import(
+                  /* webpackChunkName: "main-items" */ "./views/main/items/Items.vue"
+                ),
             },
             {
               path: "items/create",
               name: "main-items-create",
-              component: () => import(/* webpackChunkName: "main-items-create" */ "./views/main/items/CreateItem.vue"),
+              component: () =>
+                import(
+                  /* webpackChunkName: "main-items-create" */ "./views/main/items/CreateItem.vue"
+                ),
             },
             {
               path: "items/edit/:id",
               name: "main-items-edit",
-              component: () => import(/* webpackChunkName: "main-items-create" */ "./views/main/items/EditItem.vue"),
+              component: () =>
+                import(
+                  /* webpackChunkName: "main-items-create" */ "./views/main/items/EditItem.vue"
+                ),
             },
             {
               path: "dashboard",
-              component: () => import(/* webpackChunkName: "main-dashboard" */ "./views/main/Dashboard.vue"),
+              component: () =>
+                import(
+                  /* webpackChunkName: "main-dashboard" */ "./views/main/Dashboard.vue"
+                ),
             },
             {
               path: "chatSocket",
-              component: () => import(
-                /* webpackChunkName: "main-chatSocket" */ "./views/main/chatSocket/chatSocket.vue"),
+              component: () =>
+                import(
+                  /* webpackChunkName: "main-chatSocket" */ "./views/main/chatSocket/chatSocket.vue"
+                ),
             },
             {
               path: "profile",
@@ -98,24 +144,33 @@ export default new Router({
               children: [
                 {
                   path: "view",
-                  component: () => import(
-                    /* webpackChunkName: "main-profile" */ "./views/main/profile/UserProfile.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "main-profile" */ "./views/main/profile/UserProfile.vue"
+                    ),
                 },
                 {
                   path: "edit",
-                  component: () => import(
-                    /* webpackChunkName: "main-profile-edit" */ "./views/main/profile/UserProfileEdit.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "main-profile-edit" */ "./views/main/profile/UserProfileEdit.vue"
+                    ),
                 },
                 {
                   path: "password",
-                  component: () => import(
-                    /* webpackChunkName: "main-profile-password" */ "./views/main/profile/UserProfileEditPassword.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "main-profile-password" */ "./views/main/profile/UserProfileEditPassword.vue"
+                    ),
                 },
               ],
             },
             {
               path: "admin",
-              component: () => import(/* webpackChunkName: "main-admin" */ "./views/main/admin/Admin.vue"),
+              component: () =>
+                import(
+                  /* webpackChunkName: "main-admin" */ "./views/main/admin/Admin.vue"
+                ),
               redirect: "admin/users/all",
               children: [
                 {
@@ -124,20 +179,26 @@ export default new Router({
                 },
                 {
                   path: "users/all",
-                  component: () => import(
-                    /* webpackChunkName: "main-admin-users" */ "./views/main/admin/AdminUsers.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "main-admin-users" */ "./views/main/admin/AdminUsers.vue"
+                    ),
                 },
                 {
                   path: "users/edit/:id",
                   name: "main-admin-users-edit",
-                  component: () => import(
-                    /* webpackChunkName: "main-admin-users-edit" */ "./views/main/admin/EditUser.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "main-admin-users-edit" */ "./views/main/admin/EditUser.vue"
+                    ),
                 },
                 {
                   path: "users/create",
                   name: "main-admin-users-create",
-                  component: () => import(
-                    /* webpackChunkName: "main-admin-users-create" */ "./views/main/admin/CreateUser.vue"),
+                  component: () =>
+                    import(
+                      /* webpackChunkName: "main-admin-users-create" */ "./views/main/admin/CreateUser.vue"
+                    ),
                 },
               ],
             },
@@ -146,7 +207,8 @@ export default new Router({
       ],
     },
     {
-      path: "/*", redirect: "/",
+      path: "/*",
+      redirect: "/",
     },
   ],
 });

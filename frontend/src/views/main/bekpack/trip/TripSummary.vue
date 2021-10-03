@@ -25,12 +25,12 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-    <v-toolbar dense color="gray">
+    <v-toolbar dark color="gray">
       Lists
 
       <v-btn
         :to="{
-          name: 'bekpack-edit-trip',
+          name: 'bekpack-create-itemlist',
           params: { tripId: trip.id },
         }"
         icon="mdi-plus"
@@ -38,8 +38,29 @@
         +
       </v-btn>
     </v-toolbar>
-    <div>
-      {{ itemlists }}
+    <div class="d-flex flex-row justify-start flex-wrap">
+      <v-card v-for="itemlist in itemlistsPage.items" :key="itemlist.id">
+        <v-card-text>
+          <v-toolbar :color="itemlist.color">
+            {{ itemlist.name }}
+          </v-toolbar>
+          <v-card-actions>
+            <v-btn> EDIT </v-btn>
+            <v-spacer />
+            <v-btn> DELETE </v-btn>
+          </v-card-actions>
+          <v-data-table
+            :items="itemlist.items"
+            :headers="[
+              { text: 'Name', value: 'name' },
+              { text: 'Quantity', value: 'quantity' },
+            ]"
+            :disable-pagination="true"
+            :hide-default-footer="true"
+          >
+          </v-data-table>
+        </v-card-text>
+      </v-card>
     </div>
   </div>
 </template>
@@ -60,7 +81,7 @@ export default class Bekpack extends Vue {
       page: this.pageCursor,
     });
   }
-  public get itemlists() {
+  public get itemlistsPage() {
     return readItemlistPage(this.$store);
   }
   public get tripId() {
