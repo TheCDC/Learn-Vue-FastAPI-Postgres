@@ -3,8 +3,6 @@ from pydantic import BaseModel
 
 # Shared properties
 class BekpackItemListItemBase(BaseModel):
-    id: Optional[int]
-
     description: Optional[str]
     list_index: Optional[int]
     name: Optional[str]

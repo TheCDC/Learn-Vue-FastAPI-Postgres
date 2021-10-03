@@ -73,7 +73,10 @@ class BekpackItemList(Base):
     parent_trip: BekpackTrip = relationship(BekpackTrip, back_populates="item_lists")
     parent_user: BekpackUser = relationship(BekpackUser)
     items: List["BekpackItemListItem"] = relationship(
-        "BekpackItemListItem", back_populates="parent_list", lazy="subquery"
+        "BekpackItemListItem",
+        back_populates="parent_list",
+        lazy="subquery",
+        order_by="BekpackItemListItem.list_index",
     )
 
 
