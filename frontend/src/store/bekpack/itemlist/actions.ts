@@ -5,7 +5,10 @@ import {
   IItemCreate,
   IItemUpdate,
 } from "@/interfaces";
-import { IBekpackItemListCreate } from "@/interfaces/bekpack.ts/bekpackitemlist";
+import {
+  IBekpackItemList,
+  IBekpackItemListCreate,
+} from "@/interfaces/bekpack.ts/bekpackitemlist";
 import { IBekpackItemListItemUpdate } from "@/interfaces/bekpack.ts/bekpackitemlistitem";
 import { IPageRead } from "@/interfaces/common";
 import { getStoreAccessors } from "typesafe-vuex";
@@ -106,7 +109,7 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
-  async actionDeleteOne(context: MainContext, payload: { id: number }) {
+  async actionDeleteOne(context: MainContext, payload: IBekpackItemList) {
     try {
       const loadingNotification = { content: "deleting", showProgress: true };
       commitAddNotification(context, loadingNotification);
@@ -118,7 +121,7 @@ export const actions = {
           ),
         ])
       )[0];
-      commitDeleteItemlistOne(context, response.data);
+      commitDeleteItemlistOne(context, payload);
     } catch (error) {
       await dispatchCheckApiError(context, error);
     }

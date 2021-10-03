@@ -39,7 +39,7 @@ export const api = {
     );
   },
   async deleteOne(token: string, payload: { id: number }) {
-    return axios.post<IBekpackItemList>(
+    return axios.delete(
       `${apiUrl}/api/v1/bekpack/bekpackitemlists/${payload.id}`,
       authHeaders(token)
     );

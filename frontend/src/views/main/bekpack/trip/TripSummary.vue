@@ -33,7 +33,6 @@
           name: 'bekpack-create-itemlist',
           params: { tripId: trip.id },
         }"
-        icon="mdi-plus"
       >
         +
       </v-btn>
@@ -45,9 +44,16 @@
             {{ itemlist.name }}
           </v-toolbar>
           <v-card-actions>
-            <v-btn> EDIT </v-btn>
+            <v-btn
+              :to="{
+                name: 'bekpack-edit-itemlist',
+                params: { itemlistId: itemlist.id },
+              }"
+            >
+              EDIT
+            </v-btn>
             <v-spacer />
-            <v-btn> DELETE </v-btn>
+            <v-btn @click="deleteChild(itemlist)"> DELETE </v-btn>
           </v-card-actions>
           <v-data-table
             :items="itemlist.items"
@@ -65,10 +71,15 @@
   </div>
 </template>
 <script lang="ts">
+import { IBekpackItemList } from "@/interfaces/bekpack.ts/bekpackitemlist";
+import { IBekpackItemListItem } from "@/interfaces/bekpack.ts/bekpackitemlistitem";
 import { IPageRead } from "@/interfaces/common";
 import { dispatchGetTrip } from "@/store/bekpack/actions";
 import { readTripsOne } from "@/store/bekpack/getters";
-import { dispatchGetBekpackItemlistMulti } from "@/store/bekpack/itemlist/actions";
+import {
+  dispatchDeleteBekpackItemlist,
+  dispatchGetBekpackItemlistMulti,
+} from "@/store/bekpack/itemlist/actions";
 import { readItemlistPage } from "@/store/bekpack/itemlist/getters";
 import { Component, Vue, Watch } from "vue-property-decorator";
 @Component
@@ -89,6 +100,14 @@ export default class Bekpack extends Vue {
   }
   public get trip() {
     return readTripsOne(this.$store)(this.tripId);
+  }
+
+  public async deleteChild(item: IBekpackItemList) {
+    await dispatchDeleteBekpackItemlist(this.$store, item);
+    dispatchGetBekpackItemlistMulti(this.$store, {
+      tripId: this.tripId,
+      page: this.pageCursor,
+    });
   }
 }
 </script>

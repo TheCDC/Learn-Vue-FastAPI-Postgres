@@ -96,6 +96,14 @@ export default new Router({
                           /* webpackChunkName: "bekpack-create-itemlist" */ "./views/main/bekpack/trip/CreateItemlist.vue"
                         ),
                     },
+                    {
+                      path: ":tripId/Itemlist/:itemlistId/edit",
+                      name: "bekpack-edit-itemlist",
+                      component: () =>
+                        import(
+                          /* webpackChunkName: "bekpack-edit-itemlist" */ "./views/main/bekpack/trip/EditItemlist.vue"
+                        ),
+                    },
                   ],
                 },
               ],
