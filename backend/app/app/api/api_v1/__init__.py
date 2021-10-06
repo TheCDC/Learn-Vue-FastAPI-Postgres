@@ -1,8 +1,8 @@
-from typing import Any, Generic, List, Optional, Type, TypeVar
+from typing import Any, Generic, List,  Type, TypeVar
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.param_functions import Security
-from fastapi_pagination import Page, pagination_params
+from fastapi_pagination.page import Page
+from fastapi_pagination.api import pagination_params
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.paginator import paginate
 from pydantic import BaseModel
@@ -10,10 +10,9 @@ from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.core.security import SecurityError
-from app.crud.base import CRUDBase, CRUDBaseSecure
+from app.crud.base import CRUDBaseSecure
 from app.db.base_class import Base
 from app.models import User
-from app import schemas
 
 ModelType = TypeVar("ModelType", bound=Base)
 ReadSchemaType = TypeVar("ReadSchemaType", bound=BaseModel)
