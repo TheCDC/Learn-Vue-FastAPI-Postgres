@@ -1,16 +1,18 @@
 export interface IBekpackItemListItem {
   id: number;
   bag_id?: number;
+  parent_list_id: number;
   description: string;
   list_index: number;
   name: string;
-  parent_list_id: number;
   quantity: number;
 }
 export interface IBekpackItemListItemCreate {
+  parent_itemlist_id: number;
   description: string;
   name: string;
   quantity: number;
+  list_index?: number;
 }
 
 export interface IBekpackItemListItemUpdate {

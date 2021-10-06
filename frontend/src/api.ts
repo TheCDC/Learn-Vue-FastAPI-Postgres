@@ -1,6 +1,7 @@
 import { apiUrl } from "@/env";
 import axios from "axios";
 import { api as itemlist } from "./api/bekpack/itemlist";
+import { api as itemlistitem } from "./api/bekpack/itemlistitem";
 import { authHeaders, paginated } from "./api/utils";
 import {
   IBekpackTrip,
@@ -16,7 +17,7 @@ import {
 } from "./interfaces";
 import { IPage, IPageRead } from "./interfaces/common";
 export const api = {
-  bekpack: { itemlist },
+  bekpack: { itemlist, itemlistitem },
   async logInGetToken(username: string, password: string) {
     const params = new URLSearchParams();
     params.append("username", username);

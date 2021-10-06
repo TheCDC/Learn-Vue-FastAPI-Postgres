@@ -1,24 +1,27 @@
 {
-	"folders": [
-		{
-			"path": "./backend"
-		}
-	],
-	"settings": {
-		"editor.formatOnSave": true,
-		"files.insertFinalNewline": true,
-		"files.trimFinalNewlines": true
-	},
-	"extensions": {
-		"recommendations": [
-			"eamodio.gitlens",
-			"ms-azuretools.vscode-docker",
-			"ms-python.python",
-			"ms-python.vscode-pylance",
-			"tommorris.mako",
-			"ms-vscode-remote.remote-containers",
-			"visualstudioexptteam.vscodeintellicode",
-			"tht13.python"
-		],
-	},
+  "folders": [
+    {
+      "path": "./backend"
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "cSpell.words": ["Bekpack", "bekpackitemlist", "bekpackitemlistitem"],
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.extraPaths": ["app"]
+  },
+  "extensions": {
+    "recommendations": [
+      "eamodio.gitlens",
+      "ms-azuretools.vscode-docker",
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "tommorris.mako",
+      "ms-vscode-remote.remote-containers",
+      "visualstudioexptteam.vscodeintellicode",
+      "tht13.python"
+    ]
+  }
 }

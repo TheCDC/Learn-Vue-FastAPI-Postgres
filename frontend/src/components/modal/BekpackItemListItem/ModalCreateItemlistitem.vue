@@ -16,7 +16,7 @@
               <v-layout column wrap>
                 <v-text-field
                   label="Name"
-                  v-model="name"
+                  v-model="objectUnderEdit.name"
                   required
                   style="width: 90%"
                 ></v-text-field>
@@ -25,8 +25,19 @@
               <v-textarea
                 label="Description"
                 v-model="description"
-                required
               ></v-textarea>
+              <v-text-field
+                label="Quantity"
+                type="number"
+                v-model="objectUnderEdit.quantity"
+              >
+              </v-text-field>
+              <v-text-field
+                label="List Index"
+                type="number"
+                v-model="objectUnderEdit.list_index"
+              >
+              </v-text-field>
             </v-form>
           </template>
         </v-card-text>
@@ -44,7 +55,10 @@
 </template>
 
 <script lang="ts">
-import { IBekpackItemListItemCreate } from "@/interfaces/bekpack.ts/bekpackitemlistitem";
+import {
+  IBekpackItemListItem,
+  IBekpackItemListItemCreate,
+} from "@/interfaces/bekpack.ts/bekpackitemlistitem";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
@@ -53,6 +67,8 @@ export default class ModalCreateItemlistitem extends Vue {
   public showDialog = false;
   public name = "";
   public description = "";
+  public quantity = "";
+  public listIndex = 0;
 
   public reset() {
     this.name = "";
@@ -66,9 +82,22 @@ export default class ModalCreateItemlistitem extends Vue {
   public cancel() {
     this.$router.back();
   }
+  public get objectUnderEdit() {
+    return {
+      id: -1,
+      name: "NAME",
+      description: "DESC",
+      parent_list_id: -1,
+      list_index: 0,
+      quantity: 1,
+      bag_id: -1,
+    } as IBekpackItemListItem;
+  }
   public async submit() {
     if (await this.$validator.validateAll()) {
       const newRecord: IBekpackItemListItemCreate = {
+        parent_itemlist_id: 0,
+        quantity: 1,
         name: this.name,
         description: this.description,
       };
