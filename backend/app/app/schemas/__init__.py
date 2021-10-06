@@ -37,6 +37,13 @@ from .bekpack.bekpackitemlist import (
     BekpackItemListUpdate,
 )
 
+from .bekpack.bekpackitemlistitem import (
+    BekpackItemListItem,
+    BekpackItemListItemCreate,
+    BekpackItemListItemInDBBase,
+    BekpackItemListItemUpdate,
+)
+
 from .bekpack.bekpackuser import (
     BekpackUser,
     BekpackUserCreate,
