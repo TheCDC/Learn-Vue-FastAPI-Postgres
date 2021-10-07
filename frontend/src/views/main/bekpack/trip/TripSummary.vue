@@ -68,10 +68,16 @@
               { text: 'Quantity', value: 'quantity' },
               { text: 'Bag' },
               { text: 'Status' },
+              { text: 'Actions', value: 'id' },
             ]"
             :disable-pagination="true"
             :hide-default-footer="true"
           >
+            <template v-slot:[`item.id`]="{ item }">
+              <v-btn @click="deleteChildChild(item)" text>
+                <v-icon> delete </v-icon>
+              </v-btn>
+            </template>
           </v-data-table>
           <modal-create-itemlistitem
             :onSuccess="refresh"
@@ -86,6 +92,7 @@
 <script lang="ts">
 import ModalCreateItemlistitem from "@/components/modal/BekpackItemListItem/ModalCreateItemlistitem.vue";
 import { IBekpackItemList } from "@/interfaces/bekpack.ts/bekpackitemlist";
+import { IBekpackItemListItem } from "@/interfaces/bekpack.ts/bekpackitemlistitem";
 import { IPageRead } from "@/interfaces/common";
 import { dispatchGetTrip } from "@/store/bekpack/actions";
 import { readTripsOne } from "@/store/bekpack/getters";
@@ -94,6 +101,7 @@ import {
   dispatchGetBekpackItemlistMulti,
 } from "@/store/bekpack/itemlist/actions";
 import { readItemlistPage } from "@/store/bekpack/itemlist/getters";
+import { dispatchDeleteBekpackItemlistitem } from "@/store/bekpack/itemlistitem/actions";
 import { Component, Vue } from "vue-property-decorator";
 @Component({ components: { ModalCreateItemlistitem } })
 export default class Bekpack extends Vue {
@@ -110,13 +118,19 @@ export default class Bekpack extends Vue {
   public get trip() {
     return readTripsOne(this.$store)(this.tripId);
   }
-  public async refresh() {
-    dispatchGetTrip(this.$store, { id: this.tripId });
-
+  public async refreshChildren() {
     dispatchGetBekpackItemlistMulti(this.$store, {
       tripId: this.tripId,
       page: this.pageCursor,
     });
+  }
+  public async refresh() {
+    dispatchGetTrip(this.$store, { id: this.tripId });
+    this.refreshChildren();
+  }
+  public async deleteChildChild(o: IBekpackItemListItem) {
+    await dispatchDeleteBekpackItemlistitem(this.$store, o);
+    this.refreshChildren();
   }
   public async deleteChild(item: IBekpackItemList) {
     await dispatchDeleteBekpackItemlist(this.$store, item);
