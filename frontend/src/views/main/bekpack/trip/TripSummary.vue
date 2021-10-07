@@ -64,7 +64,11 @@
           </v-btn>
         </v-toolbar>
         <div class="d-flex flex-row justify-start flex-wrap">
-          <v-card v-for="itemlist in itemlistsPage.items" :key="itemlist.id">
+          <v-card
+            v-for="itemlist in itemlistsPage.items"
+            :key="itemlist.id"
+            class="ma-2"
+          >
             <v-card-text>
               <v-toolbar :color="itemlist.color">
                 {{ itemlist.name }}
