@@ -4,14 +4,18 @@
     </v-progress-circular>
     <div v-if="trip">
       <v-card :color="trip.color">
-        <v-card-title>
+        <v-card-title class="d-flex flex-row justify-space-between flex-wrap">
           {{ trip.name }}
-        </v-card-title>
-        <v-card-subtitle>
-          Created: {{ trip.time_created | localeDate }}
+          <v-card-subtitle
+            class="d-flex flex-row justify-space-between flex-wrap"
+          >
+            <div>Modified : {{ trip.time_updated | localeDate }}</div>
+          </v-card-subtitle>
 
-          Last modified : {{ trip.time_updated | localeDate }}
-        </v-card-subtitle>
+          <v-card-subtitle>
+            <div>Created: {{ trip.time_created | localeDate }}</div>
+          </v-card-subtitle>
+        </v-card-title>
         <v-card-text>
           {{ trip.description }}
         </v-card-text>
@@ -30,7 +34,7 @@
         <v-tab>
           Lists
 
-          <v-icon> clipboard </v-icon>
+          <v-icon>assignment</v-icon>
         </v-tab>
         <v-tab>
           Bags
@@ -38,20 +42,20 @@
           <v-icon> backpack </v-icon>
         </v-tab>
       </v-tabs>
-      <v-toolbar dark color="gray">
-        <v-btn
-          light
-          :to="{
-            name: 'bekpack-create-itemlist',
-            params: { tripId: trip.id },
-          }"
-        >
-          Create List +
-        </v-btn>
-      </v-toolbar>
     </div>
     <v-tabs-items v-model="tab">
       <v-tab-item>
+        <v-toolbar dark color="gray">
+          <v-btn
+            light
+            :to="{
+              name: 'bekpack-create-itemlist',
+              params: { tripId: trip.id },
+            }"
+          >
+            Create List +
+          </v-btn>
+        </v-toolbar>
         <div class="d-flex flex-row justify-start flex-wrap">
           <v-card v-for="itemlist in itemlistsPage.items" :key="itemlist.id">
             <v-card-text>
@@ -73,6 +77,7 @@
                 </v-btn>
               </v-card-actions>
               <v-data-table
+                v-if="itemlist.items.length > 0"
                 :items="itemlist.items"
                 :headers="[
                   { text: 'Name', value: 'name' },
@@ -85,17 +90,19 @@
                 :hide-default-footer="true"
               >
                 <template v-slot:[`item.name`]="{ item }">
-                  <div
-                    class="d-flex flex-row justify-space-between flex-nowrap"
-                  >
+                  <div class="d-flex flex-row justify-start flex-nowrap">
                     <modal-create-itemlistitem
                       :onSuccess="refresh"
                       :parentId="itemlist.id"
                       :objectToEdit="item"
                     >
                     </modal-create-itemlistitem>
-                    <div>
-                      {{ item.name }}
+                    <div
+                      class="d-flex flex-col justify-space-around flex-nowrap"
+                    >
+                      <p>
+                        {{ item.name }}
+                      </p>
                     </div>
                   </div>
                 </template>

@@ -8,7 +8,13 @@
     "editor.formatOnSave": true,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
-    "cSpell.words": ["Bekpack", "bekpackitemlist", "bekpackitemlistitem"],
+    "cSpell.words": [
+      "Bekpack",
+      "bekpackitemlist",
+      "bekpackitemlistitem",
+      "deps",
+      "onupdate"
+    ],
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.extraPaths": ["app"]
   },

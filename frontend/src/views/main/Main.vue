@@ -12,7 +12,7 @@
           <v-subheader>Main menu</v-subheader>
           <v-list-item :to="{ name: 'bekpack-home' }">
             <v-list-item-action>
-              <v-icon>web</v-icon>
+              <v-icon>flight</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Bekpack</v-list-item-title>
@@ -205,14 +205,14 @@ export default class Main extends Vue {
   public switchShowDrawer() {
     commitSetDashboardShowDrawer(
       this.$store,
-      !readDashboardShowDrawer(this.$store),
+      !readDashboardShowDrawer(this.$store)
     );
   }
 
   public switchMiniDrawer() {
     commitSetDashboardMiniDrawer(
       this.$store,
-      !readDashboardMiniDrawer(this.$store),
+      !readDashboardMiniDrawer(this.$store)
     );
   }
 

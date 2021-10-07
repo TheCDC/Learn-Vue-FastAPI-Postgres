@@ -9,8 +9,8 @@
           :to="{
             name: 'bekpack-create-trip',
           }"
-          >Create Trip</v-btn
-        >
+          >Create Trip<v-icon>flight</v-icon>
+        </v-btn>
       </v-toolbar>
     </div>
     <div v-if="!hasAccount">
@@ -39,12 +39,13 @@
         :server-items-length="trips.total"
         :options.sync="tablePaginationoptions"
         :loading="loading"
-        @click:row="clickRow"
       >
         <template v-slot:[`item.name`]="{ item }">
-          <v-badge class="ma-2" :color="item.color" inline left>
-            {{ item.name | truncate(64, "...") }}
-          </v-badge>
+          <v-btn @click="clickRow(item)">
+            <v-badge class="ma-2" :color="item.color" inline left>
+              {{ item.name | truncate(64, "...") }}
+            </v-badge>
+          </v-btn>
         </template>
         <template v-slot:[`item.description`]="{ item }">
           {{ item.description | truncate(100, "...") }}
