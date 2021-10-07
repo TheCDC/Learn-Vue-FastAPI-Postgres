@@ -59,6 +59,7 @@ class BekpackTrip(Base, TimestampsMixin):
         "BekpackItemList",
         back_populates="parent_trip",
         collection_class=ordering_list("name"),
+        cascade="all,delete",
     )
 
 
@@ -80,6 +81,7 @@ class BekpackItemList(Base):
         lazy="subquery",
         order_by="BekpackItemListItem.list_index",
         collection_class=ordering_list("list_index"),
+        cascade="all,delete",
     )
 
 
