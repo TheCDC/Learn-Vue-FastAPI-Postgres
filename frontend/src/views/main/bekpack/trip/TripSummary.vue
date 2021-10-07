@@ -2,41 +2,45 @@
   <div>
     <v-progress-circular :indeterminate="true" v-if="!trip">
     </v-progress-circular>
-    <v-card :color="trip.color" v-if="trip">
-      <v-card-title>
-        {{ trip.name }}
-      </v-card-title>
-      <v-card-subtitle>
-        Created: {{ trip.time_created | localeDate }}
+    <div v-if="trip">
+      <v-card :color="trip.color">
+        <v-card-title>
+          {{ trip.name }}
+        </v-card-title>
+        <v-card-subtitle>
+          Created: {{ trip.time_created | localeDate }}
 
-        Last modified : {{ trip.time_updated | localeDate }}
-      </v-card-subtitle>
-      <v-card-text>
-        {{ trip.description }}
-      </v-card-text>
-      <v-card-actions>
+          Last modified : {{ trip.time_updated | localeDate }}
+        </v-card-subtitle>
+        <v-card-text>
+          {{ trip.description }}
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            :to="{
+              name: 'bekpack-edit-trip',
+              params: { tripId: trip.id },
+            }"
+          >
+            edit
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+
+      <v-toolbar dark color="gray">
+        Lists
+
         <v-btn
           :to="{
-            name: 'bekpack-edit-trip',
+            name: 'bekpack-create-itemlist',
             params: { tripId: trip.id },
           }"
         >
-          edit
+          +
         </v-btn>
-      </v-card-actions>
-    </v-card>
-    <v-toolbar dark color="gray">
-      Lists
+      </v-toolbar>
+    </div>
 
-      <v-btn
-        :to="{
-          name: 'bekpack-create-itemlist',
-          params: { tripId: trip.id },
-        }"
-      >
-        +
-      </v-btn>
-    </v-toolbar>
     <div class="d-flex flex-row justify-start flex-wrap">
       <v-card v-for="itemlist in itemlistsPage.items" :key="itemlist.id">
         <v-card-text>
@@ -69,7 +73,11 @@
             :hide-default-footer="true"
           >
           </v-data-table>
-          <modal-create-itemlistitem> </modal-create-itemlistitem>
+          <modal-create-itemlistitem
+            :onSuccess="refresh"
+            :parentId="itemlist.id"
+          >
+          </modal-create-itemlistitem>
         </v-card-text>
       </v-card>
     </div>
@@ -91,11 +99,7 @@ import { Component, Vue } from "vue-property-decorator";
 export default class Bekpack extends Vue {
   public pageCursor: IPageRead = { page: 0, size: 64 };
   public mounted() {
-    dispatchGetTrip(this.$store, { id: this.tripId });
-    dispatchGetBekpackItemlistMulti(this.$store, {
-      tripId: this.tripId,
-      page: this.pageCursor,
-    });
+    this.refresh();
   }
   public get itemlistsPage() {
     return readItemlistPage(this.$store);
@@ -106,7 +110,14 @@ export default class Bekpack extends Vue {
   public get trip() {
     return readTripsOne(this.$store)(this.tripId);
   }
+  public async refresh() {
+    dispatchGetTrip(this.$store, { id: this.tripId });
 
+    dispatchGetBekpackItemlistMulti(this.$store, {
+      tripId: this.tripId,
+      page: this.pageCursor,
+    });
+  }
   public async deleteChild(item: IBekpackItemList) {
     await dispatchDeleteBekpackItemlist(this.$store, item);
     dispatchGetBekpackItemlistMulti(this.$store, {

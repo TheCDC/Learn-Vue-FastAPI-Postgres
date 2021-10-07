@@ -1,22 +1,14 @@
 from typing import Any, List
 
-import sqlalchemy
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi_pagination.page import Page
-from fastapi_pagination.api import pagination_params
-from fastapi_pagination.bases import AbstractPage
-from fastapi_pagination.paginator import paginate
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
-import app.api.api_v1.endpoints.bekpack.deps as deps_bekpack
 import app.schemas as schemas
 from app import crud, models, schemas
 from app.api import deps
 from app.api.api_v1 import DefaultCrudRouter
-from app.crud import user as crud_user
 from app.crud.crud_bekpack.crud_bekpackitemlist import CRUDBekpackItemList
 from app.models import User
-from app.models.bekpack import BekpackUser
 
 router = DefaultCrudRouter[
     models.BekpackItemList,
@@ -45,4 +37,16 @@ def create_bekpackitemlist(
         obj_in=obj_in,
         parent_trip_id=parent_trip_id,
         parent_user_id=current_user.id,
+    )
+
+
+@router.get("/{id}/items", response_model=List[schemas.BekpackItemListItem])
+def get_bekpackitemlist_items(
+    *,
+    id: int,
+    current_user: User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+):
+    return crud.bekpackitemlistitem.get_multi_by_itemlist(
+        db=db, parent_itemlist_id=id, user=current_user
     )

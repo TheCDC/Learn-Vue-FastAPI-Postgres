@@ -2,10 +2,10 @@ from typing import TYPE_CHECKING, List, Union
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from sqlalchemy_utils.types import ColorType
 
 from app.db.base_class import Base
 from app.models.mixins import TimestampsMixin
+from sqlalchemy.ext.orderinglist import ordering_list
 
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
@@ -56,7 +56,9 @@ class BekpackTrip(Base, TimestampsMixin):
     )
     owner: BekpackUser = relationship(BekpackUser, back_populates="owned_trips")
     item_lists: List["BekpackItemList"] = relationship(
-        "BekpackItemList", back_populates="parent_trip"
+        "BekpackItemList",
+        back_populates="parent_trip",
+        collection_class=ordering_list("name"),
     )
 
 
@@ -77,6 +79,7 @@ class BekpackItemList(Base):
         back_populates="parent_list",
         lazy="subquery",
         order_by="BekpackItemListItem.list_index",
+        collection_class=ordering_list("list_index"),
     )
 
 

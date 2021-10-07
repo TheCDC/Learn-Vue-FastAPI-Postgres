@@ -9,6 +9,8 @@ export interface IBekpackItemListItem {
 }
 export interface IBekpackItemListItemCreate {
   parent_itemlist_id: number;
+  bag_id?: number;
+
   description: string;
   name: string;
   quantity: number;

@@ -19,12 +19,13 @@
                   v-model="objectUnderEdit.name"
                   required
                   style="width: 90%"
+                  autofocus
                 ></v-text-field>
               </v-layout>
 
               <v-textarea
                 label="Description"
-                v-model="description"
+                v-model="objectUnderEdit.description"
               ></v-textarea>
               <v-text-field
                 label="Quantity"
@@ -59,20 +60,34 @@ import {
   IBekpackItemListItem,
   IBekpackItemListItemCreate,
 } from "@/interfaces/bekpack.ts/bekpackitemlistitem";
+import {
+  dispatchCreateBekpackItemlistitem,
+  dispatchGetBekpackItemlistitem,
+} from "@/store/bekpack/itemlistitem/actions";
+import { readItemlistitem } from "@/store/bekpack/itemlistitem/getters";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class ModalCreateItemlistitem extends Vue {
-  @Prop() public itemlistId!: number;
+  @Prop() public parentId!: number;
+  @Prop() public onSuccess!: () => void;
+  public valid = false;
   public showDialog = false;
-  public name = "";
-  public description = "";
-  public quantity = "";
-  public listIndex = 0;
-
+  public objectUnderEdit: IBekpackItemListItemCreate = {
+    name: "",
+    description: "",
+    quantity: 1,
+    list_index: 0,
+    parent_itemlist_id: this.parentId,
+  };
   public reset() {
-    this.name = "";
-    this.description = "";
+    this.objectUnderEdit = {
+      name: "",
+      description: "",
+      quantity: 1,
+      list_index: 0,
+      parent_itemlist_id: this.parentId,
+    };
   }
 
   public async mounted() {
@@ -82,26 +97,12 @@ export default class ModalCreateItemlistitem extends Vue {
   public cancel() {
     this.$router.back();
   }
-  public get objectUnderEdit() {
-    return {
-      id: -1,
-      name: "NAME",
-      description: "DESC",
-      parent_list_id: -1,
-      list_index: 0,
-      quantity: 1,
-      bag_id: -1,
-    } as IBekpackItemListItem;
-  }
+
   public async submit() {
     if (await this.$validator.validateAll()) {
-      const newRecord: IBekpackItemListItemCreate = {
-        parent_itemlist_id: 0,
-        quantity: 1,
-        name: this.name,
-        description: this.description,
-      };
-
+      const newRecord: IBekpackItemListItemCreate = this.objectUnderEdit;
+      await dispatchCreateBekpackItemlistitem(this.$store, newRecord);
+      this.onSuccess();
       this.reset();
       this.showDialog = false;
     }
