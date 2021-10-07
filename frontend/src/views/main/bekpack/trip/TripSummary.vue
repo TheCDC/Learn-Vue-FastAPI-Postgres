@@ -26,80 +26,96 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <v-tabs v-model="tab">
+        <v-tab>
+          Lists
 
+          <v-icon> clipboard </v-icon>
+        </v-tab>
+        <v-tab>
+          Bags
+
+          <v-icon> backpack </v-icon>
+        </v-tab>
+      </v-tabs>
       <v-toolbar dark color="gray">
-        Lists
-
         <v-btn
+          light
           :to="{
             name: 'bekpack-create-itemlist',
             params: { tripId: trip.id },
           }"
         >
-          +
+          Create List +
         </v-btn>
       </v-toolbar>
     </div>
-
-    <div class="d-flex flex-row justify-start flex-wrap">
-      <v-card v-for="itemlist in itemlistsPage.items" :key="itemlist.id">
-        <v-card-text>
-          <v-toolbar :color="itemlist.color">
-            {{ itemlist.name }}
-          </v-toolbar>
-          <v-card-actions>
-            <v-btn
-              :to="{
-                name: 'bekpack-edit-itemlist',
-                params: { itemlistId: itemlist.id },
-              }"
-            >
-              <v-icon> edit </v-icon>
-            </v-btn>
-            <v-spacer />
-            <v-btn @click="deleteChild(itemlist)">
-              <v-icon> delete </v-icon>
-            </v-btn>
-          </v-card-actions>
-          <v-data-table
-            :items="itemlist.items"
-            :headers="[
-              { text: 'Name', value: 'name' },
-              { text: 'Quantity', value: 'quantity' },
-              { text: 'Bag' },
-              { text: 'Status' },
-              { text: '', value: 'id' },
-            ]"
-            :disable-pagination="true"
-            :hide-default-footer="true"
-          >
-            <template v-slot:[`item.name`]="{ item }">
-              <div class="d-flex flex-row justify-space-between flex-nowrap">
-                <modal-create-itemlistitem
-                  :onSuccess="refresh"
-                  :parentId="itemlist.id"
-                  :objectToEdit="item"
+    <v-tabs-items v-model="tab">
+      <v-tab-item>
+        <div class="d-flex flex-row justify-start flex-wrap">
+          <v-card v-for="itemlist in itemlistsPage.items" :key="itemlist.id">
+            <v-card-text>
+              <v-toolbar :color="itemlist.color">
+                {{ itemlist.name }}
+              </v-toolbar>
+              <v-card-actions>
+                <v-btn
+                  :to="{
+                    name: 'bekpack-edit-itemlist',
+                    params: { itemlistId: itemlist.id },
+                  }"
                 >
-                </modal-create-itemlistitem>
-                <div>
-                  {{ item.name }}
-                </div>
-              </div>
-            </template>
-            <template v-slot:[`item.id`]="{ item }">
-              <v-btn @click="deleteChildChild(item)" text small dense>
-                <v-icon> delete </v-icon>
-              </v-btn>
-            </template>
-          </v-data-table>
-          <modal-create-itemlistitem
-            :onSuccess="refresh"
-            :parentId="itemlist.id"
-          >
-          </modal-create-itemlistitem>
-        </v-card-text>
-      </v-card>
-    </div>
+                  <v-icon> edit </v-icon>
+                </v-btn>
+                <v-spacer />
+                <v-btn @click="deleteChild(itemlist)">
+                  <v-icon> delete </v-icon>
+                </v-btn>
+              </v-card-actions>
+              <v-data-table
+                :items="itemlist.items"
+                :headers="[
+                  { text: 'Name', value: 'name' },
+                  { text: 'Quantity', value: 'quantity' },
+                  { text: 'Bag' },
+                  { text: 'Status' },
+                  { text: '', value: 'id' },
+                ]"
+                :disable-pagination="true"
+                :hide-default-footer="true"
+              >
+                <template v-slot:[`item.name`]="{ item }">
+                  <div
+                    class="d-flex flex-row justify-space-between flex-nowrap"
+                  >
+                    <modal-create-itemlistitem
+                      :onSuccess="refresh"
+                      :parentId="itemlist.id"
+                      :objectToEdit="item"
+                    >
+                    </modal-create-itemlistitem>
+                    <div>
+                      {{ item.name }}
+                    </div>
+                  </div>
+                </template>
+                <template v-slot:[`item.id`]="{ item }">
+                  <v-btn @click="deleteChildChild(item)" text small dense>
+                    <v-icon> delete </v-icon>
+                  </v-btn>
+                </template>
+              </v-data-table>
+              <modal-create-itemlistitem
+                :onSuccess="refresh"
+                :parentId="itemlist.id"
+              >
+              </modal-create-itemlistitem>
+            </v-card-text>
+          </v-card>
+        </div>
+      </v-tab-item>
+      <v-tab-item> BAGS UNDER CONSTRUCTION </v-tab-item>
+    </v-tabs-items>
   </div>
 </template>
 <script lang="ts">
@@ -119,6 +135,7 @@ import { Component, Vue } from "vue-property-decorator";
 @Component({ components: { ModalCreateItemlistitem } })
 export default class Bekpack extends Vue {
   public pageCursor: IPageRead = { page: 0, size: 64 };
+  public tab = null;
   public mounted() {
     this.refresh();
   }
