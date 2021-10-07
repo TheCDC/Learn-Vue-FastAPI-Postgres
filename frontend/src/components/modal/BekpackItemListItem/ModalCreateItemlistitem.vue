@@ -3,8 +3,19 @@
     <v-dialog v-model="showDialog" width="500px ">
       <template v-slot:activator="{ attrs, on }">
         <slot :attrs="attrs" :on="on">
-          <v-btn dark color="red lighten-2" light v-bind="attrs" v-on="on">
+          <v-btn
+            dark
+            color="red lighten-2"
+            light
+            v-bind="attrs"
+            v-on="on"
+            v-if="!objectToEdit"
+          >
             Add Item
+          </v-btn>
+
+          <v-btn light text v-bind="attrs" v-on="on" v-if="objectToEdit">
+            <v-icon>edit</v-icon>
           </v-btn>
         </slot>
       </template>
@@ -63,6 +74,7 @@ import {
 import {
   dispatchCreateBekpackItemlistitem,
   dispatchGetBekpackItemlistitem,
+  dispatchUpdateBekpackItemlistitem,
 } from "@/store/bekpack/itemlistitem/actions";
 import { readItemlistitem } from "@/store/bekpack/itemlistitem/getters";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -71,6 +83,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 export default class ModalCreateItemlistitem extends Vue {
   @Prop() public parentId!: number;
   @Prop() public onSuccess!: () => void;
+  @Prop() public objectToEdit!: IBekpackItemListItem;
   public valid = false;
   public showDialog = false;
   public objectUnderEdit: IBekpackItemListItemCreate = {
@@ -78,16 +91,20 @@ export default class ModalCreateItemlistitem extends Vue {
     description: "",
     quantity: 1,
     list_index: 0,
-    parent_itemlist_id: this.parentId,
+    parent_list_id: this.parentId,
   };
   public reset() {
-    this.objectUnderEdit = {
-      name: "",
-      description: "",
-      quantity: 1,
-      list_index: 0,
-      parent_itemlist_id: this.parentId,
-    };
+    if (!this.objectToEdit) {
+      this.objectUnderEdit = {
+        name: "",
+        description: "",
+        quantity: 1,
+        list_index: 0,
+        parent_list_id: this.parentId,
+      };
+    } else {
+      this.objectUnderEdit = { ...this.objectToEdit };
+    }
   }
 
   public async mounted() {
@@ -100,8 +117,15 @@ export default class ModalCreateItemlistitem extends Vue {
 
   public async submit() {
     if (await this.$validator.validateAll()) {
-      const newRecord: IBekpackItemListItemCreate = this.objectUnderEdit;
-      await dispatchCreateBekpackItemlistitem(this.$store, newRecord);
+      if (!this.objectToEdit) {
+        const newRecord: IBekpackItemListItemCreate = this.objectUnderEdit;
+        await dispatchCreateBekpackItemlistitem(this.$store, newRecord);
+      } else {
+        await dispatchUpdateBekpackItemlistitem(this.$store, {
+          id: this.objectToEdit.id,
+          item: this.objectUnderEdit,
+        });
+      }
       this.onSuccess();
       this.reset();
       this.showDialog = false;

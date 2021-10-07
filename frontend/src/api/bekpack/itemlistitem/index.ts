@@ -30,7 +30,7 @@ export const api = {
     payload: { item: IBekpackItemListItemCreate }
   ) {
     return axios.post<IBekpackItemListItem>(
-      `${apiUrl}/api/v1/bekpack/bekpackitemlistitems/?parent_itemlist_id=${payload.item.parent_itemlist_id}`,
+      `${apiUrl}/api/v1/bekpack/bekpackitemlistitems/?parent_itemlist_id=${payload.item.parent_list_id}`,
       payload.item,
       authHeaders(token)
     );

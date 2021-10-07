@@ -68,13 +68,26 @@
               { text: 'Quantity', value: 'quantity' },
               { text: 'Bag' },
               { text: 'Status' },
-              { text: 'Actions', value: 'id' },
+              { text: '', value: 'id' },
             ]"
             :disable-pagination="true"
             :hide-default-footer="true"
           >
+            <template v-slot:[`item.name`]="{ item }">
+              <div class="d-flex flex-row justify-space-between flex-nowrap">
+                <modal-create-itemlistitem
+                  :onSuccess="refresh"
+                  :parentId="itemlist.id"
+                  :objectToEdit="item"
+                >
+                </modal-create-itemlistitem>
+                <div>
+                  {{ item.name }}
+                </div>
+              </div>
+            </template>
             <template v-slot:[`item.id`]="{ item }">
-              <v-btn @click="deleteChildChild(item)" text>
+              <v-btn @click="deleteChildChild(item)" text small dense>
                 <v-icon> delete </v-icon>
               </v-btn>
             </template>
