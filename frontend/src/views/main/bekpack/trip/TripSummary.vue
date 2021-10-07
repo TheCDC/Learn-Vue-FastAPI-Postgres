@@ -6,16 +6,23 @@
       <v-card :color="trip.color">
         <v-card-title class="d-flex flex-row justify-space-between flex-wrap">
           {{ trip.name }}
+
           <v-card-subtitle
             class="d-flex flex-row justify-space-between flex-wrap"
           >
-            <div>Modified : {{ trip.time_updated | localeDate }}</div>
+            Modified : {{ trip.time_updated | localeDate }}
           </v-card-subtitle>
 
           <v-card-subtitle>
             <div>Created: {{ trip.time_created | localeDate }}</div>
           </v-card-subtitle>
         </v-card-title>
+
+        <v-card-subtitle
+          class="d-flex flex-row justify-space-between flex-wrap"
+        >
+          by {{ trip.owner.owner.full_name }} ({{ trip.owner.owner.email }})
+        </v-card-subtitle>
         <v-card-text>
           {{ trip.description }}
         </v-card-text>
