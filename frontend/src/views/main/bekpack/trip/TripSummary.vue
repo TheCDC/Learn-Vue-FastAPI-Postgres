@@ -6,23 +6,24 @@
       <v-card :color="trip.color">
         <v-card-title class="d-flex flex-row justify-space-between flex-wrap">
           {{ trip.name }}
-
+          <v-card-subtitle class="d-flex flex-row justify-start flex-wrap">
+            <v-icon>face</v-icon> by {{ trip.owner.owner.full_name }} ({{
+              trip.owner.owner.email
+            }})
+          </v-card-subtitle>
           <v-card-subtitle
             class="d-flex flex-row justify-space-between flex-wrap"
           >
-            Modified : {{ trip.time_updated | localeDate }}
+            <v-icon>schedule</v-icon> Modified :
+            {{ trip.time_updated | localeDate }}
           </v-card-subtitle>
 
           <v-card-subtitle>
-            <div>Created: {{ trip.time_created | localeDate }}</div>
+            <v-icon>update</v-icon>
+            Created: {{ trip.time_created | localeDate }}
           </v-card-subtitle>
         </v-card-title>
 
-        <v-card-subtitle
-          class="d-flex flex-row justify-space-between flex-wrap"
-        >
-          by {{ trip.owner.owner.full_name }} ({{ trip.owner.owner.email }})
-        </v-card-subtitle>
         <v-card-text>
           {{ trip.description }}
         </v-card-text>
@@ -69,11 +70,30 @@
             :key="itemlist.id"
             class="ma-2"
           >
+            <v-toolbar :color="itemlist.color">
+              <div width="auto"></div>
+              <v-btn
+                class="ma-auto"
+                dense
+                text
+                :to="{
+                  name: 'bekpack-edit-itemlist',
+                  params: { itemlistId: itemlist.id },
+                }"
+              >
+                <v-icon> edit </v-icon>
+              </v-btn>
+              <v-toolbar-title class="flex-grow-1 justify-space-around">
+                <div>
+                  {{ itemlist.name }}
+                </div>
+              </v-toolbar-title>
+              <v-btn text class="ma-auto" dense @click="deleteChild(itemlist)">
+                <v-icon> delete </v-icon>
+              </v-btn>
+            </v-toolbar>
             <v-card-text>
-              <v-toolbar :color="itemlist.color">
-                {{ itemlist.name }}
-              </v-toolbar>
-              <v-card-actions>
+              <div class="d-flex flex-row justify-start flex-nowrap ma-2">
                 <v-btn
                   :to="{
                     name: 'bekpack-edit-itemlist',
@@ -86,7 +106,7 @@
                 <v-btn @click="deleteChild(itemlist)">
                   <v-icon> delete </v-icon>
                 </v-btn>
-              </v-card-actions>
+              </div>
               <v-data-table
                 v-if="itemlist.items.length > 0"
                 :items="itemlist.items"
@@ -108,12 +128,8 @@
                       :objectToEdit="item"
                     >
                     </modal-create-itemlistitem>
-                    <div
-                      class="d-flex flex-col justify-space-around flex-nowrap"
-                    >
-                      <p>
-                        {{ item.name }}
-                      </p>
+                    <div class="ma-auto">
+                      {{ item.name }}
                     </div>
                   </div>
                 </template>
