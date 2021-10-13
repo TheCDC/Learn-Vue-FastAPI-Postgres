@@ -12,6 +12,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 
 
+class SecurityError(Exception):
+    pass
+
+
 def create_access_token(
     subject: Union[str, Any], expires_delta: timedelta = None
 ) -> str:

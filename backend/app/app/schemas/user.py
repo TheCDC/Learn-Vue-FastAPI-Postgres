@@ -22,6 +22,7 @@ class UserUpdate(UserBase):
     password: Optional[str] = None
 
 
+# Properties shared by models stored in DB
 class UserInDBBase(UserBase):
     id: Optional[int] = None
 

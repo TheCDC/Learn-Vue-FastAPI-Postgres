@@ -2,11 +2,13 @@ export interface IFilter {
     name: string;
     filter: (...args) => void;
 }
-import Vue from 'vue';
+import Vue from "vue";
 
-import { truncate } from './truncate';
+import { localeDate } from "./dateFormat";
+import { truncate } from "./truncate";
 export const filters: IFilter[] = [
-    { name: 'truncate', filter: truncate },
+    { name: "truncate", filter: truncate },
+    { name: "localeDate", filter: localeDate },
 ];
 
 export function bootstrapFilters() {

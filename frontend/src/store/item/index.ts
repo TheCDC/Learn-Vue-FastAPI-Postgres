@@ -1,7 +1,7 @@
-import { mutations } from './mutations';
-import { getters } from './getters';
-import { actions } from './actions';
-import { ItemState } from './state';
+import { actions } from "./actions";
+import { getters } from "./getters";
+import { mutations } from "./mutations";
+import { ItemState } from "./state";
 
 const defaultState: ItemState = {
     items: [],

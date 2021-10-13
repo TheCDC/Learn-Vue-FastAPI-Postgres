@@ -1,8 +1,8 @@
-import { IItem } from '@/interfaces';
-import { getStoreAccessors } from 'typesafe-vuex';
-import { itemModule } from '.';
-import { State } from '../state';
-import { ItemState } from './state';
+import { IItem } from "@/interfaces";
+import { getStoreAccessors } from "typesafe-vuex";
+import { itemModule } from ".";
+import { State } from "../state";
+import { ItemState } from "./state";
 
 export const mutations = {
     setItems(state: ItemState, payload: IItem[]) {
@@ -22,7 +22,7 @@ export const mutations = {
     },
 };
 
-const { commit } = getStoreAccessors<ItemState, State>('');
+const { commit } = getStoreAccessors<ItemState, State>("");
 
 export const commitSetItems = commit(mutations.setItems);
 export const commitSetItem = commit(mutations.setItem);

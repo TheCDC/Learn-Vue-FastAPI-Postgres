@@ -11,7 +11,7 @@
   "rules": {
     "quotemark": [
       true,
-      "single"
+      "double"
     ],
     "indent": [
       true,
@@ -19,8 +19,11 @@
       2
     ],
     "interface-name": false,
-    "ordered-imports": false,
+    "ordered-imports": true,
+    "no-consecutive-blank-lines": false,
+    "trailing-comma": false,
+    "one-variable-per-declaration": false,
     "object-literal-sort-keys": false,
-    "no-consecutive-blank-lines": false
+    "max-line-length": false
   }
 }

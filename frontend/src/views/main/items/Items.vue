@@ -6,46 +6,56 @@
       <v-btn color="primary" to="/main/items/create">Create Item</v-btn>
     </v-toolbar>
     <div>
-      <v-data-table :headers="headers" :items="items">
-        <template slot="items" slot-scope="props">
-          <td>{{ props.item.title }}</td>
-          <td>{{ props.item.description | truncate(100, "...") }}</td>
-          <td>
-            <v-tooltip top>
-              <span>Edit </span>
+      <v-data-table
+        :headers="headers"
+        :items="items"
+        :footer-props="{
+          showFirstLastPage: true,
+        }"
+      >
+        <template v-slot:[`item.description`]="{ item }">
+          {{ item.description | truncate(100, "...") }}
+        </template>
+        <template v-slot:[`item.title`]="{ item }">
+          {{ item.title | truncate(100, "...") }}
+        </template>
+
+        <template v-slot:[`item.id`]="{ item }">
+          <v-tooltip top>
+            <span>Edit </span>
+            <template v-slot:activator="{ on }">
               <v-btn
-                slot="activator"
-                flat
+                text
+                v-on="on"
                 :to="{
                   name: 'main-items-edit',
-                  params: { id: props.item.id },
+                  params: { id: item.id },
                 }"
                 ><v-icon>edit</v-icon>
               </v-btn>
-            </v-tooltip>
-            <v-tooltip top>
-              <span>Delete </span>
-              <v-btn slot="activator" flat @click="deleteItem(props.item)"
+            </template>
+          </v-tooltip>
+          <v-tooltip top>
+            <span>Delete </span>
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" text @click="deleteItem(item)"
                 ><v-icon>delete</v-icon>
               </v-btn>
-            </v-tooltip>
-          </td>
+            </template>
+          </v-tooltip>
         </template>
       </v-data-table>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { IItem } from "@/interfaces";
 import { dispatchDeleteItem, dispatchGetItems } from "@/store/item/actions";
 import { readItems, readItemsOneUser } from "@/store/item/getters";
 import { readUserProfile } from "@/store/main/getters";
-import { IItem } from "@/interfaces";
+import { Component, Vue } from "vue-property-decorator";
 @Component
 export default class Items extends Vue {
-  public async mounted() {
-    await dispatchGetItems(this.$store);
-  }
   get items() {
     const user = readUserProfile(this.$store);
     if (user) {
@@ -58,9 +68,6 @@ export default class Items extends Vue {
   get user() {
     return readUserProfile(this.$store);
   }
-  public async deleteItem(item: IItem) {
-    await dispatchDeleteItem(this.$store, item);
-  }
   public headers = [
     { text: "title", sortable: true, value: "title", align: "left" },
     {
@@ -71,5 +78,11 @@ export default class Items extends Vue {
     },
     { text: "Actions", sortable: false, value: "id" },
   ];
+  public async mounted() {
+    await dispatchGetItems(this.$store);
+  }
+  public async deleteItem(item: IItem) {
+    await dispatchDeleteItem(this.$store, item);
+  }
 }
 </script>

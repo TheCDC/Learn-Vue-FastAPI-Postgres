@@ -51,6 +51,12 @@ docker-compose logs backend
 If your Docker is not running in `localhost` (the URLs above wouldn't work) check the sections below on **Development with Docker Toolbox** and **Development with a custom IP**.
 
 ## Backend local development, additional details
+### Access the database with psql
+Make sure app is running with `docker-compose up -d`
+
+`docker-compose exec db bash`
+
+`psql -h localhost -p 5432 -U postgres app`
 
 ### General workflow
 
