@@ -31,10 +31,10 @@ router = DefaultCrudRouter[
 @router.post("/", response_model=schemas.BekpackBag)
 def create_bekpackbag(
     *,
-    owner_trip_id: int,
-    obj_in: schemas.BekpackBagCreate,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
+    owner_trip_id: int,
+    obj_in: schemas.BekpackBagCreate,
 ) -> models.BekpackBag:
     """Create a new BekpackBag"""
     return crud.bekpackbag.create_with_trip(
@@ -43,4 +43,16 @@ def create_bekpackbag(
         obj_in=obj_in,
         owner_trip_id=owner_trip_id,
         owner_id=current_user.id,
+    )
+
+
+@router.get("/select/by_trip", response_model=List[schemas.BekpackBag])
+def get_multi_bekpackbag_by_trip(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+    trip_id: int,
+) -> List[models.BekpackBag]:
+    return crud.bekpackbag.get_multi_by_trip(
+        db=db, owner_trip_id=trip_id, user=current_user
     )

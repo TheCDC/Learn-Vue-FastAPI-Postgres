@@ -51,10 +51,9 @@ class CRUDBekpackBag(
         owner_id: int,
         user: models.User
     ) -> BekpackBag:
+        trip = crud.bekpacktrip.get(db=db, id=owner_trip_id, user=user)
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(
-            **obj_in_data, owner_id=owner_id, owner_trip_id=owner_trip_id
-        )
+        db_obj = self.model(**obj_in_data, owner_id=owner_id, owner_trip_id=trip.id)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
