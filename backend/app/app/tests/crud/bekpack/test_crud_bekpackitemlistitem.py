@@ -1,5 +1,5 @@
 import pytest
-from sqlalchemy.orm import Session, aliased
+from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.core.security import SecurityError
@@ -7,13 +7,7 @@ from app.schemas.bekpack.bekpackitemlistitem import (
     BekpackItemListItemCreate,
     BekpackItemListItemUpdate,
 )
-from app.tests.crud.bekpack.utils import get_bekpack_user, get_random_color
-from app.tests.utils.bekpack import (
-    create_random_bekpackuser,
-    create_random_itemlist,
-    create_random_trip,
-)
-from app.tests.utils.user import create_random_user, get_superuser
+from app.tests.utils.bekpack import create_random_itemlist
 from app.tests.utils.utils import random_lower_string
 
 
@@ -43,7 +37,10 @@ def test_create_bekpackitemlistitem(
     obj = crud.bekpackitemlistitem.create_with_itemlist(
         db=db,
         obj_in=BekpackItemListItemCreate(
-            description=random_lower_string(), name=random_lower_string(), quantity=1
+            description=random_lower_string(),
+            name=random_lower_string(),
+            quantity=1,
+            list_index=1,
         ),
         parent_itemlist_id=itemlist.id,
         user=owner,
@@ -65,6 +62,7 @@ def test_create_with_itemlist_unauthorized(
                 description=random_lower_string(),
                 name=random_lower_string(),
                 quantity=1,
+                list_index=1,
             ),
             parent_itemlist_id=itemlist.id,
             user=user_registered_random,
@@ -83,6 +81,7 @@ def test_create_bekpackitemlistitem_parent_nonexistent(
                 description=random_lower_string(),
                 name=random_lower_string(),
                 quantity=1,
+                list_index=1,
             ),
             parent_itemlist_id=-1,
             user=owner,
@@ -97,7 +96,10 @@ def test_read_bekpackitemlistitem_unauthorized(
     obj = crud.bekpackitemlistitem.create_with_itemlist(
         db=db,
         obj_in=BekpackItemListItemCreate(
-            description=random_lower_string(), name=random_lower_string(), quantity=1
+            description=random_lower_string(),
+            name=random_lower_string(),
+            quantity=1,
+            list_index=1,
         ),
         parent_itemlist_id=itemlist.id,
         user=owner,

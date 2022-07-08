@@ -10,10 +10,7 @@ from .validators import validate_color
 # Shared properties
 class BekpackBagBase(BaseModel):
     color: Optional[Color]
-    items: Optional[Set[int]] = None
     name: Optional[str] = None
-    owner_id: Optional[int] = None
-    owner_trip_id: Optional[int] = None
 
     @validator("color")
     def validate(cls, c: Color):
@@ -31,8 +28,7 @@ class BekpackBagBase(BaseModel):
 # Properties to receive via API on creation
 class BekpackBagCreate(BekpackBagBase):
     name: str
-    owner_id: int
-    owner_trip_id: int
+    color: Optional[Color]
 
 
 # Properties to receive via API on update
@@ -43,6 +39,9 @@ class BekpackBagUpdate(BekpackBagBase):
 # Properties shared by models stored in DB
 class BekpackBagInDBBase(BekpackBagBase):
     id: Optional[int]
+    items: Optional[Set[int]] = None
+    owner_id: Optional[int] = None
+    owner_trip_id: Optional[int] = None
 
     class Config:
         orm_mode = True

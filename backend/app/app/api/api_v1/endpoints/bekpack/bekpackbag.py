@@ -42,5 +42,5 @@ def create_bekpackbag(
         user=current_user,
         obj_in=obj_in,
         owner_trip_id=owner_trip_id,
-        owner_id=current_user,
+        owner_id=current_user.id,
     )
