@@ -1,4 +1,6 @@
 from typing import Any, List, Optional
+from app.crud.crud_bekpack.crud_bekpackbag import CRUDBekpackBag
+from app.models.bekpack import BekpackBag
 
 from fastapi import Depends, HTTPException
 from fastapi_pagination.page import Page
@@ -24,3 +26,21 @@ router = DefaultCrudRouter[
     read_schema=schemas.BekpackBag,
     update_schema=schemas.BekpackBagUpdate,
 )
+
+
+@router.post("/", response_model=schemas.BekpackBag)
+def create_bekpackbag(
+    *,
+    owner_trip_id: int,
+    obj_in: schemas.BekpackBagCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+) -> models.BekpackBag:
+    """Create a new BekpackBag"""
+    return crud.bekpackbag.create_with_trip(
+        db=db,
+        user=current_user,
+        obj_in=obj_in,
+        owner_trip_id=owner_trip_id,
+        owner_id=current_user,
+    )
