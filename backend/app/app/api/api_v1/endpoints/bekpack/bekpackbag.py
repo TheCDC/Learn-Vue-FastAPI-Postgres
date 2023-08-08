@@ -46,13 +46,14 @@ def create_bekpackbag(
     )
 
 
-@router.get("/select/by_trip", response_model=List[schemas.BekpackBag])
+@router.get("/select", response_model=List[schemas.BekpackBag])
 def get_multi_bekpackbag_by_trip(
     *,
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
     trip_id: int,
 ) -> List[models.BekpackBag]:
+    return []
     return crud.bekpackbag.get_multi_by_trip(
         db=db, owner_trip_id=trip_id, user=current_user
     )

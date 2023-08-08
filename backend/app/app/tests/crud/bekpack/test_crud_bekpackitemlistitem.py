@@ -7,7 +7,9 @@ from app.schemas.bekpack.bekpackitemlistitem import (
     BekpackItemListItemCreate,
     BekpackItemListItemUpdate,
 )
-from app.tests.utils.bekpack import create_random_itemlist
+from app.tests.utils.bekpack import (
+    create_random_itemlist,
+)
 from app.tests.utils.utils import random_lower_string
 
 

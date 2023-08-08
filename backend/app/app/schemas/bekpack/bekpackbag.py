@@ -28,7 +28,6 @@ class BekpackBagBase(BaseModel):
 # Properties to receive via API on creation
 class BekpackBagCreate(BekpackBagBase):
     name: str
-    color: Optional[Color]
 
 
 # Properties to receive via API on update

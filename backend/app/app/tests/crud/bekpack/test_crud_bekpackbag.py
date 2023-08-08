@@ -19,6 +19,6 @@ def test_crud_bekpackbag_create_with_trip(
         db=db,
         obj_in=obj,
         user=trip.owner.owner,
-        owner_id=trip.owner.id,
+        owner_id=trip.owner.owner.id,
         owner_trip_id=trip.id,
     )

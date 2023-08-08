@@ -1,10 +1,4 @@
-from .crud_bekpack import (
-    bekpackitemlist,
-    bekpackitemlistitem,
-    bekpacktrip,
-    bekpackuser,
-    bekpackbag,
-)
+from .crud_bekpack import bekpackitemlist, bekpackitemlistitem, bekpacktrip, bekpackuser
 from .crud_item import item
 from .crud_user import user
 

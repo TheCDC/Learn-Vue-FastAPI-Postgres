@@ -18,10 +18,7 @@ class BekpackItemListItemCreate(BekpackItemListItemBase):
 
 # Properties to receive via API on update
 class BekpackItemListItemUpdate(BekpackItemListItemBase):
-    description: Optional[str]
-    list_index: Optional[int]
-    name: Optional[str]
-    quantity: Optional[int]
+    pass
 
 
 # Properties shared by models stored in DB
